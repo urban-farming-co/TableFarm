@@ -1,0 +1,52 @@
+body {
+    font-size: 50%;
+    font-family:sans-serif;
+}
+div {
+    vertical-align:top;
+    display:inline-block;
+    width:100%;
+}
+div#heading {
+    display: inline-block;
+    vertical-align:top;
+    height:20% ;    
+
+}
+div#imagespot {
+    display: inline-block;
+    vertical-align:top;
+    height: 60%;
+}
+div#information{
+    vertical-align:top;
+    display: inline-block;
+    height:20%;
+}
+
+
+div#heading > img,h1 {
+    vertical-align:top;
+    display: inline-block;
+    font-size: 2vw;
+}
+
+div#text {
+
+    height:100%;
+    font-size:1vw;
+    width:49%;
+    vertical-align:top; 
+    display: inline-block;
+}
+div#table{
+    height:100%;
+    width:49%;
+    vertical-align:top; 
+    display: inline-block;
+}
+div#text>img{
+    width:75%;
+    height:auto;
+}
+
