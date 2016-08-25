@@ -25,11 +25,11 @@ http.createServer(function(req, res) {
     var content = '';
     db.each("SELECT * FROM tbl1 WHERE id=(SELECT MAX(id) FROM tbl1) ", function(err, row) {
     if (err) {console.error(err)};
-        content +="<th>Image</th> <td>row.image</td> </tr><tr> <th>Soil Moisture</th> <td>row.soilMoisture</td> </tr><tr> <th>Relative Humidity</th> <td>row.relHumidity</td> </tr><tr> <th>Temperature</th> <td>row.Temp</td>";
+        content +="<th>Image</th> <td>" + row.image+ "</td> </tr><tr> <th>Soil Moisture</th> <td>i"+row.soilMoisture+"</td> </tr><tr> <th>Relative Humidity</th> <td>"+row.relHumidity+"</td> </tr><tr> <th>Temperature</th> <td>"+row.Temp+"</td>";
     }, function() {
         res.end(layout.replace("{{content}}", content));
     });
-}).listen(80, function() {
+}).listen(4000, function() {
     console.log('Listening');
 });
 
