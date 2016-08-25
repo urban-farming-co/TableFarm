@@ -3,6 +3,15 @@ var fs     = require('fs');
 var http   = require('http');
 var sqlite = require('sqlite3');
 var db     = new sqlite.Database("holdingDash.sqlite");
+const express = require('express')
+const app = express()
+const port = 4000
+
+app.get('/', (request, response) => {
+    respons.send('Hello from Express!')
+})
+
+
 
 var tableCheck = "SELECT name FROM sqlite_master WHERE type='table' AND name='tbl1';";
 db.get(tableCheck, function(err, exists) {
