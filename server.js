@@ -8,7 +8,7 @@ const app = express()
 const port = 4000
 
 app.get('/', (request, response) => {
-    respons.send('Hello from Express!')
+    response.send('Hello from Express!')
 })
 
 
