@@ -1,8 +1,2 @@
 Starting
-Listening
-/home/karen/Repos/UrbanFarming/server.js:15
-    if (exists.length == 0) {
-              ^
-
-TypeError: Cannot read property 'length' of undefined
-    at Statement.<anonymous> (/home/karen/Repos/UrbanFarming/server.js:15:15)
+server is listening on 4000
