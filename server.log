@@ -1,2 +1,20 @@
 Starting
+Sun, 28 Aug 2016 00:38:13 GMT body-parser deprecated undefined extended: provide extended option at server.js:50:29
 server is listening on 4000
+{ host: 'localhost:4000',
+  'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0',
+  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'accept-language': 'en-US,en;q=0.5',
+  'accept-encoding': 'gzip, deflate',
+  connection: 'keep-alive',
+  'upgrade-insecure-requests': '1' }
+{ host: 'localhost:4000',
+  'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0',
+  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'accept-language': 'en-US,en;q=0.5',
+  'accept-encoding': 'gzip, deflate',
+  referer: 'http://localhost:4000/urbanfarming/data',
+  connection: 'keep-alive',
+  'upgrade-insecure-requests': '1',
+  'content-type': 'multipart/form-data; boundary=---------------------------4868049369836542721383932286',
+  'content-length': '15142' }
