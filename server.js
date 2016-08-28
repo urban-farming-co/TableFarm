@@ -36,7 +36,7 @@ app.use((request, response, next) => {
         next()
 })
 
-function getNextId() {
+function getNextId(callback) {
     db.each("SELECT * FROM tbl1 WHERE id=(SELECT MAX(id) FROM tbl1) ", function(err, row) {
         if (err) {
             return callback(err)
@@ -74,7 +74,7 @@ app.get('/urbanfarming/data', (req, res) => {
     });
 })
 
-app.post('/urbanfarming/data', Busboy, function(req, res){
+app.post('/urbanfarming/data', function(req, res){
     getNextId( (err, id) =>{
         if (err){ console.error(err) }
         console.log("next id is" + id);
@@ -89,17 +89,16 @@ app.post('/urbanfarming/data', Busboy, function(req, res){
             });
         });
         busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
-            console.log('Field [' + fieldname + ']: value: ' + inspect(val));
+            console.log('Field [' + fieldname + ']: value: ' + val);
         });
         busboy.on('finish', function() {
             console.log('Done parsing form!');
-            res.writeHead(303, { Connection: 'close', Location: '/' });
-            res.end();
+            res.writeHead(303, { Connection: 'close' });
+            res.end("thanks");
         });
         req.pipe(busboy);
     });
 
-    res.send("thanks")
 })
 app.get('/urbanfarming', (request, response) => {
     getHome(request, response, (err, content) =>{
