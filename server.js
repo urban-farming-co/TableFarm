@@ -1,6 +1,7 @@
 console.error('Starting');
 var fs      = require('fs');
 var path    = require ('path');
+var Busboy  = require('busboy');
 var sqlite  = require('sqlite3');
 var db      = new sqlite.Database("holdingDash.sqlite");
 var port    = 4000;
@@ -52,12 +53,11 @@ function getHome(request, response, callback)  {
             return callback(err)
         }
 
-        content +="<th>Image</th> <td>" + row.image+ "</td> </tr><tr> <th>Soil Moistureture</th> <td>"+row.soilMoisture+"%</td> </tr><tr> <th>Relative Humidity</th> <td>"+row.relHumidity+"%</td> </tr><tr> <th>Temperature</th> <td>"+row.Temp+"%</td>";
+        content +="<th>Image</th> <td>" + row.image+ "</td> </tr><tr> <th>Soil Moistureture</th> <td>"+row.soilMoisture+"%</td> </tr><tr> <th>Relative Humidity</th> <td>"+row.relHumidity+"%</td> </tr><tr> <th>Temperature</th> <td>"+row.Temp+" C</td>";
         callback(null, content)
     })
 }
 
-var Busboy =require('busboy');
 
 app.set('views',__dirname);
 app.engine('handlebars', exphbs)
