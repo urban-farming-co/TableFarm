@@ -8,7 +8,7 @@ body {
     font-family: Calibri;
     font-size: 1vw;
     margin:0 5%;
-    font-color: #404040;
+    color: #404040;
 
 }
 div {
@@ -23,16 +23,16 @@ div#heading > img,h1 {
 }
 
 p {
-
+    font-color: #404040;
     font-size:1vw;
     width:49%;
 }
-div#table>table>th{
+table>th{
     text-align:right;
 }
 
-div#table>table>td{
-    text-align:right;
+table>td{
+    text-align:left;
 }
 div#text>img{
     width:75%;

@@ -53,7 +53,7 @@ function getHome(request, response, callback)  {
             return callback(err)
         }
 
-        content +="<th>Image</th> <td><img width=50px height=50px  src=" + row.image+ " /></td> </tr><tr> <th>Soil Moistureture</th> <td>"+row.soilMoisture+"%</td> </tr><tr> <th>Relative Humidity</th> <td>"+row.relHumidity+"%</td> </tr><tr> <th>temperature</th> <td>"+row.temperature+" C</td><tr><th>Date/Time</th><td>"+row.time+"</td>";
+        content +="<th>Image</th> <td><img width=50px height=50px  src=" + row.image+ " /></td> </tr><tr> <th>Soil Moisture: </th> <td>"+row.soilMoisture+"%</td> </tr><tr> <th>Relative Humidity:</th> <td>"+row.relHumidity+"%</td> </tr><tr> <th>Temperature:</th> <td>"+row.temperature+" C</td><tr><th>Date/Time:</th><td>"+row.time+"</td>";
         callback(null, content)
     })
 }
