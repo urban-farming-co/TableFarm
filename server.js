@@ -1,8 +1,8 @@
 console.error('Starting');
 var fs      = require('fs');
 var path    = require ('path');
-var Busboy  = require('busboy');
 var sqlite  = require('sqlite3');
+var multiparty = require('multiparty')
 var db      = new sqlite.Database("holdingDash.sqlite");
 var port    = 4000;
 var express = require('express');
@@ -19,8 +19,8 @@ db.get(tableCheck, function(err, row) {
     if (err) {console.error(err)};
     if (row == undefined ) {
         db.serialize(function() {
-            db.run("CREATE TABLE tbl1 (id INT PRIMARY KEY, image BLOB, soilMoisture DOUBLE, relHumidity DOUBLE, Temp DOUBLE )", function(err){console.error(err)});
-            db.run("INSERT INTO tbl1 (id, soilMoisture, relHumidity, Temp) VALUES (1,100 ,100 ,100)", function(err){console.error(err)});
+            db.run("CREATE TABLE tbl1 (id INT PRIMARY KEY, image BLOB, soilMoisture DOUBLE, relHumidity DOUBLE, Temp DOUBLE, Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL )", function(err){if (err) {console.error(err)}});
+            db.run("INSERT INTO tbl1 (id, soilMoisture, relHumidity, Temp) VALUES (1,100 ,100 ,100)", function(err){if (err) {console.error(err)}});
         });
     }
 });
@@ -78,6 +78,7 @@ app.post('/urbanfarming/data', function(req, res){
     getNextId( (err, id) =>{
         if (err){ console.error(err) }
         console.log("next id is" + id);
+        db.run("INSERT INTO tbl1 (id) VALUES (" +id+")", function(err){console.error(err)});
         var busboy = new Busboy({headers: req.headers});
         busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
             console.log('file [' + fieldname + ']: filename: '+filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
@@ -90,6 +91,7 @@ app.post('/urbanfarming/data', function(req, res){
         });
         busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
             console.log('Field [' + fieldname + ']: value: ' + val);
+            db.run("UPDATE tbl1 SET "+ fieldname+"="+val+" WHERE id="+id, function(err){if (err) {console.error("error on 93 "+ err)}});
         });
         busboy.on('finish', function() {
             console.log('Done parsing form!');
