@@ -1,7 +1,8 @@
 body {
-    font-family: calibri, sans-serif;
+    font-family: Calibri;
     font-size: 1vw;
     margin:0 5%;
+    font-color: #404040;
 
 }
 div {
@@ -41,6 +42,13 @@ div#table{
     width:49%;
     vertical-align:top; 
     display: inline-block;
+}
+div#table>table>th{
+    text-align:right;
+}
+
+div#table>table>td{
+    text-align:right;
 }
 div#text>img{
     width:75%;
