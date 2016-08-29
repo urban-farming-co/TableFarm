@@ -12,15 +12,15 @@ var app     = express();
 
 app.use(express.static(path.join(__dirname, 'views')))
 app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
-
+app.use("/urbanfarming/public/images", express.static(path.join(__dirname, 'public/images')));
 
 var tableCheck = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='tbl1';";
 db.get(tableCheck, function(err, row) {
     if (err) {console.error(err)};
     if (row == undefined ) {
         db.serialize(function() {
-            db.run("CREATE TABLE tbl1 (id INT PRIMARY KEY, image BLOB, soilMoisture DOUBLE, relHumidity DOUBLE, Temp DOUBLE, Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL )", function(err){if (err) {console.error(err)}});
-            db.run("INSERT INTO tbl1 (id, soilMoisture, relHumidity, Temp) VALUES (1,100 ,100 ,100)", function(err){if (err) {console.error(err)}});
+            db.run("CREATE TABLE tbl1 (id INT PRIMARY KEY, image VARCHAR(200), soilMoisture DOUBLE, relHumidity DOUBLE, temperature DOUBLE, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL )", function(err){if (err) {console.error(err)}});
+            //db.run("INSERT INTO tbl1 (id, soilMoisture, relHumidity, temperature) VALUES (1,100 ,100 ,100)", function(err){if (err) {console.error(err)}});
         });
     }
 });
@@ -53,7 +53,7 @@ function getHome(request, response, callback)  {
             return callback(err)
         }
 
-        content +="<th>Image</th> <td>" + row.image+ "</td> </tr><tr> <th>Soil Moistureture</th> <td>"+row.soilMoisture+"%</td> </tr><tr> <th>Relative Humidity</th> <td>"+row.relHumidity+"%</td> </tr><tr> <th>Temperature</th> <td>"+row.Temp+" C</td>";
+        content +="<th>Image</th> <td><img width=50px height=50px  src=" + row.image+ " /></td> </tr><tr> <th>Soil Moistureture</th> <td>"+row.soilMoisture+"%</td> </tr><tr> <th>Relative Humidity</th> <td>"+row.relHumidity+"%</td> </tr><tr> <th>temperature</th> <td>"+row.temperature+" C</td><tr><th>Date/Time</th><td>"+row.time+"</td>";
         callback(null, content)
     })
 }
@@ -74,33 +74,29 @@ app.get('/urbanfarming/data', (req, res) => {
     });
 })
 
+var util = require('util');
 app.post('/urbanfarming/data', function(req, res){
     getNextId( (err, id) =>{
         if (err){ console.error(err) }
         console.log("next id is" + id);
-        db.run("INSERT INTO tbl1 (id) VALUES (" +id+")", function(err){console.error(err)});
-        var busboy = new Busboy({headers: req.headers});
-        busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-            console.log('file [' + fieldname + ']: filename: '+filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
-            file.on('data', function(data){
-                console.log('File [' +fieldname +'] got ' + data.length + ' bytes');
-            });
-            file.on ('end', function() {
-                console.log('File [' + fieldname + '] Finished');
-            });
-        });
-        busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
-            console.log('Field [' + fieldname + ']: value: ' + val);
-            db.run("UPDATE tbl1 SET "+ fieldname+"="+val+" WHERE id="+id, function(err){if (err) {console.error("error on 93 "+ err)}});
-        });
-        busboy.on('finish', function() {
-            console.log('Done parsing form!');
-            res.writeHead(303, { Connection: 'close' });
-            res.end("thanks");
-        });
-        req.pipe(busboy);
-    });
+        //db.run("INSERT INTO tbl1 (id) VALUES (" +id+")", function(err){console.error(err)});
+        var form = new multiparty.Form();
+        form.parse(req, function(err, fields, files) {
+            res.writeHead(200, {'content-type':'text/plain'});         
+            res.write('received upload:\n\n');
+            res.end(util.inspect({fields:fields, files:files}));
+            var fileextention = files.image[0].originalFilename.split('.').pop();
+            var target = "./public/images/"+id+"." +fileextention
+            fs.rename(files.image[0].path, target) 
+            console.log(fields.soilMoisture[0]);
+            console.log(fields.relHumidity[0]);
+            console.log(fields.temp[0]);
+            console.log(files.image[0].name);
+            console.log(`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temp[0]}, '${files.image[0].path}')`)
+                db.run(`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temp[0]},'${target}')`, function(err){if (err) {console.error("error on 93 "+ err)}});
 
+        });
+    })
 })
 app.get('/urbanfarming', (request, response) => {
     getHome(request, response, (err, content) =>{
