@@ -1,17 +1,10 @@
 Starting
 server is listening on 4000
-{ host: 'localhost:4000',
-  connection: 'keep-alive',
+{ host: '127.0.0.1:4000',
+  connection: 'close',
+  'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0',
+  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'accept-language': 'en-US,en;q=0.5',
+  'accept-encoding': 'gzip, deflate',
   'upgrade-insecure-requests': '1',
-  'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
-  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-  'accept-encoding': 'gzip, deflate, sdch',
-  'accept-language': 'en-US,en;q=0.8' }
-{ host: 'localhost:4000',
-  connection: 'keep-alive',
-  'cache-control': 'max-age=0',
-  'upgrade-insecure-requests': '1',
-  'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
-  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-  'accept-encoding': 'gzip, deflate, sdch',
-  'accept-language': 'en-US,en;q=0.8' }
+  'cache-control': 'max-age=0' }
