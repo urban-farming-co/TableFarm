@@ -1,3 +1,9 @@
+
+ul
+{
+    list-style-type: none;
+}
+
 body {
     font-family: Calibri;
     font-size: 1vw;
@@ -7,41 +13,19 @@ body {
 }
 div {
     vertical-align:top;
-    display:inline-block;
     width:100%;
-}
-div#heading {
-    display: inline-block;
-    vertical-align:top;
-
-}
-div#imagespot {
-    display: inline-block;
-    vertical-align:top;
-}
-div#information{
-    vertical-align:top;
-    display: inline-block;
 }
 
 
 div#heading > img,h1 {
-    vertical-align:top;
-    display: inline-block;
+   
     font-size: 2vw;
 }
 
-div#text {
+p {
 
     font-size:1vw;
     width:49%;
-    vertical-align:top; 
-    display: inline-block;
-}
-div#table{
-    width:49%;
-    vertical-align:top; 
-    display: inline-block;
 }
 div#table>table>th{
     text-align:right;
