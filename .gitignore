@@ -9,6 +9,8 @@ logs
 
  # Runtime data
  pids
+server.pid
+server.log
  *.pid
  *.seed
 
