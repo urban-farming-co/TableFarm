@@ -6,6 +6,7 @@ ul
 
 body {
     font-family: Calibri;
+    text-align:center;
     font-size: 1vw;
     margin:0 5%;
     color: #404040;
@@ -24,14 +25,18 @@ div#heading > img,h1 {
 
 p {
     font-color: #404040;
+    width: 50%;
+    margin:0 auto;
     font-size:1vw;
-    width:49%;
 }
-table>th{
+table{
+    margin: 0 auto;
+}
+table th{
     text-align:right;
 }
 
-table>td{
+table td{
     text-align:left;
 }
 div#text>img{
