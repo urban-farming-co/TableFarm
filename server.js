@@ -97,7 +97,7 @@ app.post('/urbanfarming/data', function(req, res){
             res.writeHead(200, {'content-type':'text/plain'});         
             res.write('received upload:\n\n');
             res.end(util.inspect({fields:fields, files:files}));
-            var target = " ";
+            var target = "./public/files/flower.gif";
             if (files.image[0].name!=undefined){
                 var fileextention = files.image[0].originalFilename.split('.').pop();
                 target = "./public/images/"+id+"." +fileextention;
@@ -109,7 +109,7 @@ app.post('/urbanfarming/data', function(req, res){
             console.log(files.image[0].name);
             console.log(fields.plantName[0]);
             console.log(fields.lightLuxLevel[0]);
-            var sql=`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temperature[0]},'${target}', ${fields.plantName[0]}, ${fields.lightLuxLevel[0]} )`;
+            var sql=`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temperature[0]},'${target}', '${fields.plantName[0]}', ${fields.lightLuxLevel[0]} )`;
             console.log(sql);
             db.run(sql, function(err){if (err) {console.error("error on 93 "+ err)}});
 
