@@ -105,11 +105,11 @@ app.post('/urbanfarming/data', function(req, res){
             }
             console.log(fields.soilMoisture[0]);
             console.log(fields.relHumidity[0]);
-            console.log(fields.temp[0]);
+            console.log(fields.temperature[0]);
             console.log(files.image[0].name);
             console.log(fields.plantName[0]);
             console.log(fields.lightLuxLevel[0]);
-            var sql=`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temp[0]},'${target}', ${fields.plantName[0]}, ${fields.lightLuxLevel[0]} )`;
+            var sql=`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temperature[0]},'${target}', ${fields.plantName[0]}, ${fields.lightLuxLevel[0]} )`;
             console.log(sql);
             db.run(sql, function(err){if (err) {console.error("error on 93 "+ err)}});
 
