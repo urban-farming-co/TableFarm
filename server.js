@@ -71,6 +71,10 @@ app.set('views',__dirname);
 app.engine('handlebars', exphbs)
 app.set('view engine', '');
 
+app.get('/', function (req, res) {
+        res.redirect(301,  "/urbanfarming/");
+})
+
 app.get('/urbanfarming/data', (req, res) => {
     fs.readFile('form.html', function(err, data) {
         res.writeHead(200, {
