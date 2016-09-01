@@ -16,7 +16,9 @@ div {
     vertical-align:top;
     width:100%;
 }
-
+img#jason {
+    vertical-align:top;
+}
 
 div#heading > img,h1 {
    
