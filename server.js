@@ -72,7 +72,7 @@ app.engine('handlebars', exphbs)
 app.set('view engine', '');
 
 app.get('/', function (req, res) {
-        res.redirect(301,  "/urbanfarming/");
+    res.redirect(301,  "/urbanfarming/");
 })
 
 app.get('/urbanfarming/data', (req, res) => {
@@ -97,18 +97,21 @@ app.post('/urbanfarming/data', function(req, res){
             res.writeHead(200, {'content-type':'text/plain'});         
             res.write('received upload:\n\n');
             res.end(util.inspect({fields:fields, files:files}));
-            var fileextention = files.image[0].originalFilename.split('.').pop();
-            var target = "./public/images/"+id+"." +fileextention
-                fs.rename(files.image[0].path, target) 
-                console.log(fields.soilMoisture[0]);
+            var target = " ";
+            if (files.image[0].name!=undefined){
+                var fileextention = files.image[0].originalFilename.split('.').pop();
+                target = "./public/images/"+id+"." +fileextention;
+                fs.rename(files.image[0].path, target); 
+            }
+            console.log(fields.soilMoisture[0]);
             console.log(fields.relHumidity[0]);
             console.log(fields.temp[0]);
             console.log(files.image[0].name);
             console.log(fields.plantName[0]);
             console.log(fields.lightLuxLevel[0]);
-            console.log(`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temp[0]}, '${files.image[0].path}')`)
-
-                db.run(`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temp[0]},'${target}', fields.plantName[0], fields.lightLuxLevel[0] )`, function(err){if (err) {console.error("error on 93 "+ err)}});
+            var sql=`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temp[0]},'${target}', ${fields.plantName[0]}, ${fields.lightLuxLevel[0]} )`;
+            console.log(sql);
+            db.run(sql, function(err){if (err) {console.error("error on 93 "+ err)}});
 
         });
     })
