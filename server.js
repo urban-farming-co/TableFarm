@@ -91,9 +91,11 @@ app.post('/urbanfarming/data', function(req, res){
     getNextId( (err, id) =>{
         if (err){ console.error(err) }
         console.log("next id is" + id);
-        //db.run("INSERT INTO tbl1 (id) VALUES (" +id+")", function(err){console.error(err)});
         var form = new multiparty.Form();
         form.parse(req, function(err, fields, files) {
+            Object.keys(files).forEach(function(name){
+                console.log('got file named '+name);
+            });
             res.writeHead(200, {'content-type':'text/plain'});         
             res.write('received upload:\n\n');
             res.end(util.inspect({fields:fields, files:files}));
