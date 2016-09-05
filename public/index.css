@@ -49,5 +49,6 @@ div#text>img{
 @media only screen and (max-device-width:480px){
     body {
         background-color:lightgreen;
+        padding: 10px !important;
     }
 }
