@@ -108,13 +108,13 @@ app.post('/urbanfarming/data', function(req, res){
                 target = "./public/images/"+id+"." +fileextention;
                 fs.rename(files.image.path, target); 
             }
-            console.log(fields.soilMoisture[0]);
-            console.log(fields.relHumidity[0]);
-            console.log(fields.temperature[0]);
+            console.log(fields.soilMoisture);
+            console.log(fields.relHumidity);
+            console.log(fields.temperature);
             console.log(files.image.name);
-            console.log(fields.plantName[0]);
-            console.log(fields.lightLuxLevel[0]);
-            var sql=`INSERT INTO tbl1 (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temperature[0]}, '${target}', '${fields.plantName[0]}', ${fields.lightLuxLevel[0]})`;
+            console.log(fields.plantName);
+            console.log(fields.lightLuxLevel);
+            var sql=`INSERT INTO tbl1 (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture}, ${fields.relHumidity}, ${fields.temperature}, '${target}', '${fields.plantName}', ${fields.lightLuxLevel})`;
             console.log(sql);
             db.run(sql, function(err){if (err) {console.error("error on 93 "+ err)}});
 
