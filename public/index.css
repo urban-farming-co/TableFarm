@@ -45,3 +45,9 @@ div#text>img{
     width:75%;
 }
 
+
+@media only screen and (max-device-width:480px){
+    body {
+        background-color:lightgreen;
+    }
+}

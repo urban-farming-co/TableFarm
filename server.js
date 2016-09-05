@@ -3,7 +3,6 @@ var fs      = require('fs');
 var path    = require ('path');
 var rasp    = require('./Functions/addRaspberryPi/server.js');
 var sqlite  = require('sqlite3');
-var multiparty = require('multiparty')
 var formidable = require('formidable')
 var db      = new sqlite.Database("holdingDash.sqlite");
 var port    = (process.env.VCAP_APP_PORT || 4000);
