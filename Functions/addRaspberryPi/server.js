@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var multiparty = require('multiparty');
 var sqlite = require('sqlite3');
 var db = new sqlite.Database("raspberrys.sqlite");
 var port    = (process.env.VCAP_APP_PORT || 4000);
