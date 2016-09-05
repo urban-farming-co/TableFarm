@@ -37,6 +37,20 @@ p {
     margin:0 auto;
     font-size:1vw;
 }
+p#leaf{
+    width:80%;
+    font-size:1vw;
+    margin-bottom:-1em;
+}
+div#stats li>h3:last-child{
+    display:inline;
+    white-space:pre-wrap;
+}
+div#stats li>h3:first-child{
+    color: #ff9933;
+    font-size:3vw;
+    display:inline;
+}
 
 div#table{
     align-items: center;
@@ -63,13 +77,16 @@ table#mail{
 
 @media only screen and (max-width:480px){
     body {
-        background-color:lightgreen;
         padding: 5px !important;
         font-size:5vw;
 
     }
     img#logo{
-        width:50%;
+        width:80%;
+    }
+    img#motivation{
+        width:90%;
+        height:100%;
     }
     p {
         width: 50%;
@@ -77,4 +94,32 @@ table#mail{
         font-size:3vw;
     }
 
+    table th{
+        text-align:right;
+        width:70%;
+    }
+
+    table td{
+        text-align:left;
+        width:30%;
+    }
+    div#imagespot img{
+        width:40%;
+    }
+    table#data img{
+        width:100%;
+    }
+
+    div#stats li>h3:first-child {
+        color:#ff9933;
+        font-size:7vw;
+    }
+    div#stats h3 {
+        font-size:4vw;
+        margin-bottom: 1em;
+    }
+    div#stats p{
+        font-size:1vw;
+        margin-bottom: 0em;
+    }
 }

@@ -36,7 +36,7 @@
             <font color="#FF9933"> <h2>It's alive!</h2> </font>
             <b>TableFarm®'s live beta test grow data (work in progress):</b>
             <br/>
-            <table>
+            <table id="data">
                 <tr>
                     {{content}}
                 </tr>
@@ -47,14 +47,16 @@
         <p>
         In our age of virtual existences and on-line experiences the digital skills and confidence of young children using a tablet, laptop or smart phone is truly impressive...but you'll be truly shocked if you question them about where their food comes from.
         </p>
+        <div id="stats">
         <h3 style="margin-bottom:-0.2em;"><font size=6vw>In a recent food survey of 2,000 children</font></h3>
-        <font size=2vw>Sustainable food and farming organisation Linking Environment and Farming (Leaf)</font> 
+        <p id="leaf">Sustainable food and farming organisation Linking Environment and Farming (Leaf)</font></p> 
         <ul>
-            <li><h3><font color="#FF9933" size=7vw>28%</font> didn't know that carrots grow underground. </h3></li> 
-            <li><h3><font color="#FF9933" size=7vw>60%</font> admitted they didn't know lettuce grew on the ground </h3></li>                            
-            <li><h3><font color="#FF9933" size=7vw>78%</font> didn't know broccoli grew on a plant</h3></li>  
-            <li><h3><font color="#FF9933" size=7vw>5%</font> believe strawberries grow inside the fridge      </h3></li>  
+            <li><h3>28%</h3> <h3> didn't know that carrots grow underground. </h3></li> 
+            <li><h3>60%</h3> <h3> admitted they didn't know lettuce grew on the ground </h3></li>                            
+            <li><h3>78%</h3> <h3> didn't know broccoli grew on a plant</h3></li>  
+            <li><h3>5%</h3>  <h3> believe strawberries grow inside the fridge </h3></li>  
         </ul>
+        </div>
         <div id="imagespot">
             <img src="public/files/child.jpg" style="margin:2%;" >
             <img src="public/files/strawberry.jpg" style="margin:2%" > 
@@ -71,7 +73,7 @@
                             <td colspan="2">Sign up for more inspiring photos, stories and special offers from Urban Farming Company:</span></td>
                         </tr>
                         <tr>
-                            <td valign="top" align="right"> Email: <input name="YMP0" size="20" type="text" /></td>
+                            <td valign="top" align="right"> Email:</td> <td> <input name="YMP0" size="20" type="text" /></td>
                             <td valign="top" align="left" > <input value="Submit" type="submit"  style="background-color:#ffcc00; color:#000000"/></td>
                         </tr>
                     </tbody>
