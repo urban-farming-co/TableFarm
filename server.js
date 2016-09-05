@@ -4,6 +4,7 @@ var path    = require ('path');
 var rasp    = require('./Functions/addRaspberryPi/server.js');
 var sqlite  = require('sqlite3');
 var multiparty = require('multiparty')
+var formidable = require('formidable')
 var db      = new sqlite.Database("holdingDash.sqlite");
 var port    = (process.env.VCAP_APP_PORT || 4000);
 var host    = (process.env.VCAP_APP_HOST || 'localhost');
@@ -92,7 +93,7 @@ app.post('/urbanfarming/data', function(req, res){
     getNextId( (err, id) =>{
         if (err){ console.error(err) }
         console.log("next id is" + id);
-        var form = new multiparty.Form();
+        var form = new formidable.IncomingForm();
         form.parse(req, function(err, fields, files) {
             Object.keys(files).forEach(function(name){
                 console.log('got file named '+ name);
@@ -103,15 +104,15 @@ app.post('/urbanfarming/data', function(req, res){
             res.write('received upload:\n\n');
             res.end(util.inspect({fields:fields, files:files}));
             var target = "./public/files/flower.gif";
-            if (files.image[0].name!=undefined){
-                var fileextention = files.image[0].originalFilename.split('.').pop();
+            if (files.image.name!=undefined){
+                var fileextention = files.image.name.split('.').pop();
                 target = "./public/images/"+id+"." +fileextention;
-                fs.rename(files.image[0].path, target); 
+                fs.rename(files.image.path, target); 
             }
             console.log(fields.soilMoisture[0]);
             console.log(fields.relHumidity[0]);
             console.log(fields.temperature[0]);
-            console.log(files.image[0].name);
+            console.log(files.image.name);
             console.log(fields.plantName[0]);
             console.log(fields.lightLuxLevel[0]);
             var sql=`INSERT INTO tbl1 (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temperature[0]}, '${target}', '${fields.plantName[0]}', ${fields.lightLuxLevel[0]})`;
