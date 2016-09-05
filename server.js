@@ -1,6 +1,7 @@
 console.error('Starting');
 var fs      = require('fs');
 var path    = require ('path');
+var rasp    = require('./Functions/addRaspberryPi/server.js');
 var sqlite  = require('sqlite3');
 var multiparty = require('multiparty')
 var db      = new sqlite.Database("holdingDash.sqlite");
@@ -94,8 +95,10 @@ app.post('/urbanfarming/data', function(req, res){
         var form = new multiparty.Form();
         form.parse(req, function(err, fields, files) {
             Object.keys(files).forEach(function(name){
-                console.log('got file named '+name);
+                console.log('got file named '+ name);
             });
+            var fileArry = files.uploadFiles;
+            console.log(" fileAry" + fileArry);
             res.writeHead(200, {'content-type':'text/plain'});         
             res.write('received upload:\n\n');
             res.end(util.inspect({fields:fields, files:files}));
@@ -111,7 +114,7 @@ app.post('/urbanfarming/data', function(req, res){
             console.log(files.image[0].name);
             console.log(fields.plantName[0]);
             console.log(fields.lightLuxLevel[0]);
-            var sql=`INSERT INTO tbl1 (id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel  ) VALUES (${id},${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temperature[0]},'${target}', '${fields.plantName[0]}', ${fields.lightLuxLevel[0]} )`;
+            var sql=`INSERT INTO tbl1 (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture[0]}, ${fields.relHumidity[0]}, ${fields.temperature[0]}, '${target}', '${fields.plantName[0]}', ${fields.lightLuxLevel[0]})`;
             console.log(sql);
             db.run(sql, function(err){if (err) {console.error("error on 93 "+ err)}});
 
