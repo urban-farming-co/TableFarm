@@ -7,11 +7,9 @@
         <link rel="shortcut icon" type="image/x-icon" href='public/files/flower.ico' />
     </head>
     <body>
-        <div id="heading">
 
 
-            <img src="public/files/flower.gif" height=15% width=15%>
-        </div>
+        <img id="logo"  src="public/files/flower.gif" >
         <hr/>
         <font color="#FF9933"><h2>Who?</h2></font>
         <p>Based at the Edinburgh Centre for Carbon Innovation, Urban Farming Company is a social start-up applying design thinking and emerging technology to enhance children’s awareness of the benefits of fresh food using their digital knowledge and prowess.</p>
@@ -31,7 +29,7 @@
 
         Watch this space...</p>
         <br/>
-        <img width=50% height=50% src="public/files/getMotivated.jpg" />
+        <img id="motivation" width=50% height=50% src="public/files/getMotivated.jpg" />
         <br/>      
         <hr/>
         <div id="table">
@@ -86,19 +84,43 @@
 
             <script type='text/javascript'>
 var i=document.getElementById('jason');
+var minW=i.width;
+var maxW=minW * 5;
 console.log("hi");
-console.log(i.height);
+console.log(i.width);
+console.log(minW.toString());
+console.log(maxW.toString());
+minW = minW.toString() + "px";
+maxW = maxW.toString() + "px";
+window.addEventListener("resize", function(){
+    console.log('resize!');
+    if (flag){
+        maxW=i.width;
+        minW=maxW*0.2;
+    }else{
+        minW=i.width;
+        maxW=minW*5;
+    }
+    minW = minW.toString() + "px";
+    maxW = maxW.toString() + "px";
+    console.log(minW);
+    console.log(maxW);
+}, true);
+
+var flag = true;
 i.addEventListener('click', function() {
-    if (i.height == "851") {
+    if (flag ) {
         console.log("true");
-        i.height="70";
+        i.style.width=minW;
+        console.log(i.width);
+        flag=false;
     }
     else {
         console.log("false");
-        i.height="851";
+        i.style.width=maxW;
+        console.log(i.width);
+        flag=true;
     }
-
-    console.log(i.height);
 });
             </script>
 

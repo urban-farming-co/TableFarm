@@ -12,17 +12,23 @@ body {
     color: #404040;
 
 }
+
+
+img {
+    height:auto;
+    width:15%; 
+}
+
 div {
     vertical-align:top;
     width:100%;
+    display:block;
 }
 img#jason {
     vertical-align:top;
 }
-
-div#heading > img,h1 {
-   
-    font-size: 2vw;
+img#motivation{
+    width:50%;
 }
 
 p {
@@ -31,9 +37,16 @@ p {
     margin:0 auto;
     font-size:1vw;
 }
-table{
-    margin: 0 auto;
+
+div#table{
+    align-items: center;
 }
+
+table{
+    margin-right: auto;
+    margin-left: auto;
+}
+
 table th{
     text-align:right;
 }
@@ -41,14 +54,22 @@ table th{
 table td{
     text-align:left;
 }
-div#text>img{
-    width:75%;
-}
 
 
-@media only screen and (max-device-width:480px){
+@media only screen and (max-width:480px){
     body {
         background-color:lightgreen;
-        padding: 10px !important;
+        padding: 5px !important;
+        font-size:5vw;
+
     }
+    img#logo{
+        width:50%;
+    }
+    p {
+        width: 50%;
+        margin:0 auto;
+        font-size:3vw;
+    }
+
 }
