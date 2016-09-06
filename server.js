@@ -61,8 +61,19 @@ function getHome(request, response, callback)  {
         if (err) {
             return callback(err)
         }
-
-        content +="<th></th> <td><img width=50px height=50px  src=" + row.image+ " /></td> </tr> <tr><th>Date/Time:</th><td>"+row.time+"</td><tr><th>Plant name:</th><td>"+row.plantName+"</td></tr><tr><th>Lighting lux level:</th><td>"+row.lightLuxLevel+" lux <tr> <th>Soil Moisture: </th> <td>"+row.soilMoisture+"%</td> </tr><tr> <th>Relative Humidity:</th> <td>"+row.relHumidity+"%</td> </tr><tr> <th>Ambient temperature:</th> <td>"+row.temperature+" C</td>";
+        date=row.time.split(' ')[0];
+        time=row.time.split(' ')[1];
+        dd=   date.split('-')[2];
+        mm=   date.split('-')[1];
+        yyyy= date.split('-')[0];
+        content +="<th>                   </th><td><img src=" + row.image+" /></td> </tr>"+
+            "<tr><th>Date:                </th><td id='date' >" +dd+"-"+mm+"-"+yyyy+ "</td>                  </tr>"+
+            "<tr><th>Time:                </th><td>" +time+"</td>                   </tr>"+
+            "<tr><th>Plant name:          </th><td>" +row.plantName+"</td>          </tr>"+
+            "<tr><th>Lighting lux level:  </th><td>" +row.lightLuxLevel+" lux</td>  </tr>"+
+            "<tr><th>Soil Moisture:       </th><td>" +row.soilMoisture+"%</td>      </tr>"+
+            "<tr><th>Relative Humidity:  </th><td>" +row.relHumidity+"%</td>       </tr>"+
+            "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
         callback(null, content)
     })
 }

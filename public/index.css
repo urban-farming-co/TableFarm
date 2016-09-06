@@ -1,18 +1,19 @@
-
-ul
-{
+ul{
     list-style-type: none;
+    padding-left:0em;
 }
 
 body {
     font-family: Calibri;
     text-align:center;
-    font-size: 1vw;
-    margin:0 5%;
+    font-size: 16pt;
+    margin:0 15%;
     color: #404040;
-
 }
 
+h2{
+    color:#ff9933;
+}
 
 img {
     height:auto;
@@ -24,6 +25,10 @@ div {
     width:100%;
     display:block;
 }
+div#imagespot img{
+    margin:2%;
+    width:auto;
+}
 img#jason {
     vertical-align:top;
 }
@@ -32,94 +37,139 @@ img#motivation{
 }
 
 p {
-    font-color: #404040;
-    width: 50%;
+    color: #404040;
+    width: 80%;
     margin:0 auto;
-    font-size:1vw;
+    font-size:1em ;
 }
 p#leaf{
-    width:80%;
-    font-size:1vw;
+    font-size:0.85em ;
     margin-bottom:-1em;
 }
+h3{
+    margin-bottom:-0.2em;
+    font-size:1.5em ;
+}
+
 div#stats li>h3:last-child{
     display:inline;
     white-space:pre-wrap;
 }
 div#stats li>h3:first-child{
     color: #ff9933;
-    font-size:3vw;
+    font-size:3em ;
     display:inline;
 }
 
-div#table{
-    align-items: center;
-}
-
 table{
-    margin-right: auto;
-    margin-left: auto;
+    margin:0  auto;
 }
 
-table th{
+table#data th{
     text-align:right;
     width:50%;
 }
-
-table td{
+table#data img {
+    width:100px;
+}
+table#data td{
     text-align:left;
     width:50%;
 }
 
 table#mail{
     padding:3%;
+    margin-bottom:3%;
+    width:auto;
+    height:163px;
+    background-color:#f2f2f2;
+    border:"0";
+    /* cellpadding:"5"; */
+    border-spacing:"0";
+    text-align:center;
+    font-size: 0.9em;
+}
+
+table#mail tr:last-child td{
+    vertical-align:top;
+    text-align:right;
+}
+
+
+
+table#mail tr:last-child td:last-child{
+    text-align:left;
+}
+table#mail tr:last-child td:first-child{
+}
+
+input[name="YMP0"]{
+    width:100%;
+}
+input[value="Submit"]{
+    background-color:#ffcc00;
+    color: #000000;
+    font-size:0.9em;
+    font-family: Calibri;
 }
 
 @media only screen and (max-width:480px){
     body {
-        padding: 5px !important;
-        font-size:5vw;
-
+        font-size:10pt ;
     }
     img#logo{
         width:80%;
+    }
+    img#jason{
+        width:20%;
     }
     img#motivation{
         width:90%;
         height:100%;
     }
     p {
-        width: 50%;
+        width: 90%;
+        font-size:1em;
         margin:0 auto;
-        font-size:3vw;
-    }
 
-    table th{
+    }
+    table#data {
+        width:100%;
+        margin:0em auto;
+    }
+    table#data th{
         text-align:right;
-        width:70%;
+        font-size:75%;
     }
-
-    table td{
+    table#data td{
         text-align:left;
-        width:30%;
+        font-size:80%;
     }
     div#imagespot img{
         width:40%;
     }
     table#data img{
-        width:100%;
+        width:50px;
     }
-
+    table#mail td{
+        text-align:center;
+    }
     div#stats li>h3:first-child {
         color:#ff9933;
-        font-size:7vw;
+        font-size:1.5em ;
     }
     div#stats h3 {
-        font-size:4vw;
-        margin-bottom: 1em;
+        font-size:130% ;
+        margin-bottom:0em;
     }
     div#stats p{
-        font-size:1vw;
+        font-size:0.7em ;
         margin-bottom: 0em;
     }
+    /*a is bigger than paragraph
+    reduce margin size
+    increase the leaf
+    the stats should be over one line.
+    review the mail box
+     */
 }
