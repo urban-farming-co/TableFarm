@@ -2,9 +2,10 @@ console.error('Starting');
 var fs      = require('fs');
 var path    = require ('path');
 var rasp    = require('./Functions/addRaspberryPi/server.js');
-var sqlite  = require('sqlite3');
 var formidable = require('formidable')
-var db      = new sqlite.Database("holdingDash.sqlite");
+var pg      = require('pg');
+var conString= "postgres://ibyxzonx:dWFDS_l0tiI_fNMA0Q7iZvKe6aWlMcS_@qdjjtnkv.db.elephantsql.com:5432/ibyxzonx" || "postgres://postgres:urban2016@127.0.0.1:5432/UrbanFarming";
+var Client  = require('pg').Client;
 var port    = (process.env.VCAP_APP_PORT || 4000);
 var host    = (process.env.VCAP_APP_HOST || 'localhost');
 var express = require('express');
@@ -16,14 +17,27 @@ app.use(express.static(path.join(__dirname, 'views')))
 app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
 app.use("/urbanfarming/public/images", express.static(path.join(__dirname, 'public/images')));
 
-var tableCheck = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='tbl1';";
-db.get(tableCheck, function(err, row) {
-    if (err) {console.error(err)};
-    if (row == undefined ) {
-        db.serialize(function() {
-            db.run("CREATE TABLE tbl1 (id INT PRIMARY KEY, image VARCHAR(200), soilMoisture DOUBLE, relHumidity DOUBLE, temperature DOUBLE, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, plantName VARCHAR(50), lightLuxLevel DOUBLE )", function(err){if (err) {console.error(err)}});
-            //db.run("INSERT INTO tbl1 (id, soilMoisture, relHumidity, temperature) VALUES (1,100 ,100 ,100)", function(err){if (err) {console.error(err)}});
+var tableCheck = "SELECT 1 FROM information_schema.tables WHERE table_name='livedata'";
+var client = new Client({user:'postgres', password:'urban2016', database:'UrbanFarming', host:'localhost', port:5432});
+client.connect();    
+client.query(tableCheck, function(err, row) {
+    console.log(row.rowCount)
+    if (row.rowCount == 0 ) {
+        console.log("livedata doesn't exist, creating")
+        var sql = "CREATE TABLE livedata (id INTEGER PRIMARY KEY, image VARCHAR(200), soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER )";
+        var sql1="INSERT INTO livedata (id, soilMoisture, relHumidity, temperature) VALUES (1,100 ,100 ,100)";
+        var query1 = client.query(sql , function(err){if (err) {console.error(err)}});
+        query1.on('end', function(){ 
+            var query2 = client.query(sql1, function(err){if (err) {console.error(err)}});
+            query2.on('end', function() {
+
+                client.end();
+            })
         });
+    }
+    else {
+        console.log("livedata does exist")
+        client.end();
     }
 });
 
@@ -47,34 +61,48 @@ app.use(function(req, res, next) {
 });
 
 function getNextId(callback) {
-    db.each("SELECT * FROM tbl1 WHERE id=(SELECT MAX(id) FROM tbl1) ", function(err, row) {
-        if (err) {
-            return callback(err)
-        }
-        callback(null, row.id + 1);
+    var sql="SELECT * FROM livedata WHERE id=(SELECT MAX(id)) ";
+    var client = new Client({user:'postgres', password:'urban2016', database:'UrbanFarming', host:'localhost', port:5432});
+    client.connect(function(err){
+        if (err){return console.error("couldn't connect to postgres", err)}
+        var q = client.query(sql, function(err, row) {
+            if (err) {
+                return callback(err)
+            }
+            callback(null, row.id + 1);
+        })
+        q.on('end', function() {
+            client.end()
+        })
     })
 }
 
 function getHome(request, response, callback)  {
     var content = '';
-    db.each("SELECT * FROM tbl1 WHERE id=(SELECT MAX(id) FROM tbl1) ", function(err, row) {
-        if (err) {
-            return callback(err)
-        }
-        date=row.time.split(' ')[0];
-        time=row.time.split(' ')[1];
-        dd=   date.split('-')[2];
-        mm=   date.split('-')[1];
-        yyyy= date.split('-')[0];
-        content +="<th>                   </th><td><img src=" + row.image+" /></td> </tr>"+
-            "<tr><th>Date:                </th><td id='date' >" +dd+"-"+mm+"-"+yyyy+ "</td>                  </tr>"+
-            "<tr><th>Time:                </th><td>" +time+"</td>                   </tr>"+
-            "<tr><th>Plant name:          </th><td>" +row.plantName+"</td>          </tr>"+
-            "<tr><th>Lighting lux level:  </th><td>" +row.lightLuxLevel+" lux</td>  </tr>"+
-            "<tr><th>Soil Moisture:       </th><td>" +row.soilMoisture+"%</td>      </tr>"+
-            "<tr><th>Relative Humidity:  </th><td>" +row.relHumidity+"%</td>       </tr>"+
-            "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
-        callback(null, content)
+    var sql="SELECT * FROM livedata WHERE id=(SELECT MAX(id)) ";
+    var client = new Client({user:'postgres', password:'urban2016', database:'UrbanFarming', host:'localhost', port:5432});
+    client.connect(function(err){
+        if (err){return console.error("couldn't connect to postgres", err)}
+        client.query(sql, function(err, row) {
+            if (err) {
+                return callback(err)
+            }
+            date = row.time.split(' ')[0];
+            time = row.time.split(' ')[1];
+            dd   = date.split('-')[2];
+            mm   = date.split('-')[1];
+            yyyy = date.split('-')[0];
+            content +="<th>                   </th><td><img src=" + row.image+" /></td>        </tr>"+
+                "<tr><th>Date:                </th><td id='date' >" +dd+"-"+mm+"-"+yyyy+ "</td></tr>"+
+                "<tr><th>Time:                </th><td>" +time+"</td>                          </tr>"+
+                "<tr><th>Plant name:          </th><td>" +row.plantName+"</td>                 </tr>"+
+                "<tr><th>Lighting lux level:  </th><td>" +row.lightLuxLevel+" lux</td>         </tr>"+
+                "<tr><th>Soil Moisture:       </th><td>" +row.soilMoisture+"%</td>             </tr>"+
+                "<tr><th>Relative Humidity:   </th><td>" +row.relHumidity+"%</td>              </tr>"+
+                "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
+            callback(null, content)
+            client.end()
+        })
     })
 }
 
@@ -125,10 +153,14 @@ app.post('/urbanfarming/data', function(req, res){
             console.log(files.image.name);
             console.log(fields.plantName);
             console.log(fields.lightLuxLevel);
-            var sql=`INSERT INTO tbl1 (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture}, ${fields.relHumidity}, ${fields.temperature}, '${target}', '${fields.plantName}', ${fields.lightLuxLevel})`;
+            var sql=`INSERT INTO livedata (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture}, ${fields.relHumidity}, ${fields.temperature}, '${target}', '${fields.plantName}', ${fields.lightLuxLevel})`;
             console.log(sql);
-            db.run(sql, function(err){if (err) {console.error("error on 93 "+ err)}});
-
+            var client = new Client({user:'postgres', password:'urban2016', database:'UrbanFarming', host:'localhost', port:5432});
+            client.connect();
+            var q = client.query(sql);
+            q.on('end', function(){
+                client.end()
+            });
         });
     })
 })
