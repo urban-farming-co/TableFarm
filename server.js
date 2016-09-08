@@ -57,7 +57,7 @@ function getNextId(callback) {
 
 function getLast127Rows(request, response, callback)  {
     var content = '';
-    db.all("SELECT * FROM tbl1 WHERE id>(SELECT MAX(id)-127 FROM tbl1) ", function(err, rows) {
+    db.all("SELECT * FROM tbl1", function(err, rows) {
         if (err) {
             return callback(err)
         }
