@@ -77,6 +77,47 @@ function getNextId(callback) {
     })
 }
 
+function getLast127Rows(request, response, callback)  {
+    var content = '';
+    db.all("SELECT * FROM tbl1", function(err, rows) {
+        if (err) {
+            return callback(err)
+        }
+        rows.forEach(function(row) {
+            date=row.time.split(' ')[0];
+            time=row.time.split(' ')[1];
+            dd=   date.split('-')[2];
+            mm=   date.split('-')[1];
+            yyyy= date.split('-')[0];
+            var img = "";
+            if (row.image==null) {
+                img="http://tablefarm.co.uk/public/files/flower.gif";
+            }
+            else{
+                img = "http://tablefarm.co.uk/urbanfarming"+ row.image.substring(1);
+            }
+            content +="<table id='"+row.id+"' >"+
+                "<tr><th>               </th><td><img src=" + img +" />       </td> </tr>"+
+                "<tr><th>Date:                </th><td id='date' >" +dd+"-"+mm+"-"+yyyy+ "</td></tr>"+
+                "<tr><th>Time:                </th><td>" +time+"</td>                          </tr>"+
+                "<tr><th>Plant name:          </th><td>" +row.plantName+"</td>                 </tr>"+
+                "<tr><th>Lighting lux level:  </th><td>" +row.lightLuxLevel+" lux</td>         </tr>"+
+                "<tr><th>Soil Moisture:       </th><td>" +row.soilMoisture+"%</td>             </tr>"+
+                "<tr><th>Relative Humidity:  </th><td>" +row.relHumidity+"%</td>               </tr>"+
+                "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>              </tr>"+
+
+                "</table> <hr/>";
+        })
+        callback(null, content)
+    })
+}
+app.get('/urbanfarming/view', (request, response) => {
+    getLast127Rows(request, response, (err, content) =>{
+        if (err){ console.error(err) }
+        var index = fs.readFileSync('view.html', 'utf8');
+        response.end(index.replace("{{content}}",content));
+    })
+})
 function getHome(request, response, callback)  {
     var content = '';
     var sql="SELECT * FROM livedata WHERE id=(SELECT MAX(id)) ";
