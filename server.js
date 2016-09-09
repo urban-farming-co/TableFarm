@@ -170,39 +170,58 @@ app.get('/urbanfarming/data', (req, res) => {
 var util = require('util');
 app.post('/urbanfarming/data', function(req, res){
     getNextId( (err, id) =>{
-        if (err){ console.error(err) }
-        console.log("next id is" + id);
-        var form = new formidable.IncomingForm();
-        form.parse(req, function(err, fields, files) {
-            Object.keys(files).forEach(function(name){
-                console.log('got file named '+ name);
-            });
-            var fileArry = files.uploadFiles;
-            console.log(" fileAry" + fileArry);
-            res.writeHead(200, {'content-type':'text/plain'});         
-            res.write('received upload:\n\n');
-            res.end(util.inspect({fields:fields, files:files}));
-            var target = "./public/files/flower.gif";
-            if (files.image.name!=undefined){
-                var fileextention = files.image.name.split('.').pop();
-                target = "./public/images/"+id+"." +fileextention;
-                fs.rename(files.image.path, target); 
-            }
-            console.log(fields.soilMoisture);
-            console.log(fields.relHumidity);
-            console.log(fields.temperature);
-            console.log(files.image.name);
-            console.log(fields.plantName);
-            console.log(fields.lightLuxLevel);
-            var sql=`INSERT INTO livedata (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture}, ${fields.relHumidity}, ${fields.temperature}, '${target}', '${fields.plantName}', ${fields.lightLuxLevel})`;
-            console.log(sql);
-            var client = new Client({user:'postgres', password:'urban2016', database:'UrbanFarming', host:'localhost', port:5432});
-            client.connect();
-            var q = client.query(sql);
-            q.on('end', function(){
-                client.end()
-            });
-        });
+        if (err){
+            res.write('The data upload was unsucessful. Unable to find the perfect id for this data');
+            res.end();
+            console.error(err)
+        }
+        else {
+            console.log("next id is" + id);
+            var form = new formidable.IncomingForm();
+            form.parse(req, function(err, fields, files) {
+                Object.keys(files).forEach(function(name){
+                    console.log('got file named '+ name);
+                });
+                var fileArry = files.uploadFiles;
+                console.log(" fileAry" + fileArry);
+                res.writeHead(200, {'content-type':'text/plain'});         
+                res.write('received upload:\n\n');
+                res.end(util.inspect({fields:fields, files:files}));
+                var target = "./public/files/flower.gif";
+                console.log(files.image.name);
+                if (files.image.name!=""){
+                    var fileextention = files.image.name.split('.').pop();
+                    target = "./public/images/"+id+"." +fileextention;
+                    fs.rename(files.image.path, target); 
+                }
+
+
+                var moisture =  fields.soilMoisture;
+                var humidity = fields.relHumidity;
+                var temp     = fields.temperature;
+                var name     = (( fields.plantName== "")?  'a' : fields.plantName);
+                var light    = fields.lightLuxLevel;
+
+                var a =`(id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
+                console.log(a);
+                var a =`(id, soilMoisture,relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${fields.soilMoisture}, ${fields.relHumidity}, ${fields.temperature}, '${target}', '${fields.plantName}', ${fields.lightLuxLevel})`;
+                var sql=`INSERT INTO ${liveData} (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
+                console.log(sql);
+                pg.connect(conStr, function(err, client){;
+                    if(err){
+                        console.error(err);
+                        res.write('The data upload was unsucessful. Couldn\'t connect to postgres. Please try again later.');
+                        res.end();
+                    }
+                    else{
+                        var q = client.query(sql);
+                        q.on('end', function(){
+                            client.end()
+                        });
+                    }
+                })
+            })
+        };
     })
 })
 app.get('/urbanfarming', (request, response) => {
