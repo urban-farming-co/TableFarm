@@ -5,45 +5,65 @@ var rasp    = require('./Functions/addRaspberryPi/server.js');
 var formidable = require('formidable');
 var pg      = require('pg');
 var Client  = require('pg').Client;
-var liveData = 'ibyxzonx.livedata';
-var port    = (process.env.VCAP_APP_PORT || 4000);
-var host    = (process.env.VCAP_APP_HOST || 'localhost');
-var conStr  = ("postgres://ibyxzonx:dWFDS_l0tiI_fNMA0Q7iZvKe6aWlMcS_@qdjjtnkv.db.elephantsql.com:5432/ibyxzonx" || "postgres://postgres:urban2016@localhost:5432/ibyxzonx"); 
+var schema  = 'urbanfarming';
+var table   = 'livedata';
+var liveData = schema + "." + table;
+var conStr  = ""; 
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
 var app     = express();
-var client = new Client(conStr);
 
+
+if (process.env.NODE_ENV === 'development') {
+    conStr = "postgres://ilperodq:WQO8D8EHusxAIFAfhS065P1iWIOhkwFN@qdjjtnkv.db.elephantsql.com:5432/ilperodq"; 
+    var host='localhost';
+    var port=4000;
+} else  if (process.env.NODE_ENV === 'production') {
+    conStr = "postgres://ibyxzonx:dWFDS_l0tiI_fNMA0Q7iZvKe6aWlMcS_@qdjjtnkv.db.elephantsql.com:5432/ibyxzonx"; 
+    var host=process.env.VCAP_APP_HOST;
+    var port=process.env.VCAP_APP_PORT;
+}
+
+var client = new Client(conStr);
 
 app.use(express.static(path.join(__dirname, 'views')));
 app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
 app.use("/urbanfarming/public/images", express.static(path.join(__dirname, 'public/images')));
 
-var tableCheck = "SELECT 1 FROM information_schema.tables WHERE table_name='livedata' and table_schema='ibyxzonx'";
+var tableCheck = "SELECT 1 FROM information_schema.tables WHERE table_name='"+table+"' and table_schema='"+schema+"'";
 pg.connect(conStr, function(err, client){    
     if(err){ 
         console.error(err);
     }
     else {
         client.query(tableCheck, function(err, row) {
-            console.log(row.rowCount);
             if (row.rowCount === 0 ) {
                 console.log("livedata doesn't exist, creating");
+                var sql0 = "SELECT 1 FROM information_schema.tables WHERE table_schema='"+schema+"'";
                 var sql = `CREATE TABLE ${liveData} (id INTEGER PRIMARY KEY, image VARCHAR(200), soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER)`;
                 var sql1 = `INSERT INTO ${liveData} (id, soilMoisture, relHumidity, temperature) VALUES (1,100 ,100 ,100)`;
-                var query1 = client.query(sql , function(err){if (err) {console.error(err)}});
-                query1.on('end', function(){ 
-                    var query2 = client.query(sql1, function(err){if (err) {console.error(err)}});
-                    query2.on('end', function() {
+                var query0 = client.query(sql0, function(err, result){if (err) {console.error(err)}});
+                query0.on('end', function(){
+                    if (row.rowCount === 0) {
+                        client.query("CREATE SCHEMA " + schema, function(err){
+                            if (err) {console.error(err)}  
+                        })
+                    }
+                    var query1 = client.query(sql , function(err){if (err) {console.error(err)}});
+                    query1.on('end', function(){ 
+                        var query2 = client.query(sql1, function(err){if (err) {console.error(err)}});
+                        query2.on('end', function() {
 
-                        client.end();
-                    })
-                });
+                            client.end();
+                        })
+                    });
+
+                })
             }
             else {
-                console.log("livedata does exist")
-                    client.end();
+                console.log("livedata does exist");
+                client.end();
             }
         });
     }
@@ -71,7 +91,7 @@ function getNextId(callback) {
     var sql="SELECT * FROM "+ liveData+" WHERE id=(SELECT MAX(id) FROM "+liveData+" ) ";
     pg.connect(conStr, function(err, client){
         if (err){
-            
+
             return console.error("couldn't connect to postgres", err)
         }
         else {
@@ -102,9 +122,22 @@ function formatTime(t){
     return time;
 }
 
-function getLast127Rows(request, response, callback)  {
-    var content = '';
-    var sql="SELECT * FROM "+liveData;
+function getLastXRows(request, response)  {
+    var content = "<table id='view'>" +
+        "<tr>" +
+        "<th>Image</th>"+
+        "<th>date</th>"+
+        "<th>time</th>"+
+        "<th>PlantName</th>"+
+        "<th>light lux level</th>"+
+        "<th>soilMoisture</th>"+
+        "<th>relative Humidity</th>"+
+        "<th>temperature</th>"+
+        "</tr>";
+    var x = request.query.x;
+    x = 10;
+    var sql="SELECT * FROM "+liveData +" WHERE id >(SELECT MAX(id) - "+ x+ " FROM "+liveData +" )";
+    console.log(sql);
     pg.connect(conStr, function(err, client){
         if(err){
             console.error(err);
@@ -113,54 +146,60 @@ function getLast127Rows(request, response, callback)  {
             var q = client.query(sql, function(err, result) {
                 console.log(result);
                 if (err) {
-                    res.write('Error getting data');
-                    return callback(err)
+                    response.write('Error getting data');
+                    console.error(err)
                 }
-                var N = result.rows.length -1;
-                for (var n =0; n <=N; n++){
-                    var row = result.rows[n];
-
-                    console.log(N +"    "+ n);
-                    console.log(row);
-                    date = formatDate(row.time);
-                    time = formatTime(row.time);
-                    var img = "";
-                    if (row.image==null) {
-                        img="http://tablefarm.co.uk/public/files/flower.gif";
+                else {
+                    var N = result.rows.length;
+                    var row = result.rows[0];
+                    for (var n =0; n <N; n++){
+                        row = result.rows[n];
+                        console.log(N +"    "+ n);
+                        console.log(row);
+                        date = formatDate(row.time);
+                        time = formatTime(row.time);
+                        var img = "";
+                        if (row.image==null) {
+                            img="http://tablefarm.co.uk/public/files/flower.gif";
+                        }
+                        else{
+                            img = "http://tablefarm.co.uk/urbanfarming"+ row.image.substring(1);
+                        }
+                        content +="<tr> "+
+                            "<td><img src='" + img +"' /></td>"+ 
+                            "<td id='date' >" +date+ "</td>"+
+                            "<td>" +time+"</td>"+
+                            "<td>" +row.plantname+"</td>"+
+                            "<td>" +row.lightluxlevel+" lux</td>"+
+                            "<td>" +row.soilmoisture+"%</td>"+
+                            "<td>" +row.relhumidity+"%</td>"+
+                            "<td>" +row.temperature+"C</td>"+
+                            "</tr>";
                     }
-                    else{
-                        img = "http://tablefarm.co.uk/urbanfarming"+ row.image.substring(1);
-                    }
-                    content +="<table id='data"+row.id+"' >"+
-                        "<tr><th>               </th><td><img src=" + img +" />       </td> </tr>"+
-                        "<tr><th>Date:                </th><td id='date' >" +date+ "</td></tr>"+
-                        "<tr><th>Time:                </th><td>" +time+"</td>                          </tr>"+
-                        "<tr><th>Plant name:          </th><td>" +row.plantname+"</td>                 </tr>"+
-                        "<tr><th>Lighting lux level:  </th><td>" +row.lightluxlevel+" lux</td>         </tr>"+
-                        "<tr><th>Soil Moisture:       </th><td>" +row.soilmoisture+"%</td>             </tr>"+
-                        "<tr><th>Relative Humidity:  </th><td>" +row.relhumidity+"%</td>               </tr>"+
-                        "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>              </tr>"+
-                        "</table> <hr/>";
+                    content += "</table>" ;
+                    console.log(content);
+                    console.log(Buffer.byteLength(content));
+                    response.writeHead(200, {
+                        'Content-Type'  : 'text/html', 
+                        'Content-Length': Buffer.byteLength(content)});
+                    response.write(content); 
+                    client.end();
                 }
-                client.end();
-                callback(null, content);
             })
         }
     })
 }
+
+app.get('/urbanfarming/viewcontent', (request, response) => {
+    getLastXRows(request, response);
+})
 app.get('/urbanfarming/view', (request, response) => {
-    getLast127Rows(request, response, (err, content) =>{
-        if (err){
-            console.error(err) 
-            res.write('Unable to retrieve data.');
-            res.end();
-        }
-        var index = fs.readFileSync('view.html', 'utf8');
-        response.end(index.replace("{{content}}",content));
-    })
+    var index = fs.readFileSync('view.html', 'utf8');
+    response.write(index);
+    response.end()
 })
 function getHome(request, response, callback)  {
-    var content = '';
+    var content = "<table id='data'><tr>";
     var sql="SELECT * FROM "+liveData+" WHERE id=(SELECT MAX(id) FROM "+liveData+") ";
     pg.connect(conStr, function(err, client){
         if (err){
@@ -194,12 +233,24 @@ function getHome(request, response, callback)  {
                     "<tr><th>Soil Moisture:       </th><td>" +row.rows[0].soilmoisture+"%</td>             </tr>"+
                     "<tr><th>Relative Humidity:   </th><td>" +row.rows[0].relhumidity+"%</td>              </tr>"+
                     "<tr><th>Ambient temperature: </th><td>" +row.rows[0].temperature+"C</td>";
+                content+= "</tr></table>";
                 callback(null, content)
                     client.end()
             })
         }
     })
 }
+
+app.get('/urbanfarming/liveData',(req, res)=>{
+    getHome(req, res, function(err, con){ 
+        if (err) {
+            console.error(err);
+        } else{
+            res.write(con);
+            res.end();
+        }
+    })
+})
 
 
 app.set('views',__dirname);
@@ -273,15 +324,7 @@ app.post('/urbanfarming/data', function(req, res){
     })
 })
 app.get('/urbanfarming', (request, response) => {
-    getHome(request, response, (err, content) =>{
-        if (err){ 
-            var index = fs.readFileSync('index.html', 'utf8');
-            response.end(index.replace("{{content}}","Data unavailable, sorry. Please try again later."));
-            console.error(err) 
-        }
-        else {
-            var index = fs.readFileSync('index.html', 'utf8');
-            response.end(index.replace("{{content}}",content));
-        }
-    })
+    var index = fs.readFileSync('index.html', 'utf8');
+    response.write(index);
+    response.end()
 })

@@ -77,7 +77,12 @@ table[id^="data"] td{
     text-align:left;
     width:50%;
 }
-
+table#view,
+table#view th,
+table#view td{
+    width:auto;
+    border: 1px solid black;
+}
 table#mail{
     padding:3%;
     margin-bottom:3%;
@@ -96,8 +101,6 @@ table#mail tr:last-child td{
     text-align:right;
 }
 
-
-
 table#mail tr:last-child td:last-child{
     text-align:left;
 }
@@ -105,6 +108,9 @@ table#mail tr:last-child td:first-child{
 }
 
 input[name="YMP0"]{
+    width:100%;
+}
+input[name="YMP1"]{
     width:100%;
 }
 input[value="Submit"]{

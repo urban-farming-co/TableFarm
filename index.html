@@ -37,11 +37,9 @@
             <h2>It's alive!</h2>
             <b>TableFarm®'s live beta test grow data (work in progress):</b>
             <br/>
-            <table id="data">
-                <tr>
-                    {{content}}
-                </tr>
-            </table>
+            <div id="ajaxDiv">
+                {{content}}
+            </div>
         </div>
         <hr/>
         <h2>Why?</h2>
@@ -74,7 +72,12 @@
                             <td colspan="3">Sign up for more inspiring photos, stories and special offers from<br/> Urban Farming Company:</span></td>
                         </tr>
                         <tr>
+                            <td>Name:</td><td valign="top"><input type="text" name="YMP1"/><td>
+                        </tr>
+                        <tr>
                             <td>Email:</td> <td> <input name="YMP0"  type="text" /></td>
+                        </tr>
+                        <tr>
                             <td > <input value="Submit" type="submit"/></td>
                         </tr>
                     </tbody>
@@ -133,6 +136,62 @@ i.addEventListener('click', function() {
 
             </script>
 
+<script language="javascript" type="text/javascript">
+<!-- 
+//Browser Support Code
+function ajaxFunction(){
+    var ajaxRequest;  // The variable that makes Ajax possible!
+    try{
+
+        // Opera 8.0+, Firefox, Safari
+        ajaxRequest = new XMLHttpRequest();
+    }catch (e){
+
+        // Internet Explorer Browsers
+        try{
+            ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+        }catch (e) {
+
+            try{
+                ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            }catch (e){
+
+                // Something went wrong
+                alert("Your browser broke!");
+                return false;
+            }
+        }
+    }
+
+    // Create a function that will receive data
+    // sent from the server and will update
+    // div section in the same page.
+    ajaxRequest.onreadystatechange = function(){
+        var ajaxDisplay = document.getElementById('ajaxDiv');
+        if(ajaxRequest.readyState == 4){
+            if (ajaxRequest.status == 200 && ajaxRequest.status<300){
+                console.log(ajaxRequest.responseText);
+                ajaxDisplay.innerHTML = ajaxRequest.responseText;
+            }
+            else{
+                console.log("error!");
+                ajaxDisplay.innerHTML = "Error";
+            }
+        }
+        else if (ajaxRequest.readyState < 4){
+            ajaxDisplay.innerHTML = "Loading...";
+        }
+    }
+
+    console.log("hi");
+    ajaxRequest.open("GET", "http://holdingwebtest.eu-gb.mybluemix.net/urbanfarming/liveData/");
+    ajaxRequest.send();
+}
+setInterval(function(){ ajaxFunction(); }, 30 *1000);
+setTimeout(ajaxFunction(), 20);
+
+//-->
+</script>
     </body>
 
 </html>
