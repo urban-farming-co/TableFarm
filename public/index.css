@@ -65,14 +65,15 @@ table{
     margin:0  auto;
 }
 
-table#data th{
+table[id^="data"] th{
     text-align:right;
     width:50%;
 }
-table#data img {
+table[id^="data"] img {
     width:100px;
+    
 }
-table#data td{
+table[id^="data"] td{
     text-align:left;
     width:50%;
 }

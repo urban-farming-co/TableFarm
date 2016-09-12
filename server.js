@@ -131,7 +131,7 @@ function getLast127Rows(request, response, callback)  {
                     else{
                         img = "http://tablefarm.co.uk/urbanfarming"+ row.image.substring(1);
                     }
-                    content +="<table id='"+row.id+"' >"+
+                    content +="<table id='data"+row.id+"' >"+
                         "<tr><th>               </th><td><img src=" + img +" />       </td> </tr>"+
                         "<tr><th>Date:                </th><td id='date' >" +date+ "</td></tr>"+
                         "<tr><th>Time:                </th><td>" +time+"</td>                          </tr>"+
