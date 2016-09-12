@@ -299,11 +299,14 @@ app.post('/urbanfarming/data', function(req, res){
                     target = "./public/images/"+id+"." +fileextention;
                     fs.rename(files.image.path, target); 
                 }
-                var moisture = (( fields.soilMoisture !="")? fields.soilMoisture : 0);
-                var humidity = (( fields.relHumidity !="")? fields.relHumidity : 0);
-                var temp     = (( fields.temperature !="")? fields.temperature : 0);
-                var name     = (( fields.plantName !="")? fields.plantName : 0);
-                var light    = (( fields.lightLuxLevel !="")? fields.lightLuxLevel : 0);
+
+
+                var moisture =  fields.soilMoisture;
+                var humidity = fields.relHumidity;
+                var temp     = fields.temperature;
+                var name     = (( fields.plantName== "")?  'a' : fields.plantName);
+                var light    = fields.lightLuxLevel;
+
                 var sql=`INSERT INTO ${liveData} (id, soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES (${id}, ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
                 console.log(sql);
                 pg.connect(conStr, function(err, client){;
