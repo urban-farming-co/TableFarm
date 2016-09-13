@@ -1,0 +1,30 @@
+{
+    "elephantsql": [
+        {
+            "credentials": {
+                "uri": "postgres://postgres:urban2016@127.0.0.1:5432/UrbanFarming",
+                "max_conns": "5"
+            },
+            "syslog_drain_url": null,
+            "label": "elephantsql",
+            "provider": null,
+            "plan": "turtle",
+            "name": "ElephantSQL-fl",
+            "tags": [
+                "Data Stores",
+                "DBA",
+                "Bluemix",
+                "ibm_dedicated_public",
+                "Data Scientist",
+                "Infrastructure",
+                "Development",
+                "Service",
+                "data_management",
+                "Runs on SoftLayer",
+                "Application",
+                "IT Operations",
+                "ibm_third_party"
+            ]
+        }
+    ]
+}
