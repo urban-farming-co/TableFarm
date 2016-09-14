@@ -7,7 +7,10 @@
     "body-parser": "^1.15.2",
     "errorhandler": "^1.4.3",
     "express": "^4.14.0",
+    "express-cors": "0.0.3",
     "express-handlebars": "^3.0.0",
+    "formidable": "^1.0.17",
+    "jquery": "^3.1.0",
     "mocha": "^3.0.2",
     "pg": "^6.1.0",
     "sqlite3": "^3.1.4"
