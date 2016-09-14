@@ -82,9 +82,11 @@
                 </table>
             </form>
             <hr/>
-        <center>
-             <div class="tumblr-post" data-href="https://embed.tumblr.com/embed/post/ITqOd_fdPc9KCpJFLONryg/150124570829" data-did="6accd46e97f021f76b854549c192fe9a7f9b0faa"><a href="http://blogurbanfarm.tumblr.com/post/150124570829/what-is-tablefarm-and-who-are-urban-farming-co">http://blogurbanfarm.tumblr.com/post/150124570829/what-is-tablefarm-and-who-are-urban-farming-co</a></div>  <script async src="https://secure.assets.tumblr.com/post.js"></script>
-        </center>
+            <center>
+                <div class="tumblr-container"> 
+                    <iframe allowfullscreen width=100 height=100 frameborder="0" src="https://embed.tumblr.com/embed/post/ITqOd_fdPc9KCpJFLONryg/150124570829?width=542&language=en_US&did=a28c539f006edaeba5067d389b6cd834175a4782a" </iframe>
+                </div>
+            </center>
             <script type='text/javascript'>
 
 var i=document.getElementById('jason');
@@ -171,28 +173,30 @@ function ajaxFunction(){
         var ajaxDisplay = document.getElementById('ajaxDiv');
         if(ajaxRequest.readyState == 4){
             if (ajaxRequest.status == 200 && ajaxRequest.status<300){
-                console.log(ajaxRequest.responseText);
-                ajaxDisplay.innerHTML = ajaxRequest.responseText;
-        
-            }
-            else{
-                console.log("error!");
-                ajaxDisplay.innerHTML = "Error";
-            }
-        }
-        else if (ajaxRequest.readyState < 4){
-            console.log("loading")
-        }
-    }
+                              console.log(ajaxRequest.responseText);
+                              ajaxDisplay.innerHTML = ajaxRequest.responseText;
 
-    ajaxRequest.open("GET", "http://www.tablefarm.co.uk/urbanfarming/liveData/");
-    ajaxRequest.send();
-}
-setInterval(function(){ ajaxFunction(); }, 6 *1000);
-setTimeout(ajaxFunction(), 20);
+                              }
+                              else{
+                              console.log("error!");
+                              ajaxDisplay.innerHTML = "Error";
+                              }
+                              }
+                              else if (ajaxRequest.readyState < 4){
+                              console.log("loading")
+                              }
+                              }
 
-//-->
+                              ajaxRequest.open("GET", "http://www.tablefarm.co.uk/urbanfarming/liveData/");
+                              ajaxRequest.send();
+                              }
+                              setInterval(function(){ ajaxFunction(); }, 30 *1000);
+                              setTimeout(ajaxFunction(), 20);
+
+                              //-->
 </script>
+
+
     </body>
 
 </html>
