@@ -181,12 +181,11 @@ function ajaxFunction(){
             }
         }
         else if (ajaxRequest.readyState < 4){
-            ajaxDisplay.innerHTML = "Loading...";
             console.log("loading")
         }
     }
 
-    ajaxRequest.open("GET", "http://holdingwebtest.eu-gb.mybluemix.net/urbanfarming/liveData/");
+    ajaxRequest.open("GET", "http://www.tablefarm.co.uk/urbanfarming/liveData/");
     ajaxRequest.send();
 }
 setInterval(function(){ ajaxFunction(); }, 6 *1000);
