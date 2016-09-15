@@ -344,7 +344,7 @@ app.get('/urbanfarming/img', function(req, res, next){
     var sql = "";
     if (x && f){
 
-        sql = "SELECT image FROM " + liveData + " WHERE id>" +x +" AND image <> null limit 1;";
+        sql = "SELECT image FROM " + liveData + " WHERE id>" +x +" AND image IS NOT NULL LIMIT 1;";
     }
     else if (x==null && f){
         sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData +" WHERE image IS NOT NULL)";
