@@ -14,10 +14,14 @@ var conStr  = vcapServices.elephantsql[0].credentials.uri;
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
+var passport  = require('passport');
+
+
+
+
 var app     = express();
 var port    = (process.env.VCAP_APP_PORT || 4000);
 var util = require('util');
-
 
 
 app.use(cors({
@@ -157,14 +161,19 @@ function formatDate(d){
 }
 
 function formatTime(t){
-    time = t.getHours() + ":" +t.getMinutes() +":"+t.getSeconds();
+    hh = t.getHours(); 
+    o =  t.getTimezoneOffset() / 60;
+    hh = hh- o;
+    mm = t.getMinutes() ;
+    ss = t.getSeconds();
+    time = `${hh}:${mm}:${ss}`
     return time;
 }
 function addRow(content, row) {
     content +="<tr> "+
         "<td><img src='http://tablefarm.co.uk/urbanfarming/img?x=" + row.id.toString() + "' /></td>"+ 
         "<td id='date' >" +formatDate(row.time)+ "</td>"+
-        "<td>" + formatTime(row.time)+"</td>"+
+        "<td>" + row.time +"</td>"+
         "<td>" +row.plantname+"</td>"+
         "<td>" +row.lightluxlevel+" lux</td>"+
         "<td>" +row.soilmoisture+"%</td>"+
@@ -337,3 +346,10 @@ app.get('/urbanfarming/view', (request, response) => {
 app.get('/urbanfarming/liveData',(req, res)=>{
     getHome(req, res)
 })
+
+app.get('/urbanfarming/game', (req, res) => {
+    var index ='<iframe src="http://zap.pm/game/55ae4e2b7dfb285122934106/play" width="480" height="365" allowfullscreen></iframe><br> <a href="http://zap.pm/game/55ae4e2b7dfb285122934106" target=_blank>Tank Battle by roger on ZAP<br> Remix to add your own pictures and settings!</a> - See more at: http://zap.pm/game/55ae4e2b7dfb285122934106#sthash.Ptk8wWfG.dpuf';
+    res.write(index);
+    res.end()
+})
+
