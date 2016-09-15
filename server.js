@@ -89,7 +89,7 @@ checkTablesExist();
 
 var clientPromise;
 function askDatabase( sql, callback ) {
-//    console.log(sql)
+    console.log(sql)
         if (clientPromise == null) {
             clientPromise = pg.connect(conStr);
         } 
@@ -167,7 +167,7 @@ function formatTime(t){
     mm = t.getMinutes() ;
     ss = t.getSeconds();
     time = `${hh}:${mm}:${ss}`
-    return time;
+        return time;
 }
 function addRow(content, row) {
     content +="<tr> "+
@@ -222,7 +222,7 @@ function getHome(request, response)  {
         date = formatDate(row.time);
         time = formatTime(row.time);
 
-        content +="<th>                   </th><td><img src='http://tablefarm.co.uk/urbanfarming/img/' /></td>        </tr>"+
+        content +="<th>                   </th><td><img src='http://tablefarm.co.uk/urbanfarming/img?f=1/' /></td>        </tr>"+
             "<tr><th>Date:                </th><td id='date' >" +date+ "</td></tr>"+
             "<tr><th>Time:                </th><td id='time'>" +time+"</td>                          </tr>"+
             "<tr><th>Plant name:          </th><td>" +row.plantname+"</td>                 </tr>"+
@@ -232,8 +232,8 @@ function getHome(request, response)  {
             "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
         content+= "</tr></table>";
         content+="<script>console.log('i');</script>";
-        content+="<script>console.log(1);var tz = (new Date()).getTimezoneOffset() / 60;console.log(1); var textarea = document.getElementById('time'); console.log(1); tex= textarea.innerHTML;console.log(1); var hh = parseInt(tex.split(':')[0]) - tz; var mm = tex.split(':')[1]; var ss =tex.split(':')[2]; textarea.innerHTML = `${hh.toString()}-${mm}-${ss}`; </script> ";
-            response.write(content);
+        content+="<script>console.log(1);var tz = (new Date()).getTimezoneOffset() / 60;console.log(1); var textarea = document.getElementById('time'); console.log(1); tex= textarea.innerHTML;console.log(1); var hh = parseInt(tex.split(':')[0]) - tz; var mm = tex.split(':')[1]; var ss =tex.split(':')[2]; textarea.innerHTML = `${hh.toString()}:${mm}:${ss}`; </script> ";
+        response.write(content);
         response.end();
     })
 }
@@ -243,17 +243,17 @@ function formatImageForDB(path, response, callback){
         if (!err) {
             console.log(fileToRead);
             console.log(typeof(fileToRead))
-            fs.readFile(path,'hex', function(err, data) {
-                if (!err) {
-                    data = '\\x'+data;
+                fs.readFile(path,'hex', function(err, data) {
+                    if (!err) {
+                        data = '\\x'+data;
 
-                    callback(null, data);
-                }else{
+                        callback(null, data);
+                    }else{
 
-                    console.error(err);
-                    callback(err);
-                }
-            });
+                        console.error(err);
+                        callback(err);
+                    }
+                });
 
         }else {
             console.log(err);
@@ -261,36 +261,55 @@ function formatImageForDB(path, response, callback){
         }
     });
 }
-
+function processTextFields(fields, response, request, target){
+    var moisture =  fields.soilMoisture;
+    var humidity = fields.relHumidity;
+    var temp     = fields.temperature;
+    var name     = (( fields.plantName== "")?  'a' : fields.plantName);
+    var light    = fields.lightLuxLevel;
+    if (target){   
+    var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
+    }
+    else {
+    var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light})`;
+    }
+    askDatabase(sql, function(err, result){;
+        if(err){
+            console.error(err);
+            response.write('The data upload was unsucessful. Couldn\'t connect to postgres. Please try again later.');
+            response.end();
+        }
+        else {
+            response.writeHead(200, {'content-type':'text/plain'});         
+            response.write('received upload:\n\n');
+            response.end(util.inspect({fields:fields}));
+        }
+    })
+}
 function processDataUpload(request, response, id){
     var form = new formidable.IncomingForm();
     form.parse(request, function(err, fields, files) {
-        formatImageForDB(files.image.path, response, function (err, target){
-            var moisture =  fields.soilMoisture;
-            var humidity = fields.relHumidity;
-            var temp     = fields.temperature;
-            var name     = (( fields.plantName== "")?  'a' : fields.plantName);
-            var light    = fields.lightLuxLevel;
+        if (files) {
+            console.log(files.image.size);
+            if (files.image.size<1) {
+                processTextFields(fields, response, request, null);
+            }
+            else {
+                formatImageForDB(files.image.path, response, function (err, target){
+                    processTextFields(fields, response, request, target);
+                })
+            }
+        }
+        else {
 
-            var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
-            askDatabase(sql, function(err, result){;
-                if(err){
-                    console.error(err);
-                    response.write('The data upload was unsucessful. Couldn\'t connect to postgres. Please try again later.');
-                    response.end();
-                }
-                else {
-                    response.writeHead(200, {'content-type':'text/plain'});         
-                    response.write('received upload:\n\n');
-                    response.end(util.inspect({fields:fields, files:files}));
-                }
-            })
-        })
+            processTextFields(fields, response, request, null);
+
+        }
     })
 }
 
 app.post('/urbanfarming/data', function(req, res){
-            processDataUpload(req, res)  
+    processDataUpload(req, res)  
 
 
 })
@@ -311,13 +330,31 @@ app.get('/urbanfarming/data', (req, res) => {
 
 app.get('/urbanfarming/img', function(req, res, next){
     var x = req.query.x;
-    var sql = "";
-    if (x==null) {
-        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData+")" ;
-    }
-    else {
+    var f = req.query.f;  // if supplied then when the corresponding id image is null, then find the nearest id that has got an image. otherwise, if the image is null, then display the null image.
+    if (x && x.substr(-1) == '/'){
         x = x.substr(0, x.length -1);
-        sql = "SELECT image FROM " + liveData + " WHERE id=" +x;
+    }
+
+    if (f && f.substr(-1) == '/'){
+        f = f.substr(0, f.length -1);
+    }
+    console.log(f);
+    console.log(x);
+
+    var sql = "";
+    if (x && f){
+
+        sql = "SELECT image FROM " + liveData + " WHERE id>" +x +" AND image <> null limit 1;";
+    }
+    else if (x==null && f){
+        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData +" WHERE image IS NOT NULL)";
+    }
+    else if(x && f==null) {
+        sql = "SELECT image FROM " + liveData + " WHERE id=" +x ;
+    }
+
+    else {
+        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData+")" ;
     }
     askDatabase(sql , function(err, result){
         if (err) {
@@ -325,10 +362,20 @@ app.get('/urbanfarming/img', function(req, res, next){
 
         }
         console.log(result);
-        fs.writeFile('public/foo.jpg', result.rows[0].image, function (errr) {
-
-            res.sendFile(__dirname + "/public/foo.jpg");
-        })
+        if (result.rowCount === 0){
+            console.log("not sending image")
+                res.sendFile(__dirname +"/public/test.jpg");
+        }
+        else if (result.rows[0].image == undefined) {
+            console.log("not sending image")
+                res.sendFile(__dirname +"/public/test.jpg");
+        }
+        else {
+            fs.writeFile('public/foo.jpg', result.rows[0].image, function (errr) {
+                console.log("sending image");
+                res.sendFile(__dirname + "/public/foo.jpg");
+            })
+        }
     });   
 }) 
 
