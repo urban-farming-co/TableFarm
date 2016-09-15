@@ -6,7 +6,7 @@ var formidable = require('formidable');
 var pg      = require('pg');
 var Client  = require('pg').Client;
 var schema  = 'urbanfarming';
-var table   = 'livedatey';
+var table   = 'livedateyo';
 var liveData = schema + "." + table;
 var cors    = require('express-cors');
 var vcapServices = require('./vcapServices');
@@ -114,7 +114,7 @@ function createTables(sql, sql1){
 }
 function createSchemaAndTables(){
     var checkSchema = "SELECT 1 FROM information_schema.tables WHERE table_schema='"+schema+"'";
-    var createLiveData = `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER)`;
+    var createLiveData = `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER)`;
     var AddARowToLiveData = `INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature) VALUES (100 ,100 ,100)`;
 
     askDatabase(checkSchema, function(err, result){
@@ -173,7 +173,7 @@ function addRow(content, row) {
     content +="<tr> "+
         "<td><img src='http://tablefarm.co.uk/urbanfarming/img?x=" + row.id.toString() + "' /></td>"+ 
         "<td id='date' >" +formatDate(row.time)+ "</td>"+
-        "<td>" + row.time +"</td>"+
+        "<td>" + formatTime(row.time) +"</td>"+
         "<td>" +row.plantname+"</td>"+
         "<td>" +row.lightluxlevel+" lux</td>"+
         "<td>" +row.soilmoisture+"%</td>"+
@@ -224,14 +224,16 @@ function getHome(request, response)  {
 
         content +="<th>                   </th><td><img src='http://tablefarm.co.uk/urbanfarming/img/' /></td>        </tr>"+
             "<tr><th>Date:                </th><td id='date' >" +date+ "</td></tr>"+
-            "<tr><th>Time:                </th><td>" +time+"</td>                          </tr>"+
+            "<tr><th>Time:                </th><td id='time'>" +time+"</td>                          </tr>"+
             "<tr><th>Plant name:          </th><td>" +row.plantname+"</td>                 </tr>"+
             "<tr><th>Lighting lux level:  </th><td>" +row.lightluxlevel+" lux</td>         </tr>"+
             "<tr><th>Soil Moisture:       </th><td>" +row.soilmoisture+"%</td>             </tr>"+
             "<tr><th>Relative Humidity:   </th><td>" +row.relhumidity+"%</td>              </tr>"+
             "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
         content+= "</tr></table>";
-        response.write(content);
+        content+="<script>console.log('i');</script>";
+        content+="<script>console.log(1);var tz = (new Date()).getTimezoneOffset() / 60;console.log(1); var textarea = document.getElementById('time'); console.log(1); tex= textarea.innerHTML;console.log(1); var hh = parseInt(tex.split(':')[0]) - tz; var mm = tex.split(':')[1]; var ss =tex.split(':')[2]; textarea.innerHTML = `${hh.toString()}-${mm}-${ss}`; </script> ";
+            response.write(content);
         response.end();
     })
 }
