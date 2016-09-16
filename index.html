@@ -194,7 +194,9 @@ function ajaxFunction(){
         }
     }
 
-    ajaxRequest.open("GET", "http://www.tablefarm.co.uk/urbanfarming/liveData/");
+    var localTimeOffset = (new Date()).getTimezoneOffset() / 60
+    console.log(localTimeOffset);        
+    ajaxRequest.open("GET", "http://www.tablefarm.co.uk/urbanfarming/liveData?o="+localTimeOffset+"/");
     ajaxRequest.send();
 }
 setInterval(function(){ ajaxFunction(); }, 30 *1000);
