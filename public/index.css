@@ -102,7 +102,7 @@ table#mail tr:last-child td{
 }
 
 table#mail tr:last-child td:last-child{
-    text-align:left;
+    text-align:center;
 }
 table#mail tr:last-child td:first-child{
 }
@@ -115,6 +115,7 @@ input[name="YMP1"]{
 }
 input[value="Submit"]{
     background-color:#ffcc00;
+    margin: 0 auto;
     color: #000000;
     font-size:0.9em;
     font-family: Calibri;
