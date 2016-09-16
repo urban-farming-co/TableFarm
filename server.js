@@ -160,7 +160,8 @@ function formatDate(d){
     return `${dd}-${mm}-${yyyy}`;
 }
 
-function formatTime(t, o=0 ){
+function formatTime(t, o ){
+    o = typeof o !== 'undefined' ? o: 0
     hh = parseInt(t.getHours())
         hh = hh - parseInt(o);  
     console.log(hh)
@@ -416,7 +417,7 @@ app.get('/urbanfarming/chart', (req, res) => {
         var chartData = [];
         var chartData1 = [];
         var labelData = [];
-        askDatabase("Select time, relhumidity,  temperature from "+ liveData , function(err, result) {
+        askDatabase("Select time, relhumidity,  temperature from "+ liveData + " WHERE id % 4=0" , function(err, result) {
             console.log(result);
             for (var n =0; n<result.rowCount; n++ ){
                 labelData.push(result.rows[n].time);
