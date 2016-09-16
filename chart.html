@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta charset="utf-8" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    </head>
+    <body>
+        <div width=100% height=100%>
+            <canvas id="myChart"></canvas>
+        </div>
+        <script>
+var data = {
+    labels: {{labels}},
+    datasets: [
+    {
+        label: "Temperature",
+        fillColor: "rgba(220,220,220,0.2)",
+        strokeColor: "rgba(220,220,220,1)",
+        pointColor: "rgba(220,220,220,1)",
+        pointStrokeColor: "#fff",
+        pointHighlightFill: "#fff",
+        pointHighlightStroke: "rgba(220,220,220,1)",
+        data: {{chartData}}
+    },
+
+    {
+        label: "Relative Humidity",
+        fillColor: "rgba(100,10,100,0.2)",
+        strokeColor: "rgba(100,10,100,1)",
+        pointColor: "rgba(100,10,100,1)",
+        pointStrokeColor: "#0",
+        pointHighlightFill: "#0",
+        pointHighlightStroke: "rgba(100,100,100,1)",
+        data: {{chartData1}}
+    }
+    ]
+
+};
+
+var ctx = document.getElementById("myChart").getContext("2d");
+var myNewChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options:{ 
+        scales: {
+            yAxes:[{
+                ticks:{
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+})
+        </script>
+    </body>
+</html>
