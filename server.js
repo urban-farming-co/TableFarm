@@ -154,20 +154,21 @@ function checkTablesExist(){
 
 
 function formatDate(d){
-    dd=   d.getDate();
-    mm=   d.getMonth();
-    yyyy= d.getFullYear();
+    dd   =   ('0' + d.getDate()).slice(-2);
+    mm   =   ('0' + d.getMonth()).slice(-2);
+    yyyy = d.getFullYear();
     return `${dd}-${mm}-${yyyy}`;
 }
 
-function formatTime(t){
-    hh = t.getHours(); 
-    o =  t.getTimezoneOffset() / 60;
-    hh = hh- o;
-    mm = t.getMinutes() ;
+function formatTime(t, o=0 ){
+    hh = parseInt(t.getHours())
+        hh = hh - parseInt(o);  
+    console.log(hh)
+        hh = ('0' + hh.toString()).slice(-2); 
+    mm = ('0' + t.getMinutes()).slice(-2) ;
     ss = t.getSeconds();
-    time = `${hh}:${mm}:${ss}`
-        return time;
+    time = `${hh}:${mm}`;
+    return time;
 }
 function addRow(content, row) {
     content +="<tr> "+
@@ -213,14 +214,14 @@ function getLastXRows(request, response)  {
 
 
 
-function getHome(request, response)  {
+function getHome(request, response, o)  {
     var content = "<table id='data'><tr>";
     var sql="SELECT * FROM "+liveData+" WHERE id=(SELECT MAX(id) FROM "+liveData+") ";
     askDatabase (sql, function(err, result){
         if (err) { console.error(err); return false }
         var row = result.rows[0];
         date = formatDate(row.time);
-        time = formatTime(row.time);
+        time = formatTime(row.time, o);
 
         content +="<th>                   </th><td><img src='http://tablefarm.co.uk/urbanfarming/img?f=1/' /></td>        </tr>"+
             "<tr><th>Date:                </th><td id='date' >" +date+ "</td></tr>"+
@@ -231,8 +232,6 @@ function getHome(request, response)  {
             "<tr><th>Relative Humidity:   </th><td>" +row.relhumidity+"%</td>              </tr>"+
             "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
         content+= "</tr></table>";
-        content+="<script>console.log('i');</script>";
-        content+="<script>console.log(1);var tz = (new Date()).getTimezoneOffset() / 60;console.log(1); var textarea = document.getElementById('time'); console.log(1); tex= textarea.innerHTML;console.log(1); var hh = parseInt(tex.split(':')[0]) - tz; var mm = tex.split(':')[1]; var ss =tex.split(':')[2]; textarea.innerHTML = `${hh.toString()}:${mm}:${ss}`; </script> ";
         response.write(content);
         response.end();
     })
@@ -268,10 +267,10 @@ function processTextFields(fields, response, request, target){
     var name     = (( fields.plantName== "")?  'a' : fields.plantName);
     var light    = fields.lightLuxLevel;
     if (target){   
-    var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
     }
     else {
-    var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light})`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light})`;
     }
     askDatabase(sql, function(err, result){;
         if(err){
@@ -393,7 +392,16 @@ app.get('/urbanfarming/view', (request, response) => {
     response.end()
 })
 app.get('/urbanfarming/liveData',(req, res)=>{
-    getHome(req, res)
+    var o =  req.query.o;
+    if (o && o.substr(-1) == '/'){
+        o = o.substr(0, o.length -1);
+        parseInt(o);
+        console.log(o);
+    }
+    if (!o) {
+        o = 0;
+    }
+    getHome(req, res, o);
 })
 
 app.get('/urbanfarming/game', (req, res) => {
@@ -401,4 +409,26 @@ app.get('/urbanfarming/game', (req, res) => {
     res.write(index);
     res.end()
 })
+app.get('/urbanfarming/chart', (req, res) => {
 
+    fs.readFile('chart.html', 'utf-8', function( err, data) {
+        res.writeHead( 200, {'Content-Type':'text/html'});
+        var chartData = [];
+        var chartData1 = [];
+        var labelData = [];
+        askDatabase("Select time, relhumidity,  temperature from "+ liveData , function(err, result) {
+            console.log(result);
+            for (var n =0; n<result.rowCount; n++ ){
+                labelData.push(result.rows[n].time);
+                chartData.push(result.rows[n].temperature);    
+                chartData1.push(result.rows[n].relhumidity);    
+            };
+            var c = data.replace('{{chartData}}', JSON.stringify(chartData));
+            c = c.replace('{{labels}}',JSON.stringify(labelData));
+            c = c.replace('{{chartData1}}', JSON.stringify(chartData1));
+            console.log(chartData);
+            res.write(c);
+            res.end();
+        })
+    })
+})
