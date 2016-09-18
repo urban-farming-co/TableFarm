@@ -54,21 +54,43 @@ app.engine('handlebars', exphbs);
 app.set('view engine', '');
 
 // app.use(express.static(path.join(__dirname, 'views')));
-// app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
+app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
 // app.use("/urbanfarming/public/images", express.static(path.join(__dirname, 'public/images')));
-// app.use("/urbanfarming/public/", express.static('public'));
-// app.use("/urbanfarming/public/images", express.static('public/images'));
+app.use("/urbanfarming/public/", express.static('public'));
+//app.use("/urbanfarming/public/images", express.static('public/images'));
 
 app.get('/urbanfarming/public/files/flower.gif/', function(req, res) {
     res.sendFile(__dirname + "/public/files/flower.gif")
 })
 
+app.get('/urbanfarming/public/files/growRig1.jpg/', function(req, res) {
+    res.sendFile(__dirname + "/public/files/growRig1.jpg")
+})
+app.get('/urbanfarming/public/files/growRig2.jpg/', function(req, res) {
+    res.sendFile(__dirname + "/public/files/growRig2.jpg")
+})
 app.get('/urbanfarming/public/index.css/', function(req, res) {
     res.sendFile(__dirname + "/public/index.css")
 })
 
 app.get('/urbanfarming/public/files/scotsman_article.jpg/', function (req, res) {
     res.sendFile(__dirname + "/public/files/scotsman_article.jpg");
+})
+
+app.get('/urbanfarming/public/files/uoe-logo.jpg/', function (req, res) {
+    res.sendFile(__dirname + "/public/files/uoe-logo.jpg");
+})
+
+app.get('/urbanfarming/public/files/ecci-logo.jpg/', function (req, res) {
+    res.sendFile(__dirname + "/public/files/ecci-logo.jpg");
+})
+
+app.get('/urbanfarming/public/files/censis-logo.jpg/', function (req, res) {
+    res.sendFile(__dirname + "/public/files/censis-logo.jpg");
+})
+
+app.get('/urbanfarming/public/files/uos-logo.jpg/', function (req, res) {
+    res.sendFile(__dirname + "/public/files/uos-logo.jpg");
 })
 
 app.get('/urbanfarming/public/files/child.jpg/', function (req, res) {
@@ -79,6 +101,15 @@ app.get('/urbanfarming/public/files/strawberry.jpg/', function (req, res) {
     res.sendFile(__dirname + "/public/files/strawberry.jpg");
 })
 
+app.get('/urbanfarming/public/files/website.jpg/', function (req, res) {
+    res.sendFile(__dirname + "/public/files/website.jpg");
+})
+app.get('/urbanfarming/public/files/lightArray.jpg/', function (req, res) {
+    res.sendFile(__dirname + "/public/files/lightArray.jpg");
+})
+app.get('/urbanfarming/public/files/makingLightingRigP.jpg/', function (req, res) {
+    res.sendFile(__dirname + "/public/files/makingLightingRigP.jpg");
+})
 app.get('/urbanfarming/public/files/getMotivated.jpg/', function (req, res) {
     res.sendFile(__dirname + "/public/files/getMotivated.jpg");
 })
@@ -162,7 +193,7 @@ function formatDate(d){
 
 function formatTime(t, o ){
     o = typeof o !== 'undefined' ? o: 0
-    hh = parseInt(t.getHours())
+        hh = parseInt(t.getHours())
         hh = hh - parseInt(o);  
     console.log(hh)
         hh = ('0' + hh.toString()).slice(-2); 
@@ -239,24 +270,13 @@ function getHome(request, response, o)  {
 }
 
 function formatImageForDB(path, response, callback){
-    fs.open( path, 'r', function (err, fileToRead){
+    fs.readFile(path,'hex', function(err, data) {
         if (!err) {
-            console.log(fileToRead);
-            console.log(typeof(fileToRead))
-                fs.readFile(path,'hex', function(err, data) {
-                    if (!err) {
-                        data = '\\x'+data;
+            data = '\\x'+data;
 
-                        callback(null, data);
-                    }else{
-
-                        console.error(err);
-                        callback(err);
-                    }
-                });
-
-        }else {
-            console.log(err);
+            callback(null, data);
+        }else{
+            console.error(err);
             callback(err);
         }
     });

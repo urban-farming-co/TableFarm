@@ -58,41 +58,98 @@
             <img src="public/files/child.jpg"     alt="child"/>
             <img src="public/files/strawberry.jpg" alt="strawberry" /> 
         </div>
-            <div>
 
+        <h3> Key challenge:</h3>
+        <br/>
+        <p> How can we develop our children's awareness of the benefits of fresh food using their digital knowledge? </p>
+        <br/>
+
+        <hr/>
+        <div id="partners">
+            <h2>Partners</h2>
+            <p>Click on a logo for more information</p>
+            <img onclick="showuoe()"src="public/files/uoe-logo.jpg"/>
+            <img onclick="showecci()" src="public/files/ecci-logo.jpg"/>
+            <img onclick="showcensis()" src="public/files/censis-logo.jpg"/>
+            <img onclick="showuos()" src="public/files/uos-logo.jpg"/>
+            <div id="uoe" style="display:block">
+                <p> The Molecular Plant Sciences department at the University of Edinburgh did some experiments for us to prove that different lighting conditions could alter the way a plant might grow.</p>
+                <img src="public/files/growRig1.jpg"/>
+                <img src="public/files/growRig2.jpg"/>
+                <br/>
+                <a  target="_blank"  href="http://www.ed.ac.uk/biology/molecular-plant-sciences">Click Here</a>
             </div>
+            <div id="uos" style="display:none"> 
+                <p>In order to test the affect that lighting has on a plant, we asked The University of Strathclyde Intelligent Lighting Centre to  make us grow rigs. They were very helpful. The grow rigs have become a product in their own right. One of our friends in the Intelligent Light Centre spoke to their local school and they bought a grow rig for their advanced higher biology course.</p> 
+                <img src="public/files/lightArray.jpg"/>
+                <img src="public/files/makingLightingRigP.jpg"/>
+                <img src="public/files/website.jpg"/>
+                <br/>
+                <a target="_blank" href="http://www.strath.ac.uk/intelligentlightingcentre/">Click Here</a>
+            </div>
+            <div id="censis" style="display:none">
+                <p> CENSIS helped us out a lot in the beginning. Everytime we have a meeting, we bring with us the prototype that they made for us.</p>
+                <a  target="_blank" href="http://censis.org.uk/cddc">Click Here</a>
+            </div>
+            <div id="ecci" style="display:none">
+                <p> ECCI is a great partner. We are based in the building and love it here.</p>
+                <a target="_blank" href="http://edinburghcentre.org/Ideas-Lab.html">Click Here</a> 
+            </div>
+        </div>
+        <hr/>
+        <script>
+function displayNone(){
+    document.getElementById('uos').style.display ="none";
+    document.getElementById('censis').style.display ="none";
+    document.getElementById('ecci').style.display ="none";
+    document.getElementById('uoe').style.display ="none";
+}
+function showuos(){
+    displayNone();
+    document.getElementById('uos').style.display ="block";
 
-            <h3> Key challenge:</h3>
-            <br/>
-            <p> How can we develop our children's awareness of the benefits of fresh food using their digital knowledge? </p>
-            <br/>
-            <form method="post" action="https://ymlp.com/subscribe.php?id=gwbuqjhgmgj">
-                <table id="mail">
-                    <tbody>
-                        <tr>
-                            <td colspan="3">Sign up for more inspiring photos, stories and special offers from<br/> Urban Farming Company:</td>
-                        </tr>
-                        <tr>
-                            <td>Name:</td><td valign="top"><input type="text" name="YMP1"/><td>
-                        </tr>
-                        <tr>
-                            <td>Email:</td> <td> <input name="YMP0"  type="text" /></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3" > <input value="Submit" type="submit"/></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
-            <hr/>
-            <center>
-                <div class="tumblr-container"> 
-                    <iframe width=100 height=100 frameborder="0" src="https://embed.tumblr.com/embed/post/ITqOd_fdPc9KCpJFLONryg/150124570829?width=542&language=en_US&did=a28c539f006edaeba5067d389b6cd834175a4782a"> </iframe>
-                </div>
-            </center>
+}
+function showecci(){
+    displayNone();
+    document.getElementById('ecci').style.display ="block";
+}
+function showcensis(){
+    displayNone();
+    document.getElementById('censis').style.display ="block";
+}
+function showuoe(){
+    displayNone();
+    document.getElementById('uoe').style.display ="block";
+}
+        </script>
+        <br/>
+        <form method="post" action="https://ymlp.com/subscribe.php?id=gwbuqjhgmgj">
+            <table id="mail">
+                <tbody>
+                    <tr>
+                        <td colspan="3">Sign up for more inspiring photos, stories and special offers from<br/> Urban Farming Company:</td>
+                    </tr>
+                    <tr>
+                        <td>Name:</td><td valign="top"><input type="text" name="YMP1"/><td>
+                    </tr>
+                    <tr>
+                        <td>Email:</td> <td> <input name="YMP0"  type="text" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" > <input value="Submit" type="submit"/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        <hr/>
+        <center>
+            <div class="tumblr-container"> 
+                <iframe width=100 height=100 frameborder="0" src="https://embed.tumblr.com/embed/post/ITqOd_fdPc9KCpJFLONryg/150124570829?width=542&language=en_US&did=a28c539f006edaeba5067d389b6cd834175a4782a"> </iframe>
+            </div>
+        </center>
 
 
-            <script type='text/javascript'>
+        <script type='text/javascript'>
 
 var i=document.getElementById('jason');
 var minW=i.width;
@@ -143,7 +200,7 @@ i.addEventListener('click', function() {
     }
 });
 
-            </script>
+        </script>
 
 <script language="javascript" type="text/javascript">
 <!-- 
