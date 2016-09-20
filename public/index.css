@@ -67,7 +67,7 @@ div#stats li>h3:first-child{
 }
 
 div#partners img{
-
+    cursor:pointer;
     display:inline-block;
     vertical-align:middle;
     padding: 2%;
