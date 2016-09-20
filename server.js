@@ -212,6 +212,7 @@ function addRow(content, row) {
         "<td>" +row.soilmoisture+"%</td>"+
         "<td>" +row.relhumidity+"%</td>"+
         "<td>" +row.temperature+"C</td>"+
+        "<td>" +row.colour+"C</td>"+
         "</tr>";
     return content;
 }
@@ -245,6 +246,17 @@ function getLastXRows(request, response)  {
 }
 
 
+function getrgb(hex) {
+    var result = hex.match(/^#?([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})$/i);
+    console.log(result);
+    col = result ? { r: parseInt(result[1], 16),  g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0, g:0, b:0};  
+    console.log(col);
+    return col ;
+}
+
+function rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
 
 function getHome(request, response, o)  {
     var content = "<table id='data'><tr>";
@@ -254,7 +266,8 @@ function getHome(request, response, o)  {
         var row = result.rows[0];
         date = formatDate(row.time);
         time = formatTime(row.time, o);
-
+        var rgb = getrgb(row.colour); 
+        var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
         content +="<th>                   </th><td><img src='http://tablefarm.co.uk/urbanfarming/img?f=1/' /></td>        </tr>"+
             "<tr><th>Date:                </th><td id='date' >" +date+ "</td></tr>"+
             "<tr><th>Time:                </th><td id='time'>" +time+"</td>                          </tr>"+
@@ -262,6 +275,7 @@ function getHome(request, response, o)  {
             "<tr><th>Lighting lux level:  </th><td>" +row.lightluxlevel+" lux</td>         </tr>"+
             "<tr><th>Soil Moisture:       </th><td>" +row.soilmoisture+"%</td>             </tr>"+
             "<tr><th>Relative Humidity:   </th><td>" +row.relhumidity+"%</td>              </tr>"+
+            "<tr><th>Colour:              </th><td  bgcolor='"+row.colour+"'><font color="+rgbf+ "> red="+rgb.r+" green = "+rgb.g+", blue="+rgb.b+"</font></td>               </tr>"+    
             "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
         content+= "</tr></table>";
         response.write(content);
@@ -283,15 +297,16 @@ function formatImageForDB(path, response, callback){
 }
 function processTextFields(fields, response, request, target){
     var moisture =  fields.soilMoisture;
+    var colour   = fields.colour;
     var humidity = fields.relHumidity;
     var temp     = fields.temperature;
     var name     = (( fields.plantName== "")?  'a' : fields.plantName);
     var light    = fields.lightLuxLevel;
     if (target){   
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light})`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}')`;
     }
     else {
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light})`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}')`;
     }
     askDatabase(sql, function(err, result){;
         if(err){
@@ -305,6 +320,48 @@ function processTextFields(fields, response, request, target){
             response.end(util.inspect({fields:fields}));
         }
     })
+}
+
+function getImageSQL(res,req, x,f){
+    var sql = "";
+    if (x && f){
+        sql = "SELECT image FROM " + liveData + " WHERE id>=" +x +" AND image IS NOT NULL LIMIT 1;";
+    }
+    else if (x==null && f){
+        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData +" WHERE image IS NOT NULL)";
+    }
+    else if(x && f==null) {
+        sql = "SELECT image FROM " + liveData + " WHERE id=" +x ;
+    }
+
+    else {
+        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData+")" ;
+    }
+    return sql;
+}
+
+function formatImageForDisplay(req,res, x, f){
+    sql = getImageSQL(res, req, x,f);
+    askDatabase(sql , function(err, result){
+        if (err) {
+            console.error(err)
+        }
+        console.log(result);
+        if (result.rowCount === 0){
+            console.log("not sending image")
+                res.sendFile(__dirname +"/public/test.jpg");
+        }
+        else if (result.rows[0].image == undefined) {
+            console.log("not sending image")
+                res.sendFile(__dirname +"/public/test.jpg");
+        }
+        else {
+            fs.writeFile('public/foo.jpg', result.rows[0].image, function (errr) {
+                console.log("sending image");
+                res.sendFile(__dirname + "/public/foo.jpg");
+            })
+        }
+    });   
 }
 function processDataUpload(request, response, id){
     var form = new formidable.IncomingForm();
@@ -348,7 +405,7 @@ app.get('/urbanfarming/data', (req, res) => {
     });
 })
 
-app.get('/urbanfarming/img', function(req, res, next){
+app.get('/urbanfarming/img', function(req, res){
     var x = req.query.x;
     var f = req.query.f;  // if supplied then when the corresponding id image is null, then find the nearest id that has got an image. otherwise, if the image is null, then display the null image.
     if (x && x.substr(-1) == '/'){
@@ -360,43 +417,7 @@ app.get('/urbanfarming/img', function(req, res, next){
     }
     console.log(f);
     console.log(x);
-
-    var sql = "";
-    if (x && f){
-
-        sql = "SELECT image FROM " + liveData + " WHERE id>" +x +" AND image IS NOT NULL LIMIT 1;";
-    }
-    else if (x==null && f){
-        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData +" WHERE image IS NOT NULL)";
-    }
-    else if(x && f==null) {
-        sql = "SELECT image FROM " + liveData + " WHERE id=" +x ;
-    }
-
-    else {
-        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData+")" ;
-    }
-    askDatabase(sql , function(err, result){
-        if (err) {
-            console.error(err)
-
-        }
-        console.log(result);
-        if (result.rowCount === 0){
-            console.log("not sending image")
-                res.sendFile(__dirname +"/public/test.jpg");
-        }
-        else if (result.rows[0].image == undefined) {
-            console.log("not sending image")
-                res.sendFile(__dirname +"/public/test.jpg");
-        }
-        else {
-            fs.writeFile('public/foo.jpg', result.rows[0].image, function (errr) {
-                console.log("sending image");
-                res.sendFile(__dirname + "/public/foo.jpg");
-            })
-        }
-    });   
+    formatImageForDisplay(req, res, x, f );
 }) 
 
 app.get('/urbanfarming', (request, response) => {
