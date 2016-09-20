@@ -255,7 +255,7 @@ function getrgb(hex) {
 }
 
 function rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
 function getHome(request, response, o)  {
@@ -384,7 +384,25 @@ function processDataUpload(request, response, id){
         }
     })
 }
+function insertIntoLayout(file, callback){
+    fs.readFile(file, 'utf8', function(err, index){
+        if (err) {
+            console.error(err);
+        }
+        else {
+            index= index.toString();
+            fs.readFile('layout.html', 'utf8', function(err, layout) {;
+                if (err) {
+                    console.error(err);
+                }else {
+                    layout  = layout.replace('{{content}}',index);
+                    callback(layout);
+                }
 
+            })
+        }
+    })
+}
 app.post('/urbanfarming/data', function(req, res){
     processDataUpload(req, res)  
 
@@ -473,4 +491,16 @@ app.get('/urbanfarming/chart', (req, res) => {
             res.end();
         })
     })
+})
+app.get('/urbanfarming/verifyemail', (req, res) => {
+    insertIntoLayout(__dirname+"/pleaseVerify.html", (l)=>{
+        res.write(l);
+        res.end();
+    });
+})
+app.get('/urbanfarming/verified', (req, res) => {
+   insertIntoLayout(__dirname + "/thanksVerify.html", (l) => {
+        res.write(l);
+        res.end();
+   });
 })
