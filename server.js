@@ -1,4 +1,5 @@
 console.error('Starting');
+var spawn   = require('child_process').spawn;
 var fs      = require('fs');
 var path    = require ('path');
 var rasp    = require('./Functions/addRaspberryPi/server.js');
@@ -63,6 +64,9 @@ app.get('/urbanfarming/public/files/flower.gif/', function(req, res) {
     res.sendFile(__dirname + "/public/files/flower.gif")
 })
 
+app.get('/urbanfarming/public/foo1.JPEG/', function(req, res) {
+    res.sendFile(__dirname + "/public/foo1.JPEG")
+})
 app.get('/urbanfarming/public/files/growRig1.jpg/', function(req, res) {
     res.sendFile(__dirname + "/public/files/growRig1.jpg")
 })
@@ -340,7 +344,7 @@ function getImageSQL(res,req, x,f){
     return sql;
 }
 
-function formatImageForDisplay(req,res, x, f){
+function formatImageForDisplay(req,res, x, f, callback){
     sql = getImageSQL(res, req, x,f);
     askDatabase(sql , function(err, result){
         if (err) {
@@ -349,20 +353,20 @@ function formatImageForDisplay(req,res, x, f){
         console.log(result);
         if (result.rowCount === 0){
             console.log("not sending image")
-                res.sendFile(__dirname +"/public/test.jpg");
+                callback(__dirname +"/public/test.jpg");
         }
         else if (result.rows[0].image == undefined) {
             console.log("not sending image")
-                res.sendFile(__dirname +"/public/test.jpg");
+                callback(__dirname +"/public/test.jpg");
         }
         else {
             fs.writeFile('public/foo.jpg', result.rows[0].image, function (errr) {
-                console.log("sending image");
-                res.sendFile(__dirname + "/public/foo.jpg");
+                callback(__dirname +"/public/foo.jpg");
             })
         }
-    });   
+    })
 }
+
 function processDataUpload(request, response, id){
     var form = new formidable.IncomingForm();
     form.parse(request, function(err, fields, files) {
@@ -384,6 +388,35 @@ function processDataUpload(request, response, id){
         }
     })
 }
+
+function processImage(file, callback){
+
+    spawned_process = spawn('python', ["process_images/greenScore.py", file, 3, 1]);
+
+    spawned_process.stdout.on('data', function(data){
+        console.log("GOT DATA");
+        d = data.toString('utf8');
+        console.log(d);
+        callback(d);
+    })
+
+    spawned_process.on('message', function(message){
+        console.log("GOT A MESSAGE");
+        console.log(message.toString('utf8'));
+    })
+
+    spawned_process.stderr.on('data', function(data) {
+        console.log("GOT AN ERROR");
+        console.log(data.toString('utf8'));
+    })
+
+    spawned_process.on('close', function(code) {
+        console.log("child process exited with a code: "+ code);
+        callback(null)
+    })
+
+}
+
 function insertIntoLayout(file, callback){
     fs.readFile(file, 'utf8', function(err, index){
         if (err) {
@@ -435,13 +468,39 @@ app.get('/urbanfarming/img', function(req, res){
     }
     console.log(f);
     console.log(x);
-    formatImageForDisplay(req, res, x, f );
+    formatImageForDisplay(req, res, x, f, (fileName)=>{
+        res.sendFile(fileName);
+
+    } );
 }) 
 
 app.get('/urbanfarming', (request, response) => {
     var index = fs.readFileSync('index.html', 'utf8');
     response.write(index);
     response.end()
+})
+app.get('/urbanfarming/processImage', (req, res) => {
+    var x = req.query.x;
+    if (x && x.substr(-1) == '/') {
+        x = x.substr(0, x.length -1);
+    }
+    formatImageForDisplay(req,res, x, 1, (fileName)=> {
+        insertIntoLayout(__dirname + "/process.html", (index) => {  
+            processImage(fileName, (f) => {   
+                if (f==null){
+                    res.end();
+                    console.log("got last entry");
+                    return
+                } else {
+                    console.log("got data ");
+                    console.log(f);
+                    c = index.replace("{{image}}", "../public/foo1.JPEG"); 
+                    c = c.replace("{{score}}", f);
+                    res.write(c);
+                }
+            });
+        })
+    })
 })
 app.get('/urbanfarming/viewcontent', (request, response) => {
     getLastXRows(request, response);
@@ -469,24 +528,31 @@ app.get('/urbanfarming/game', (req, res) => {
     res.write(index);
     res.end()
 })
-app.get('/urbanfarming/chart', (req, res) => {
 
+
+app.get('/urbanfarming/chart', (req, res) => {
     fs.readFile('chart.html', 'utf-8', function( err, data) {
         res.writeHead( 200, {'Content-Type':'text/html'});
-        var chartData = [];
-        var chartData1 = [];
+        var temp = [];
+        var humi = [];
+        var luxl = [];
+        var soil = [];
         var labelData = [];
-        askDatabase("Select time, relhumidity,  temperature from "+ liveData + " WHERE id % 4=0" , function(err, result) {
+        askDatabase("SELECT * FROM "+ liveData + " WHERE id % 4=0 ORDER BY id DESC LIMIT 255" , function(err, result) {
             console.log(result);
             for (var n =0; n<result.rowCount; n++ ){
                 labelData.push(result.rows[n].time);
-                chartData.push(result.rows[n].temperature);    
-                chartData1.push(result.rows[n].relhumidity);    
+                temp.push(result.rows[n].temperature);    
+                humi.push(result.rows[n].relhumidity);    
+                luxl.push(result.rows[n].lightluxlevel);
+                soil.push(result.rows[n].soilmoisture);
             };
-            var c = data.replace('{{chartData}}', JSON.stringify(chartData));
+            var c = data.replace('{{temp}}', JSON.stringify(temp));
             c = c.replace('{{labels}}',JSON.stringify(labelData));
-            c = c.replace('{{chartData1}}', JSON.stringify(chartData1));
-            console.log(chartData);
+            c = c.replace('{{humi}}', JSON.stringify(humi));
+            c = c.replace('{{soil}}', JSON.stringify(soil));
+            c = c.replace('{{luxl}}', JSON.stringify(luxl));
+
             res.write(c);
             res.end();
         })
@@ -499,8 +565,8 @@ app.get('/urbanfarming/verifyemail', (req, res) => {
     });
 })
 app.get('/urbanfarming/verified', (req, res) => {
-   insertIntoLayout(__dirname + "/thanksVerify.html", (l) => {
+    insertIntoLayout(__dirname + "/thanksVerify.html", (l) => {
         res.write(l);
         res.end();
-   });
+    });
 })
