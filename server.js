@@ -2,7 +2,6 @@ console.error('Starting');
 var spawn   = require('child_process').spawn;
 var fs      = require('fs');
 var path    = require ('path');
-var rasp    = require('./Functions/addRaspberryPi/server.js');
 var formidable = require('formidable');
 var pg      = require('pg');
 var Client  = require('pg').Client;
@@ -64,6 +63,9 @@ app.get('/urbanfarming/public/files/flower.gif/', function(req, res) {
     res.sendFile(__dirname + "/public/files/flower.gif")
 })
 
+app.get('/urbanfarming/public/foo.jpg/', function(req, res) {
+    res.sendFile(__dirname + "/public/foo.jpg")
+})
 app.get('/urbanfarming/public/foo1.JPEG/', function(req, res) {
     res.sendFile(__dirname + "/public/foo1.JPEG")
 })
@@ -117,8 +119,6 @@ app.get('/urbanfarming/public/files/makingLightingRigP.jpg/', function (req, res
 app.get('/urbanfarming/public/files/getMotivated.jpg/', function (req, res) {
     res.sendFile(__dirname + "/public/files/getMotivated.jpg");
 })
-
-
 
 checkTablesExist();
 
@@ -367,7 +367,16 @@ function formatImageForDisplay(req,res, x, f, callback){
     })
 }
 
-function processDataUpload(request, response, id){
+function processForm(req, res, callback){
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+        console.log(fields);
+        callback( fields.after, fields.before);
+    })
+}
+
+
+function processDataUpload(request, response){
     var form = new formidable.IncomingForm();
     form.parse(request, function(err, fields, files) {
         if (files) {
@@ -417,6 +426,69 @@ function processImage(file, callback){
 
 }
 
+function generateChart(callback, after, before){
+    var sql = "SELECT * FROM "+ liveData;
+    var f = true;
+    if (!before && !after) {
+        var sql = "SELECT * FROM "+ liveData + " WHERE id % 4=0" ;
+        f = false;
+    }
+    if (after){
+        var b = sql + " AND time > '" + after + "'";
+        if (f){ 
+            b = sql + " WHERE time > '" + after + "'";
+            f = false;
+        }
+        sql = b;
+    }
+    if (before){
+        var b = sql + " AND time < '" + before + "'";
+        if (f){ 
+            b = sql + " WHERE time > '" + after + "'";
+        }
+        sql = b
+    }
+    sql = sql +" ORDER BY id DESC LIMIT 255";
+    fs.readFile('chart.html', 'utf-8', function( err, data) {
+        var temp = [];
+        var humi = [];
+        var luxl = [];
+        var soil = [];
+        var labelData = [];
+        askDatabase(sql , function(err, result) {
+            for (var n =0; n<result.rowCount; n++ ){
+                labelData.push(result.rows[n].time);
+                temp.push(result.rows[n].temperature);    
+                humi.push(result.rows[n].relhumidity);    
+                luxl.push(result.rows[n].lightluxlevel);
+                soil.push(result.rows[n].soilmoisture);
+            };
+            var c = data.replace('{{temp}}', JSON.stringify(temp));
+            c = c.replace('{{labels}}',JSON.stringify(labelData));
+            c = c.replace('{{humi}}', JSON.stringify(humi));
+            c = c.replace('{{soil}}', JSON.stringify(soil));
+            c = c.replace('{{luxl}}', JSON.stringify(luxl));
+            if (after) {
+                c = c.replace('{{after}}', JSON.stringify(after))
+            } else {
+                c = c.replace('{{after}}', JSON.stringify("the dawn of time"))
+            }
+            if (before) {
+                c = c.replace('{{before}}', JSON.stringify(before))
+            } else {
+                c = c.replace('{{before}}', JSON.stringify("the end of time"))
+            }
+            callback(c)
+        })
+    })
+}
+
+function displayChart(c, res){
+    res.writeHead( 200, {'Content-Type':'text/html'});
+    res.write(c);
+    res.end();
+}
+
 function insertIntoLayout(file, callback){
     fs.readFile(file, 'utf8', function(err, index){
         if (err) {
@@ -438,9 +510,18 @@ function insertIntoLayout(file, callback){
 }
 app.post('/urbanfarming/data', function(req, res){
     processDataUpload(req, res)  
-
-
 })
+
+app.post('/urbanfarming/chart', function(req, res) {
+    var a;
+    var b;
+    processForm(req, res, (a, b) =>{
+        console.log(a);
+        console.log(b);
+        generateChart((c) => {displayChart(c, res)},a,b);      
+    })
+})
+
 app.get('/', function (req, res) {
     res.redirect(301,  "/urbanfarming/");
 })
@@ -495,6 +576,7 @@ app.get('/urbanfarming/processImage', (req, res) => {
                     console.log("got data ");
                     console.log(f);
                     c = index.replace("{{image}}", "../public/foo1.JPEG"); 
+                    c = c.replace("{{imageO}}", "../public/foo.jpg");
                     c = c.replace("{{score}}", f);
                     res.write(c);
                 }
@@ -531,32 +613,8 @@ app.get('/urbanfarming/game', (req, res) => {
 
 
 app.get('/urbanfarming/chart', (req, res) => {
-    fs.readFile('chart.html', 'utf-8', function( err, data) {
-        res.writeHead( 200, {'Content-Type':'text/html'});
-        var temp = [];
-        var humi = [];
-        var luxl = [];
-        var soil = [];
-        var labelData = [];
-        askDatabase("SELECT * FROM "+ liveData + " WHERE id % 4=0 ORDER BY id DESC LIMIT 255" , function(err, result) {
-            console.log(result);
-            for (var n =0; n<result.rowCount; n++ ){
-                labelData.push(result.rows[n].time);
-                temp.push(result.rows[n].temperature);    
-                humi.push(result.rows[n].relhumidity);    
-                luxl.push(result.rows[n].lightluxlevel);
-                soil.push(result.rows[n].soilmoisture);
-            };
-            var c = data.replace('{{temp}}', JSON.stringify(temp));
-            c = c.replace('{{labels}}',JSON.stringify(labelData));
-            c = c.replace('{{humi}}', JSON.stringify(humi));
-            c = c.replace('{{soil}}', JSON.stringify(soil));
-            c = c.replace('{{luxl}}', JSON.stringify(luxl));
-
-            res.write(c);
-            res.end();
-        })
-    })
+    var c;
+    generateChart((c) => {displayChart(c, res)})
 })
 app.get('/urbanfarming/verifyemail', (req, res) => {
     insertIntoLayout(__dirname+"/pleaseVerify.html", (l)=>{
