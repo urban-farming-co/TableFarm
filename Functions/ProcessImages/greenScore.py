@@ -53,7 +53,7 @@ def readFile(f):
 
 def savePlantImage(m):
     im = Image.fromarray(np.uint8(m*255))
-    im.save("public/foo1.JPEG")
+    im.save("bar.JPEG")
     return
 
 
@@ -100,12 +100,24 @@ def getMin(column, points):
 
 
 def getWidth(p):
+    """ TODO
+     Calulate the actual width using some sort of marker:
+    - edges of the plant pot,
+    - a piece of card - this would translate the clips on the tripod.
+
+    """
     maxX = getMax(0, p)
     minX = getMin(0, p)
     return maxX - minX
 
 
 def getHeight(p):
+    """ TODO
+     Calulate the actual width using some sort of marker:
+    - edges of the plant pot,
+    - a piece of card - this would translate the clips on the tripod.
+
+    """
     maxY = getMax(1, p)
     minY = getMin(1, p)
     return maxY - minY
@@ -143,7 +155,7 @@ if __name__ == '__main__':
     try:
         a = sys.argv[1]
     except:
-        a = "../public/foo.jpg"
+        a = "image.jpg"
     picture = readFile(a)
     processedImage, plantPoints = findThePlant(picture)
 
@@ -154,11 +166,8 @@ if __name__ == '__main__':
     AveragePlantColour = getAveragePlantColour(plantPoints, picture)
 
     displayProcesses(Score, picture, processedImage)
+    savePlantImage(processedImage)
 
     print(Score)
-    print(Width)
-    print(Height)
-    print("square " if Compactness == 0 else "rectangle")
-    print(AveragePlantColour)
 
     sys.stdout.flush()

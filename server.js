@@ -1,20 +1,16 @@
 console.error('Starting');
-var spawn   = require('child_process').spawn;
-var fs      = require('fs');
 var path    = require ('path');
 var formidable = require('formidable');
-var pg      = require('pg');
-var Client  = require('pg').Client;
-var schema  = 'urbanfarming';
-var table   = 'livedateyo';
-var liveData = schema + "." + table;
 var cors    = require('express-cors');
 var vcapServices = require('./vcapServices');
-var conStr  = vcapServices.elephantsql[0].credentials.uri; 
+var fs      = require('fs');
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
 var passport  = require('passport');
+var database  = require('./Functions/Database/checkAndCreate.js');
+var imageStuff = require('./Functions/ProcessImages/process_images.js');
+
 
 
 
@@ -29,6 +25,25 @@ app.use(cors({
         'mybluemix.net', 'localhost:4000', 'tablefarm.co.uk'  
     ]
 }))
+
+// app.use(express.static(path.join(__dirname, 'views')));
+app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
+// app.use("/urbanfarming/public/images", express.static(path.join(__dirname, 'public/images')));
+app.use("/urbanfarming/public/", express.static('public'));
+//app.use("/urbanfarming/public/images", express.static('public/images'));
+
+
+app.get('/urbanfarming/public/:file', function(req, res) {
+    console.log(req.params);    
+    res.sendFile(__dirname + req.params);
+})
+
+app.get('/urbanfarming/Functions/ProcessImages/processed_image.jpg', function(req, res) {
+    res.sendFile(__dirname + "/Functions/ProcessImages/processed_image.jpg");
+})
+app.get('/urbanfarming/Functions/ProcessImages/image.jpg', function(req, res) {
+    res.sendFile(__dirname + "/Functions/ProcessImages/image.jpg");
+})
 
 app.listen(port, (err) => { 
     if (err) {
@@ -53,139 +68,8 @@ app.set('views',__dirname);
 app.engine('handlebars', exphbs);
 app.set('view engine', '');
 
-// app.use(express.static(path.join(__dirname, 'views')));
-app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
-// app.use("/urbanfarming/public/images", express.static(path.join(__dirname, 'public/images')));
-app.use("/urbanfarming/public/", express.static('public'));
-//app.use("/urbanfarming/public/images", express.static('public/images'));
 
-app.get('/urbanfarming/public/files/flower.gif/', function(req, res) {
-    res.sendFile(__dirname + "/public/files/flower.gif")
-})
-
-app.get('/urbanfarming/public/foo.jpg/', function(req, res) {
-    res.sendFile(__dirname + "/public/foo.jpg")
-})
-app.get('/urbanfarming/public/foo1.JPEG/', function(req, res) {
-    res.sendFile(__dirname + "/public/foo1.JPEG")
-})
-app.get('/urbanfarming/public/files/growRig1.jpg/', function(req, res) {
-    res.sendFile(__dirname + "/public/files/growRig1.jpg")
-})
-app.get('/urbanfarming/public/files/growRig2.jpg/', function(req, res) {
-    res.sendFile(__dirname + "/public/files/growRig2.jpg")
-})
-app.get('/urbanfarming/public/index.css/', function(req, res) {
-    res.sendFile(__dirname + "/public/index.css")
-})
-
-app.get('/urbanfarming/public/files/scotsman_article.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/scotsman_article.jpg");
-})
-
-app.get('/urbanfarming/public/files/uoe-logo.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/uoe-logo.jpg");
-})
-
-app.get('/urbanfarming/public/files/ecci-logo.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/ecci-logo.jpg");
-})
-
-app.get('/urbanfarming/public/files/censis-logo.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/censis-logo.jpg");
-})
-
-app.get('/urbanfarming/public/files/uos-logo.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/uos-logo.jpg");
-})
-
-app.get('/urbanfarming/public/files/child.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/child.jpg");
-})
-
-app.get('/urbanfarming/public/files/strawberry.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/strawberry.jpg");
-})
-
-app.get('/urbanfarming/public/files/website.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/website.jpg");
-})
-app.get('/urbanfarming/public/files/lightArray.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/lightArray.jpg");
-})
-app.get('/urbanfarming/public/files/makingLightingRigP.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/makingLightingRigP.jpg");
-})
-app.get('/urbanfarming/public/files/getMotivated.jpg/', function (req, res) {
-    res.sendFile(__dirname + "/public/files/getMotivated.jpg");
-})
-
-checkTablesExist();
-
-var clientPromise;
-function askDatabase( sql, callback ) {
-    console.log(sql)
-        if (clientPromise == null) {
-            clientPromise = pg.connect(conStr);
-        } 
-    clientPromise.then(function (client) {
-        client.query(sql, callback);
-    })
-}
-
-
-
-function createTables(sql, sql1){
-    askDatabase(sql , function(err){
-        if (err) {
-            console.error(err)
-        }
-        askDatabase(sql1, function(err){
-            if (err) {
-                console.error(err)
-            }
-        })
-    });
-}
-function createSchemaAndTables(){
-    var checkSchema = "SELECT 1 FROM information_schema.tables WHERE table_schema='"+schema+"'";
-    var createLiveData = `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER)`;
-    var AddARowToLiveData = `INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature) VALUES (100 ,100 ,100)`;
-
-    askDatabase(checkSchema, function(err, result){
-        if (err) {
-            console.error(err)
-        }
-
-        if (result.rowCount === 0) {
-            askDatabase("CREATE SCHEMA " + schema, function(err){
-                if (err) {
-                    console.error(err)
-                }  
-                createTables(createLiveData, AddARowToLiveData);
-            })
-        }
-        else {
-            createTables(createLiveData, AddARowToLiveData);
-        }
-    })
-}
-
-function checkTablesExist(){    
-    var tableCheck = "SELECT 1 FROM information_schema.tables WHERE table_name='"+table+"' and table_schema='"+schema+"'";
-    console.log("checking tables");
-    askDatabase(tableCheck, function(err, row) {
-        if (err) {console.error(err)}
-        console.log(row);
-        if (row.rowCount === 0 ) {
-            console.log("livedata doesn't exist, creating");
-            createSchemaAndTables()
-        }
-        else {
-            console.log("livedata does exist");
-        }
-    });
-}
+database.checkTablesExist();
 
 
 function formatDate(d){
@@ -196,11 +80,11 @@ function formatDate(d){
 }
 
 function formatTime(t, o ){
-    o = typeof o !== 'undefined' ? o: 0
-        hh = parseInt(t.getHours())
-        hh = hh - parseInt(o);  
-    console.log(hh)
-        hh = ('0' + hh.toString()).slice(-2); 
+    o = typeof o !== 'undefined' ? o: 0;
+    hh = parseInt(t.getHours());
+    hh = hh - parseInt(o);  
+    console.log(hh);
+    hh = ('0' + hh.toString()).slice(-2); 
     mm = ('0' + t.getMinutes()).slice(-2) ;
     ss = t.getSeconds();
     time = `${hh}:${mm}`;
@@ -228,9 +112,9 @@ function getLastXRows(request, response)  {
         "</tr>";
     var x = request.query.x;
     x = 10;
-    var sql="SELECT * FROM "+liveData +" WHERE id >(SELECT MAX(id) - "+ x+ " FROM "+liveData +" )";
+    var sql="SELECT * FROM "+ database.liveData +" WHERE id >(SELECT MAX(id) - "+ x+ " FROM "+database.liveData +" )";
     console.log(sql);
-    askDatabase(sql, function(err, result) {
+    database.askDatabase(sql, function(err, result) {
         if (err) {
             response.write('Error getting data');
             console.error(err)
@@ -264,8 +148,8 @@ function rgbToHex(r, g, b) {
 
 function getHome(request, response, o)  {
     var content = "<table id='data'><tr>";
-    var sql="SELECT * FROM "+liveData+" WHERE id=(SELECT MAX(id) FROM "+liveData+") ";
-    askDatabase (sql, function(err, result){
+    var sql="SELECT * FROM "+database.liveData+" WHERE id=(SELECT MAX(id) FROM "+database.liveData+") ";
+    database.askDatabase (sql, function(err, result){
         if (err) { console.error(err); return false }
         var row = result.rows[0];
         date = formatDate(row.time);
@@ -277,9 +161,9 @@ function getHome(request, response, o)  {
             "<tr><th>Time:                </th><td id='time'>" +time+"</td>                          </tr>"+
             "<tr><th>Plant name:          </th><td>" +row.plantname+"</td>                 </tr>"+
             "<tr><th>Lighting lux level:  </th><td>" +row.lightluxlevel+" lux</td>         </tr>"+
+            "<tr><th>Colour composition:  </th><td  bgcolor='"+row.colour+"'><font color="+rgbf+ "> red="+rgb.r+" green = "+rgb.g+", blue="+rgb.b+"</font></td>               </tr>"+    
             "<tr><th>Soil Moisture:       </th><td>" +row.soilmoisture+"%</td>             </tr>"+
             "<tr><th>Relative Humidity:   </th><td>" +row.relhumidity+"%</td>              </tr>"+
-            "<tr><th>Colour:              </th><td  bgcolor='"+row.colour+"'><font color="+rgbf+ "> red="+rgb.r+" green = "+rgb.g+", blue="+rgb.b+"</font></td>               </tr>"+    
             "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C</td>";
         content+= "</tr></table>";
         response.write(content);
@@ -287,18 +171,6 @@ function getHome(request, response, o)  {
     })
 }
 
-function formatImageForDB(path, response, callback){
-    fs.readFile(path,'hex', function(err, data) {
-        if (!err) {
-            data = '\\x'+data;
-
-            callback(null, data);
-        }else{
-            console.error(err);
-            callback(err);
-        }
-    });
-}
 function processTextFields(fields, response, request, target){
     var moisture =  fields.soilMoisture;
     var colour   = fields.colour;
@@ -307,12 +179,12 @@ function processTextFields(fields, response, request, target){
     var name     = (( fields.plantName== "")?  'a' : fields.plantName);
     var light    = fields.lightLuxLevel;
     if (target){   
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}')`;
+        var sql=`INSERT INTO ${database.liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}')`;
     }
     else {
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}')`;
+        var sql=`INSERT INTO ${database.liveData} (soilMoisture, relHum idity, temperature, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}')`;
     }
-    askDatabase(sql, function(err, result){;
+    database.askDatabase(sql, function(err, result){;
         if(err){
             console.error(err);
             response.write('The data upload was unsucessful. Couldn\'t connect to postgres. Please try again later.');
@@ -322,50 +194,13 @@ function processTextFields(fields, response, request, target){
             response.writeHead(200, {'content-type':'text/plain'});         
             response.write('received upload:\n\n');
             response.end(util.inspect({fields:fields}));
+            imageStuff.processNewImage(database);
         }
     })
 }
 
-function getImageSQL(res,req, x,f){
-    var sql = "";
-    if (x && f){
-        sql = "SELECT image FROM " + liveData + " WHERE id>=" +x +" AND image IS NOT NULL LIMIT 1;";
-    }
-    else if (x==null && f){
-        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData +" WHERE image IS NOT NULL)";
-    }
-    else if(x && f==null) {
-        sql = "SELECT image FROM " + liveData + " WHERE id=" +x ;
-    }
 
-    else {
-        sql = "SELECT image FROM " + liveData + " WHERE id=(SELECT MAX(id) FROM  "+liveData+")" ;
-    }
-    return sql;
-}
 
-function formatImageForDisplay(req,res, x, f, callback){
-    sql = getImageSQL(res, req, x,f);
-    askDatabase(sql , function(err, result){
-        if (err) {
-            console.error(err)
-        }
-        console.log(result);
-        if (result.rowCount === 0){
-            console.log("not sending image")
-                callback(__dirname +"/public/test.jpg");
-        }
-        else if (result.rows[0].image == undefined) {
-            console.log("not sending image")
-                callback(__dirname +"/public/test.jpg");
-        }
-        else {
-            fs.writeFile('public/foo.jpg', result.rows[0].image, function (errr) {
-                callback(__dirname +"/public/foo.jpg");
-            })
-        }
-    })
-}
 
 function processForm(req, res, callback){
     var form = new formidable.IncomingForm();
@@ -385,7 +220,7 @@ function processDataUpload(request, response){
                 processTextFields(fields, response, request, null);
             }
             else {
-                formatImageForDB(files.image.path, response, function (err, target){
+                imageStuff.formatImageForDB(files.image.path, function (err, target){
                     processTextFields(fields, response, request, target);
                 })
             }
@@ -398,39 +233,13 @@ function processDataUpload(request, response){
     })
 }
 
-function processImage(file, callback){
 
-    spawned_process = spawn('python', ["process_images/greenScore.py", file, 3, 1]);
-
-    spawned_process.stdout.on('data', function(data){
-        console.log("GOT DATA");
-        d = data.toString('utf8');
-        console.log(d);
-        callback(d);
-    })
-
-    spawned_process.on('message', function(message){
-        console.log("GOT A MESSAGE");
-        console.log(message.toString('utf8'));
-    })
-
-    spawned_process.stderr.on('data', function(data) {
-        console.log("GOT AN ERROR");
-        console.log(data.toString('utf8'));
-    })
-
-    spawned_process.on('close', function(code) {
-        console.log("child process exited with a code: "+ code);
-        callback(null)
-    })
-
-}
 
 function generateChart(callback, after, before){
-    var sql = "SELECT * FROM "+ liveData;
+    var sql = "SELECT * FROM "+ database.liveData;
     var f = true;
     if (!before && !after) {
-        var sql = "SELECT * FROM "+ liveData + " WHERE id % 4=0" ;
+        var sql = "SELECT * FROM "+ database.liveData + " WHERE id % 4=0" ;
         f = false;
     }
     if (after){
@@ -455,7 +264,7 @@ function generateChart(callback, after, before){
         var luxl = [];
         var soil = [];
         var labelData = [];
-        askDatabase(sql , function(err, result) {
+        database.askDatabase(sql , function(err, result) {
             for (var n =0; n<result.rowCount; n++ ){
                 labelData.push(result.rows[n].time);
                 temp.push(result.rows[n].temperature);    
@@ -488,6 +297,7 @@ function displayChart(c, res){
     res.write(c);
     res.end();
 }
+
 
 function insertIntoLayout(file, callback){
     fs.readFile(file, 'utf8', function(err, index){
@@ -549,8 +359,8 @@ app.get('/urbanfarming/img', function(req, res){
     }
     console.log(f);
     console.log(x);
-    formatImageForDisplay(req, res, x, f, (fileName)=>{
-        res.sendFile(fileName);
+    imageStuff.formatImageForDisplay(database, x, f, (fileName)=>{
+        res.sendFile(__dirname  +fileName);
 
     } );
 }) 
@@ -565,25 +375,32 @@ app.get('/urbanfarming/processImage', (req, res) => {
     if (x && x.substr(-1) == '/') {
         x = x.substr(0, x.length -1);
     }
-    formatImageForDisplay(req,res, x, 1, (fileName)=> {
-        insertIntoLayout(__dirname + "/process.html", (index) => {  
-            processImage(fileName, (f) => {   
-                if (f==null){
-                    res.end();
-                    console.log("got last entry");
-                    return
-                } else {
-                    console.log("got data ");
-                    console.log(f);
-                    c = index.replace("{{image}}", "../public/foo1.JPEG"); 
-                    c = c.replace("{{imageO}}", "../public/foo.jpg");
-                    c = c.replace("{{score}}", f);
-                    res.write(c);
-                }
+    imageStuff.formatImageForDisplay(database, x, 1, (fileName)=> {
+        imageStuff.showProcessedData(database, (file, score)=> {       
+            insertIntoLayout(__dirname + "/process.html", (index) => {  
+                c = index.replace("{{image}}", "/urbanfarming"+ file); 
+                c = c.replace("{{imageO}}", "/urbanfarming" + fileName);
+                c = c.replace("{{score}}", score);
+                res.write(c);
+                res.end();
             });
         })
     })
 })
+
+
+app.get('/urbanfarming/slides/carosel.js', (req, res) => {
+    res.sendFile(__dirname + "/Functions/ProcessImages/carosel.js");
+})
+app.get('/urbanfarming/slides/carosel.css', (req, res) => {
+    res.sendFile(__dirname + "/Functions/ProcessImages/carosel.css");
+})
+
+app.get('/urbanfarming/slides', (req, res) => {
+
+    res.sendFile(__dirname + "/Functions/ProcessImages/carosel.html");
+})
+
 app.get('/urbanfarming/viewcontent', (request, response) => {
     getLastXRows(request, response);
 })

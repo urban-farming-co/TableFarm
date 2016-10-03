@@ -1,0 +1,53 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" lang="nl" content="Easy and accessible photo-carrousel with html, css and unobtrusive javascript">
+    <title>Easy and accessible photo-carrousel</title>
+    <!-- http://www.sitepoint.com/forums/showthread.php?1172426-how-to-make-picture-slide-show-with-html -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="carosel.css">
+
+    <script type="text/javascript">
+// <![CDATA[
+var setPause = 4; // time before next image is fading in (in sec.)
+/*
+   Next style in the head is needed for IE (only if javascript is enabled!): then at opening of the page no flash of the scrollbar:
+ */
+document.write('<style type="text/css">')
+document.write('   #carrousel img { display: none; position: absolute; }');
+document.write('<\/style>');
+// ]]>
+</script><style type="text/css">   #carrousel img { display: none; position: absolute; }</style>
+
+</head>
+<body>
+    <div id="carrousel">
+        <ul>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=10230/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=9869/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=9508/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=9128/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=9051/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=8920/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=8198/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+            <li><img src="http://tablefarm.co.uk/urbanfarming/img?x=7837/"
+                     alt="Photo of ..." title="Click to ...">
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript" src="carosel.js"></script>
+</body>
