@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{{ title }}</title>
+        <title> <%= title %></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
         <link rel="stylesheet" type="text/css" href="../public/index.css" />
@@ -21,7 +21,7 @@
             <input type="submit">
         </form>
 
-        <p> Current values: from {{after}} to {{before}} </p>
+        <p> Current values: from <%= after %> to <%=before%> </p>
         If no dates are given, average values for each day will be calculated instead.
         <center>
         <div style="position:absolute; width:80%; height:100%">
@@ -33,7 +33,7 @@ function twoDigits(f){
     return ('0' + f).slice(-2);
 
 }
-var minHourDays = {{labels}};
+var minHourDays = <%=labels%>;
 var lab = [];
 var d = "";
 var m;
@@ -61,7 +61,7 @@ var data = {
         pointStrokeColor: "#fff",
         pointHighlightFill: "#fff",
         pointHighlightStroke: "rgba(220,220,220,1)",
-        data:[ {{temp}}]
+        data:[ <%= temp %> ]
     },
 
     {
@@ -72,7 +72,7 @@ var data = {
         pointStrokeColor: "#0",
         pointHighlightFill: "#0",
         pointHighlightStroke: "rgba(100,100,100,1)",
-        data: [{{humi}} ]
+        data: [ <%= humi %> ]
     },
     {
         label: "Light Lux Level",
@@ -82,7 +82,7 @@ var data = {
         pointStrokeColor: "#0",
         pointHighlightFill: "#0",
         pointHighlightStroke: "rgba(100,100,100,1)",
-        data:[ {{luxl}} ]
+        data:[ <%=luxl%> ]
     },
     {
         label: "Soil Moisture",
@@ -92,7 +92,7 @@ var data = {
         pointStrokeColor: "#0",
         pointHighlightFill: "#0",
         pointHighlightStroke: "rgba(100,100,100,1)",
-        data:[ {{soil}} ]
+        data:[ <%= soil %> ]
     }
     ]
 
