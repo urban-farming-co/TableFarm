@@ -9,6 +9,7 @@ from skimage.io import imread
 from skimage import img_as_float
 import numpy as np
 
+saveLocation = "bar.JPEG"
 
 def isRed(pixel):
     # if the green part is greater than the blue and red part.
@@ -53,7 +54,7 @@ def readFile(f):
 
 def savePlantImage(m):
     im = Image.fromarray(np.uint8(m*255))
-    im.save("bar.JPEG")
+    im.save(saveLocation)
     return
 
 
@@ -151,6 +152,20 @@ def getCompactness(width, height):
         return -1
 
 
+def rtoh(rgb):
+    return '"%s"' % ''.join(('%02x' % p for p in rgb))
+
+
+def displayPheno(p):
+    s = '{'
+
+    for k in p.keys():
+        s = s + '"' + str(k) + '": ' + str(p[k]) + ', '
+
+    s = s + '"0":0 }'
+    print(s)
+
+
 if __name__ == '__main__':
     try:
         a = sys.argv[1]
@@ -158,16 +173,16 @@ if __name__ == '__main__':
         a = "image.jpg"
     picture = readFile(a)
     processedImage, plantPoints = findThePlant(picture)
-
-    Score = getScore(plantPoints)
-    Width = getWidth(plantPoints)
-    Height = getHeight(plantPoints)
-    Compactness = getCompactness(Width, Height)
-    AveragePlantColour = getAveragePlantColour(plantPoints, picture)
-
-    displayProcesses(Score, picture, processedImage)
+    pheno = {}
+    pheno["Score"] = getScore(plantPoints)
+    pheno["Width"] = getWidth(plantPoints)
+    pheno["Height"] = getHeight(plantPoints)
+    pheno["Compactness"] = getCompactness(pheno["Width"], pheno["Height"])
+    p = getAveragePlantColour(plantPoints, picture)
+    pheno["AveragePlantColour"] = rtoh(p)
+    pheno["saveTo"] = '"' + saveLocation + '"'
     savePlantImage(processedImage)
 
-    print(Score)
+    displayPheno(pheno)
 
     sys.stdout.flush()

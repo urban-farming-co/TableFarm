@@ -3,10 +3,16 @@ var spawn   = require('child_process').spawn;
 
 
 
-module.exports = {formatImageForDB, formatImageForDisplay, processNewImage, processImage, getImageSQL, showProcessedData }
+module.exports = {formatImageForDB,
+    //  formatImageForDisplay, 
+    processNewImage, 
+    processImage,
+    getImageSQL, 
+    showProcessedData 
+}
 
 
-function formatImageForDB(path, callback){
+function formatImageForDB( path, callback){
     console.log(path);
     fs.readFile(path,'hex', function(err, data) {
         if (!err) {
@@ -43,7 +49,7 @@ function getImageSQL(database, x,f){
 function showProcessedData(database, callback){
     database.askDatabase("SELECT *  FROM "+database.processedData + " WHERE id=(SELECT MAX(id) FROM "+database.processedData+")" , function(err, result){
         if (err) {
-            console.error(err)
+            console.error(err);
         }
         console.log(result);
         if (result.rowCount === 0){
@@ -56,10 +62,6 @@ function showProcessedData(database, callback){
         }
         else {
             fs.writeFile(__dirname + "/processed_image.jpg", result.rows[0].image, function (errr) {
-                console.log(result.rows[0]);
-                console.log(result.rows[0].greenscore);
-                console.log(result.rows[0].greenScore);
-
                 callback("/Functions/ProcessImages/processed_image.jpg", result.rows[0].greenscore);
             })
         }
@@ -67,38 +69,22 @@ function showProcessedData(database, callback){
 }
 
 
-function formatImageForDisplay(database, x, f, callback){
-    sql = getImageSQL(database, x,f);
-    database.askDatabase(sql , function(err, result){
-        if (err) {
-            console.error(err)
-        }
-        if (result.rowCount === 0){
-            console.log("not sending image")
-                callback("/public/test.jpg");
-        }
-        else if (result.rows[0].image == undefined) {
-            console.log("not sending image")
-                callback("/public/test.jpg");
-        }
-        else {
-            fs.writeFile(__dirname + "/image.jpg", result.rows[0].image, function (errr) {
-                callback("/Functions/ProcessImages/image.jpg");
-            })
-        }
-    })
-}
 
+function processImage(file, callback){
 
-function processImage(file, callback, id){
-
-    spawned_process = spawn('python', ["Functions/ProcessImages/greenScore.py", file, 3, id]);
+    spawned_process = spawn('python', ["Functions/ProcessImages/greenScore.py", file, 3]);
 
     spawned_process.stdout.on('data', function(data){
         console.log("GOT DATA");
-        d = data.toString('utf8');
+        d = data.toString();
         console.log(d);
-        callback(d, id);
+        var dict = {};
+        dict = JSON.parse(d);
+        for (key in dict){
+            console.log(dict[key]);
+        }
+        dict["AveragePlantColour"] = "#" + dict["AveragePlantColour"];
+        callback(dict);
     })
 
     spawned_process.on('message', function(message){
@@ -113,27 +99,28 @@ function processImage(file, callback, id){
 
     spawned_process.on('close', function(code) {
         console.log("child process exited with a code: "+ code);
-        callback(null)
+        callback(null);
     })
 
 }
-function processNewImage(database){
+
+function processNewImage(id, saveProcessedData ){
     // Get the id that the processed data needs to have to match up with live data.
-    database.askDatabase("SELECT id FROM "+ database.liveData + " WHERE id = (SELECT MAX(id) FROM "+database.liveData +" WHERE image IS NOT NULL)", function(err,result) {
-        // Retrieve the image from the database, save it in file.
-        formatImageForDisplay(database, result.rows[0].id,1,(file) =>{;
-            processImage("Functions/ProcessImages/image.jpg", (data, id)=>{
-                if (data != null){
-                    formatImageForDB("bar.JPEG", (err, image) => {;
-                        database.askDatabase(`INSERT INTO ${database.processedData} (id, image, greenScore) VALUES (${id}, '${image}' , ${data})`, (err)=>{
-                            console.log("processed");
-                            if (err){
-                                console.error(err)
-                            }
-                        });
-                    })
-                }
-            }, result.rows[0].id);
-        })
-    })
+    // Retrieve the image from the database, save it in file.
+    processImage("Functions/ProcessImages/image.jpg", (data)=>{
+        if (data != null){
+            formatImageForDB(data["saveTo"], (err, image) => {;
+                data["id"] = id;
+                data["image"] = image;
+                saveProcessedData(data, () =>{
+                    console.log("processed");
+                    if (err){
+                        console.error(err)
+
+                    }
+                })
+            });
+        }
+    }) 
 }
+

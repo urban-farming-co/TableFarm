@@ -99,8 +99,8 @@ table[id^="data"] th{
     text-align:right;
     width:50%;
 }
-table[id^="data"] img {
-    width:100px;
+div#table img {
+    width:120px;
 
 }
 table[id^="data"] td{

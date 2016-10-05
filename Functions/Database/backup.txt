@@ -1,0 +1,4 @@
+pg_dump -a -b -t urbanfarming.livedateyo postgres://bxxxdrcy:CusgDp8CGYvi4lu56rDDLuRWcF46PZiv@qdjjtnkv.db.elephantsql.com:5432/bxxxdrcy > ../Database/backup.sql
+
+
+psql postgres://ycalgjst:OoU9WS1BS8qiPbjGotKo-kVV_79C8jZt@qdjjtnkv.db.elephantsql.com:5432/ycalgjst < backup.sql

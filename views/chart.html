@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ title }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="../public/index.css" />
+        <link rel="shortcut icon" type="image/x-icon" href='../public/files/flower.ico' />
+        <meta charset="utf-8" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    </head>
+    <body style="margin:0">
+
+
+      <form action="" method="post" enctype="multipart/form-data">
+            Find data after: 
+            <input type="date" name="after">
+            Find data before: 
+            <input type="date" name="before">
+            <input type="submit">
+        </form>
+
+        <p> Current values: from {{after}} to {{before}} </p>
+        If no dates are given, average values for each day will be calculated instead.
+        <center>
+        <div style="position:absolute; width:80%; height:100%">
+            <canvas id="myChart"></canvas>
+        </div>
+        </center>
+        <script>
+function twoDigits(f){
+    return ('0' + f).slice(-2);
+
+}
+var minHourDays = {{labels}};
+var lab = [];
+var d = "";
+var m;
+for (var mhd in (minHourDays)){
+    console.log(mhd);
+    d = (`${minHourDays[mhd][1]}-${twoDigits(minHourDays[mhd][2])}-${twoDigits(minHourDays[mhd][3])}T${twoDigits(minHourDays[mhd][4])}:${twoDigits(minHourDays[mhd][5])}:${twoDigits(minHourDays[mhd][6])}` ) 
+
+    console.log(d);
+    m = new Date(d)
+    console.log(m);
+    lab.push ([
+            minHourDays[mhd][0], 
+            (m).toString()
+    ] )
+}
+
+var data = {
+    labels:  lab ,
+    datasets: [
+    {
+        label: "Temperature",
+        fillColor: "rgba(220,220,220,0.2)",
+        strokeColor: "rgba(220,220,220,1)",
+        pointColor: "rgba(220,220,220,1)",
+        pointStrokeColor: "#fff",
+        pointHighlightFill: "#fff",
+        pointHighlightStroke: "rgba(220,220,220,1)",
+        data:[ {{temp}}]
+    },
+
+    {
+        label: "Relative Humidity",
+        fillColor: "rgba(100,10,100,0.2)",
+        strokeColor: "rgba(100,10,100,1)",
+        pointColor: "rgba(100,10,100,1)",
+        pointStrokeColor: "#0",
+        pointHighlightFill: "#0",
+        pointHighlightStroke: "rgba(100,100,100,1)",
+        data: [{{humi}} ]
+    },
+    {
+        label: "Light Lux Level",
+        fillColor: "rgba(100,10,100,0.2)",
+        strokeColor: "rgba(100,10,100,1)",
+        pointColor: "rgba(100,10,100,1)",
+        pointStrokeColor: "#0",
+        pointHighlightFill: "#0",
+        pointHighlightStroke: "rgba(100,100,100,1)",
+        data:[ {{luxl}} ]
+    },
+    {
+        label: "Soil Moisture",
+        fillColor: "rgba(100,10,100,0.2)",
+        strokeColor: "rgba(100,10,100,1)",
+        pointColor: "rgba(100,10,100,1)",
+        pointStrokeColor: "#0",
+        pointHighlightFill: "#0",
+        pointHighlightStroke: "rgba(100,100,100,1)",
+        data:[ {{soil}} ]
+    }
+    ]
+
+};
+
+var ctx = document.getElementById("myChart").getContext("2d");
+var myNewChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options:{ 
+        scales: {
+            yAxes:[{
+                ticks:{
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+})
+        </script>
+    </body>
+</html>
