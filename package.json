@@ -16,11 +16,12 @@
     "jquery": "^3.1.0",
     "mocha": "^3.0.2",
     "passport": "^0.3.2",
-    "pg": "^6.1.0"
+    "pg": "^6.1.0",
+    "re": "^0.1.4"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "mocha test",
+    "test": "mocha ./test/ --recursive -b -t 1000000 ",
     "start": "node server.js"
   },
   "repository": {
