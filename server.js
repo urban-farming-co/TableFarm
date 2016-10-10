@@ -67,7 +67,7 @@ app.use(function(req, res, next) {
     }
 });
 
-app.engine('html', cons.swig);
+app.engine('html', cons.ejs);
 app.set('views',__dirname + "/views");
 // app.engine('handlebars', exphbs);
 app.set('view engine', 'html');
@@ -82,9 +82,30 @@ function processChartForm(req, res, callback){
     form.parse(req, function(err, fields, files) {
         console.log(fields);
         callback( fields.after, fields.before);
+        console.log(fields.after);
+        console.log(fields.before);
     })
 }
 
+function insertIntoLayout(file, callback){
+    fs.readFile(file, 'utf8', function(err, index){
+        if (err) {
+            console.error(err);
+        }
+        else {
+            index= index.toString();
+            fs.readFile('views/layout.html', 'utf8', function(err, layout) {;
+                if (err) {
+                    console.error(err);
+                }else {
+                    layout  = layout.replace('{{content}}', index );
+                    callback(layout);
+                }
+
+            })
+        }
+    })
+}
 
 function processNewImage(database){
     // Get the id that the processed data needs to have to match up with live data.
@@ -107,36 +128,26 @@ function processNewImage(database){
     })
 }
 
-function insertIntoLayout(file, callback){
-    fs.readFile(file, 'utf8', function(err, index){
-        if (err) {
-            console.error(err);
-        }
-        else {
-            index= index.toString();
-            fs.readFile('layout.html', 'utf8', function(err, layout) {;
-                if (err) {
-                    console.error(err);
-                }else {
-                    layout  = layout.replace('{{content}}',index);
-                    callback(layout);
-                }
-
-            })
-        }
-    })
-}
 app.post('/urbanfarming/data', function(req, res){
     database.processDataUpload(req, res, formidable, imageStuff)  
 })
 
 app.post('/urbanfarming/chart', function(req, res) {
-    var a;
-    var b;
+    console.log("post");
     processChartForm(req, res, (a, b) =>{
-        tableStuff.generateChartData(database, (c) => {
+        tableStuff.generateChartData(database, (err, c) => {
             console.log(c);
             res.render("chart", c)},a,b);      
+    })
+})
+
+
+app.post('/urbanfarming/plantchart', function(req, res) {
+    console.log("post");
+    processChartForm(req, res, (a, b) =>{
+        tableStuff.generatePlantChartData(database, (err, c) => {
+            console.log(c);
+            res.render("plantChart", c)},a,b);      
     })
 })
 
@@ -145,15 +156,8 @@ app.get('/', function (req, res) {
 })
 
 app.get('/urbanfarming/data', (req, res) => {
-    fs.readFile('form.html', function(err, data) {
-        res.writeHead(200, {
-            'Content-Type' : 'text/html',
-            'Content-Length': data.length 
-        });
-        res.write(data);
-        res.end();
-    });
-})
+    res.render("form");
+});
 
 app.get('/urbanfarming/pimg', function(req, res){
     var x = req.query.x;
@@ -197,12 +201,19 @@ app.get('/urbanfarming/processImage', (req, res) => {
     }
     database.formatImageForDisplay(x, 1, (fileName)=> {
         imageStuff.showProcessedData(database, (file, score)=> {       
-            insertIntoLayout(__dirname + "/process.html", (index) => {  
-                c = index.replace("{{image}}", "/urbanfarming"+ file); 
-                c = c.replace("{{imageO}}", "/urbanfarming" + fileName);
-                c = c.replace("{{score}}", score);
-                res.write(c);
-                res.end();
+            /*insertIntoLayout(__dirname + "/views/process.html", (index) => {  
+              c = index.replace("{{image}}", "/urbanfarming"+ file); 
+              c = c.replace("{{imageO}}", "/urbanfarming" + fileName);
+              c = c.replace("{{score}}", score);
+              res.write(c);
+              res.end();
+              });
+              */
+            res.render("process", {
+                title:"Processed Image",
+                image:`/urbanfarming${file.toString()}`,
+                imageO:`/urbanfarming${fileName}`,
+                score: score
             });
         })
     })
@@ -246,7 +257,7 @@ app.get('/urbanfarming/viewcontent', (request, response) => {
     })
 })
 app.get('/urbanfarming/view', (request, response) => {
-    response.sendFile(__dirname + "/view.html", () =>{
+    response.sendFile(__dirname + "/views/view.html", () =>{
         console.log("sent");
         response.end();
 
@@ -277,26 +288,29 @@ app.get('/urbanfarming/liveData',(req, res)=>{
 
 app.get('/urbanfarming/game', (req, res) => {
     var index ='<iframe src="http://zap.pm/game/55ae4e2b7dfb285122934106/play" width="480" height="365" allowfullscreen></iframe><br> <a href="http://zap.pm/game/55ae4e2b7dfb285122934106" target=_blank>Tank Battle by roger on ZAP<br> Remix to add your own pictures and settings!</a> - See more at: http://zap.pm/game/55ae4e2b7dfb285122934106#sthash.Ptk8wWfG.dpuf';
-    res.write(index);
-    res.end()
+    //res.writeHead(200, {
+    //    "Content-Type": "text/plain"
+    //});
+    res.render("layout", {title: "possible game",
+        content:index});
 })
 
 
+app.get('/urbanfarming/plantchart', (req, res) => {
+    console.log("get");
+    tableStuff.generatePlantChartData(database, (err, dict) => {
+        res.render("plantChart", dict);
+    })
+})
 app.get('/urbanfarming/chart', (req, res) => {
-    var c;
-    tableStuff.generateChartData(database, (dict) => {
+    console.log("get");
+    tableStuff.generateChartData(database, (err, dict) => {
         res.render("chart", dict);
     })
 })
 app.get('/urbanfarming/verifyemail', (req, res) => {
-    insertIntoLayout(__dirname+"/pleaseVerify.html", (l)=>{
-        res.write(l);
-        res.end();
-    });
+    res.render("pleaseVerify", {title: "Please check your email"});
 })
 app.get('/urbanfarming/verified', (req, res) => {
-    insertIntoLayout(__dirname + "/thanksVerify.html", (l) => {
-        res.write(l);
-        res.end();
-    });
+    res.render("thanksVerify", {title: "Thank you"});
 })

@@ -1,6 +1,14 @@
+<html>
+    <head>
+        <title><%- title %> </title>
+        <% include header %>
+    </head>
+    <body>
+
         <h2>image processing complete</h2>
         <hr/>
-        <img src={{image}} />
-        <img src={{imageO}} />
-        <p>Your score was  {{score}} </p>
-
+        <img src=<%= image %> />
+        <img src=<%= imageO %> />
+        <p>Your score was  <%= score %> </p>
+    </body>
+</html>
