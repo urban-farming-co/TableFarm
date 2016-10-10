@@ -2,7 +2,26 @@ module.exports = {
     getLastXRows,
     getHome,
     generateChartData,
-    generatePlantChartData
+    generatePlantChartData,
+    getImageIDs
+}
+
+
+function getImageIDs(database, callback){
+    sql = "SELECT id FROM " + database.liveData + " WHERE IMAGE IS NOT NULL";
+    database.askDatabase(sql, (err, result) => {
+        if (err) {
+            console.error(err);
+        }
+        console.log(result);
+        ids = []
+        for (row in result.rows){
+            console.log(row);
+            ids.push(result.rows[row].id);
+        }
+        callback(ids);
+    })
+
 }
 
 function generatePlantChartData(database, callback, after, before){

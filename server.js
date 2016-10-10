@@ -221,15 +221,17 @@ app.get('/urbanfarming/processImage', (req, res) => {
 
 
 app.get('/urbanfarming/slides/carosel.js', (req, res) => {
-    res.sendFile(__dirname + "/Functions/ProcessImages/carosel.js");
+    res.sendFile(__dirname + "/views/carosel.js");
 })
 app.get('/urbanfarming/slides/carosel.css', (req, res) => {
-    res.sendFile(__dirname + "/Functions/ProcessImages/carosel.css");
+    res.sendFile(__dirname + "/views/carosel.css");
 })
 
 app.get('/urbanfarming/slides', (req, res) => {
-
-    res.sendFile(__dirname + "/Functions/ProcessImages/carosel.html");
+    tableStuff.getImageIDs(database, (ids) =>{
+        console.log(ids);
+        res.render("carosel", {title:"timelapse", ids:ids});
+    })
 })
 
 app.get('/urbanfarming/viewcontent', (request, response) => {

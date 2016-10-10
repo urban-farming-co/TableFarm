@@ -1,0 +1,39 @@
+
+#carrousel img { 
+    width:  100px;
+    height: 100px;
+    position: absolute;
+    display: none;
+}
+#carrousel {
+    width:  110px; 
+    height: 110px; 
+    margin-top: 20px;    
+    margin-bottom: 20px; 
+}
+#carrousel ul {
+    height: 110px;
+}
+
+#carrousel img {
+    padding: 5px;
+    vertical-align: top;
+    border: 0; 
+}
+#carrousel {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 0 0 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#carrousel ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+#carrousel li {
+    margin: 0;
+    padding: 0;
+}

@@ -1,0 +1,31 @@
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="carosel.css" />
+
+        <title><%- title -%></title>
+        <% include header %>
+    </head>
+    <body>
+        <div id="carrousel">
+            <ul>
+                <li> Hello </li>
+            </ul>
+        </div>
+        <p id="i">There </p>
+
+        <script>
+// Get Image ID's
+var ids = [ <%= ids %> ];
+
+var str = "<ul>";
+for (var id in ids){
+    console.log(ids[id]);
+    str = str + "<li><img src='../img?x="+ ids[id] +"/' alt='Photo of ...' title='Click to ...'> </li>"
+}
+document.getElementById("carrousel").innerHTML = str + "</ul>";
+        </script>
+        <!-- Slide through images -->
+        <script type="text/javascript" src="carosel.js"></script> 
+    </body>
+</html>
