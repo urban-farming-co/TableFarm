@@ -2,79 +2,155 @@ module.exports = {
     getLastXRows,
     getHome,
     generateChartData,
+    generatePlantChartData
 }
 
-function generateChartData(database, callback, after, before){
-    var sql = "SELECT * FROM "+ database.liveData;
-    var f = true;
+function generatePlantChartData(database, callback, after, before){
+    sql = workOutSQL(database, database.processedData, "SELECT AVG(height) as height, AVG(width) as width, MIN(time) as time, AVG(greenscore) as score, MAX(livedateyo.id) FROM urbanfarming.livedateyo, urbanfarming.processedData WHERE livedateyo.id = processedData.id AND time > CURRENT_DATE - 60 GROUP BY time::DATE", after, before);
+
+    var wid = [];
+    var hei = [];
+    var sco = [];
+    var labelData = [];
+    database.askDatabase(sql , function(err, result) {
+        if (err){
+            console.error(err);
+        }
+        console.log("the result is: ");
+        console.log(result);
+        for (var n =0; n<result.rowCount; n++ ){
+
+            labelData.push(formatLabel(result.rows[n], n));
+            w = parseInt(result.rows[n].width);
+            h = parseInt(result.rows[n].height);
+            s = parseInt(result.rows[n].score);
+            wid.push(w || 0);    
+            hei.push(h || 0);    
+            sco.push(s || 0);
+        }
+        var e;
+        e = afterAndBefore(after, before);
+        console.log(e[0]);
+        console.log(e[1]);
+        console.log(e[2]);
+
+        dict = { title      : e[2],
+            score : sco,
+            labels: JSON.stringify(labelData),
+            width :wid,
+            height : hei,
+            after: e[0],
+            before:e[1]
+        }
+        callback(null, dict);
+    })
+}
+
+
+function workOutSQL(database, table,  noABsql, after, before){
+    if (table == database.processedData){
+        var sql = "SELECT height, width, time, greenscore as score, livedateyo.id FROM urbanfarming.livedateyo, urbanfarming.processedData WHERE livedateyo.id = processedData.id" ;
+
+        var whereInStatement= true;
+    }else {
+        var sql = "SELECT * FROM "+ table;
+        var whereInStatement= false;
+    }
     if (!before && !after) {
         // Temp, Humi, light, soil
-        var sql = "SELECT AVG(temperature) as temperature, AVG(relhumidity) as relhumidity, MIN(time) as time, AVG(lightluxlevel) as lightluxlevel, AVG(soilmoisture) as soilmoisture, MAX(id) FROM urbanfarming.livedateyo WHERE temperature IS NOT NULL AND relhumidity IS NOT NULL and lightluxlevel IS NOT NULL and  time > CURRENT_DATE -60 GROUP BY time::DATE";
-        f = false;
+        sql = noABsql;
+        sql = sql + " ORDER BY time ASC";
+        whereInStatement= true;
     }else {
-        if (after){
-            var b = sql + " AND time > '" + after + "'";
-            if (f){ 
-                b = sql + " WHERE time > '" + after + "'";
-                f = false;
+        console.log(after)
+            console.log(before)
+            if (typeof after !== 'undefined' && after){
+                var b = sql + " AND time > '" + after + "'";
+                if  (!whereInStatement){ 
+                    b = sql + " WHERE time > '" + after + "'";
+                    whereInStatement= true;
+                }
+                sql = b;
+            }
+        if (typeof before !== 'undefined' && before){
+            var b = sql + " AND time < '" + before + "'";
+            if  (!whereInStatement){ 
+                b = sql + " WHERE time > '" + before + "'";
             }
             sql = b;
         }
-        if (before){
-            var b = sql + " AND time < '" + before + "'";
-            if (f){ 
-                b = sql + " WHERE time > '" + after + "'";
-            }
-            sql = b
-        }
+        sql = sql + " ORDER BY time ASC";
     }
-    sql = sql + " ORDER BY time ASC LIMIT 10";
+    return sql;
+}
+
+function formatLabel(result, n){
+    return [n, 
+    result.time.getFullYear(), 
+    result.time.getMonth() + 1, 
+    result.time.getDate(), 
+    result.time.getHours(), 
+    result.time.getMinutes(),  
+    result.time.getSeconds(), 
+    ]
+}
+
+
+function afterAndBefore(after, before){
+    var e = "the dawn of time";
+    var d = "the end of time";
+    if (after) {
+        e = JSON.stringify(after)
+    }
+    if (before) {
+        d = JSON.stringify(before)
+    }
+    t = "chart";
+    return [e, d, t];
+}
+
+function generateChartData(database, callback, after, before){
+    sql = workOutSQL(database, database.liveData, "SELECT AVG(temperature) as temperature, AVG(relhumidity) as relhumidity, MIN(time) as time, AVG(lightluxlevel) as lightluxlevel, AVG(soilmoisture) as soilmoisture, MAX(id) FROM urbanfarming.livedateyo WHERE time > CURRENT_DATE -60 GROUP BY time::DATE", after, before);
+    console.log(sql);
     var temp = [];
     var humi = [];
     var luxl = [];
     var soil = [];
     var labelData = [];
 
+    console.log("HELLO");
     database.askDatabase(sql , function(err, result) {
         if (err){
             console.error(err);
         }
-
-        console.log(result)
+        console.log("the result is: ");
+        console.log(result);
         for (var n =0; n<result.rowCount; n++ ){
-            labelData.push([n, 
-                    result.rows[n].time.getFullYear(), 
-                    result.rows[n].time.getMonth() + 1, 
-                    result.rows[n].time.getDate(), 
-                    result.rows[n].time.getHours(), 
-                    result.rows[n].time.getMinutes(),  
-                    result.rows[n].time.getSeconds(), 
-            ]);
-            temp.push(parseInt(result.rows[n].temperature));    
-            humi.push(parseInt(result.rows[n].relhumidity));    
-            luxl.push(parseInt(result.rows[n].lightluxlevel));
-            soil.push(parseInt(result.rows[n].soilmoisture));
+            labelData.push(formatLabel(result.rows[n], n));
+            t = parseInt(result.rows[n].temperature);
+            h = parseInt(result.rows[n].relhumidity);
+            l = parseInt(result.rows[n].lightluxlevel);
+            m = parseInt(result.rows[n].soilmoisture);
+            temp.push(t || 0);    
+            humi.push(h || 0);    
+            luxl.push(l || 0);
+            soil.push(m || 0);
         };
-        var e = "the dawn of time";
-        var d = "the end of time";
-        if (after) {
-            e = JSON.stringify(after)
+        var e;
+
+        e = afterAndBefore(after, before);
+
+        dict = { title      : e[2],
+            temp       : temp,
+            labels     : JSON.stringify(labelData),
+            humi       : humi,
+            soil       : soil,
+            luxl       : luxl,
+            after      : e[0],
+            before     : e[1]
         }
-        if (before) {
-            d = JSON.stringify(before)
-        }
-        t = "chart"
-            dict = { title      : t,
-                temp       : temp,
-                labels     : JSON.stringify(labelData),
-                humi       : humi,
-                soil       : soil,
-                luxl       : luxl,
-                after      : e,
-                before     : d
-            }
         console.log(dict);
-        callback(dict)
+        callback(err, dict)
     })
 
 }
