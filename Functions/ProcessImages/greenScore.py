@@ -1,15 +1,17 @@
 # from skimage import color
 import sys
-try:
-    import Image
-except ImportError:
-    from PIL import Image
 import matplotlib.pyplot as plt
 from skimage.io import imread
 from skimage import img_as_float
 import numpy as np
+try:
+    import Image
+except ImportError:
+    from PIL import Image
 
 saveLocation = "bar.JPEG"
+cardLengthmm = 75
+
 
 def isRed(pixel):
     # if the green part is greater than the blue and red part.
@@ -100,28 +102,46 @@ def getMin(column, points):
     return m
 
 
-def getWidth(p):
-    """ TODO
-     Calulate the actual width using some sort of marker:
-    - edges of the plant pot,
-    - a piece of card - this would translate the clips on the tripod.
+def isOrange(orange, pixel):
+    if pixel[0] >= (orange[0] - 0.14) and pixel[0] <= (orange[0] + 0.14):
+        if pixel[2] >= (orange[2] - 0.14) and pixel[2] <= (orange[2] + 0.14):
+            if pixel[1] >= (orange[1] - 0.1) and pixel[1] <= (orange[1] + 0.14):
+                return True
+    return False
 
+
+def findCard(p):
     """
+    There is an orange card in the image.
+    Return the length of the card in pixels.
+    The actual length of the card is 7.5cm
+    """
+    l = []
+    orange = (234 / 255.0, 142 / 255.0, 65 / 255.0)
+    print(orange)
+    for x in range(p.shape[0]):
+        for y in range(p.shape[1]):
+            if (isOrange(orange, p[x][y])):
+                p[x][y][0] = p[x][y][2] = 1
+                l.append((y, x))
+    x1 = getMin(0, l)
+    x2 = getMax(0, l)
+    return p, x2 - x1
+
+
+def getWidth(p, ratio):
+
     maxX = getMax(0, p)
     minX = getMin(0, p)
-    return maxX - minX
+
+    return (maxX - minX) * ratio
 
 
-def getHeight(p):
-    """ TODO
-     Calulate the actual width using some sort of marker:
-    - edges of the plant pot,
-    - a piece of card - this would translate the clips on the tripod.
-
-    """
+def getHeight(p, ratio):
     maxY = getMax(1, p)
     minY = getMin(1, p)
-    return maxY - minY
+    print(ratio)
+    return (maxY - minY) * ratio
 
 
 def getAverageColour(column, points, image):
@@ -171,12 +191,16 @@ if __name__ == '__main__':
         a = sys.argv[1]
     except:
         a = "image.jpg"
+
     picture = readFile(a)
     processedImage, plantPoints = findThePlant(picture)
+    processedImage, length = findCard(processedImage)
+    mmtopixRatio = cardLengthmm/(length+0.0)
+
     pheno = {}
     pheno["Score"] = getScore(plantPoints)
-    pheno["Width"] = getWidth(plantPoints)
-    pheno["Height"] = getHeight(plantPoints)
+    pheno["Width"] = getWidth(plantPoints, mmtopixRatio)
+    pheno["Height"] = getHeight(plantPoints, mmtopixRatio)
     pheno["Compactness"] = getCompactness(pheno["Width"], pheno["Height"])
     p = getAveragePlantColour(plantPoints, picture)
     pheno["AveragePlantColour"] = rtoh(p)
@@ -184,5 +208,6 @@ if __name__ == '__main__':
     savePlantImage(processedImage)
 
     displayPheno(pheno)
+    displayProcesses(pheno["Score"], picture, processedImage)
 
     sys.stdout.flush()
