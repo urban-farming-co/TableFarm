@@ -29,4 +29,5 @@ RUN pip install image \
 
 # start up the node app.  
 RUN npm install
-CMD npm start
+RUN npm test
+ENTRYPOINT npm start
