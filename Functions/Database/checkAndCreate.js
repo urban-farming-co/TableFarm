@@ -115,7 +115,7 @@ function processTextFields(fields, target, callback){
         var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}')`;
     }
     else {
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHum idity, temperature, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}')`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}')`;
     }
     askDatabase(sql, function(err, result){;
         if(err){
@@ -135,7 +135,9 @@ function processTextFields(fields, target, callback){
 function processDataUpload(request, response, formidable, imageStuff){
     var form = new formidable.IncomingForm();
     form.parse(request, function(err, fields, files) {
+        console.log(fields);
         if (files) {
+            console.log(files);
             if (files.image.size<1) {
                 processTextFields(fields, null, (c) => {
                     response.write(c);
