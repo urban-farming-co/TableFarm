@@ -278,13 +278,10 @@ app.get('/urbanfarming/liveData',(req, res)=>{
     tableStuff.getHome( o, database, (err, content)=>{
         if (err){
             res.write(err);
+            res.end();
         }else{
-            res.writeHead(200, {
-                'Content-Type'  : 'text/html', 
-                'Content-Length': Buffer.byteLength(content)});
-            res.write(content);
+            res.render("liveData", {row:content});
         }
-        res.end()
     });
 })
 

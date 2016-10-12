@@ -253,28 +253,16 @@ function getHome(o, database, callback)  {
         time = formatTime(row.time, o);
         var rgb = getrgb(row.colour); 
         var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
-        // content +="<th>                   </th><td><img src='http://tablefarm.co.uk/urbanfarming/img?f=1/' /> <img src='http://tablefarm.co.uk/urbanfarming/pimg?f=1/' /> </td>        </tr>"+
 
-        var content = "<h3>Green Fingers Score:"+row.greenscore+"</h3>";
-        content +="<img width=100 src='/urbanfarming/img?f=1/' /> <img width=100 src='/urbanfarming/pimg/' /> "+
-            "<table id='data-plant'><tr>"+
-            "<tr><th>Plant name:          </th><td>" +row.plantname+                 "</td></tr>"+
-            "<tr><th>Date:                </th><td id='date' >" +date+               "</td></tr>"+
-            "<tr><th>Time:                </th><td id='time'>" +time+                "</td></tr>"+
-            "<tr><th>Green Fingers Score: </th><td> " +row.greenscore +              " </td></tr>" + 
-            "<tr><th>Plant Width:         </th><td> " +row.width +                   " </td></tr>" + 
-            "<tr><th>Plant Height:        </th><td> " +row.height +                  " </td></tr>" + 
-            "<tr><th>Plant Compactness:   </th><td> " +row.compactness +             " </td></tr>" + 
-            "<tr><th>Plant Colour composition:</th><td  bgcolor='"+row.colour+"'><font color='white'> red="+rgb.r+" green = "+rgb.g+", blue="+rgb.b+"</font></td>               </tr>"+    
-            "</table>"  +
-            "<h3>Environment Variables</h3>" +
-            "<table id='data-environment'>" +
-            "<tr><th>Lighting lux level:  </th><td>" +row.lightluxlevel+" lux" +     " </td></tr>"+
-            "<tr><th>Soil Moisture:       </th><td>" +row.soilmoisture+"%"+           "</td></tr>"+
-            "<tr><th>Relative Humidity:   </th><td>" +row.relhumidity+"%"+            "</td></tr>"+
-            "<tr><th>Ambient temperature: </th><td>" +row.temperature+"C"+            "</td>";
-        content+= "</tr></table>";
-        callback(null, content);
+        row.green= rgb.g;
+        row.blue= rgb.b;
+        row.red = rgb.r;
+        row.time = time;
+        row.date = date;
+        
+        callback(null, row);
+
+
     })
 }
 

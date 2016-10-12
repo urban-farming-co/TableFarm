@@ -13,6 +13,7 @@ body {
 
 h2{
     color:#ff9933;
+    margin:10px
 }
 
 img {
@@ -24,6 +25,7 @@ div {
     vertical-align:top;
     width:100%;
     display:block;
+    padding: 2px;
 }
 div#imagespot img{
     margin:2%;
@@ -34,6 +36,7 @@ img#jason {
 }
 img#motivation{
     width:50%;
+    padding-bottom:10px;
 }
 
 p {
@@ -113,6 +116,21 @@ table#view td{
     width:auto;
     border: 1px solid black;
 }
+div#table {
+    background-color:#f2f2f2;
+    padding:20px;
+
+}
+
+div#table h3 {
+    margin-bottom:0.2em;
+}
+div#table h2{
+    margin:2px;
+}
+    
+
+    
 table#mail{
     padding:3%;
     margin-bottom:3%;
