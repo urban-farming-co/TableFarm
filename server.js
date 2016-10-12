@@ -33,7 +33,17 @@ app.use("/urbanfarming/public", express.static(path.join(__dirname, 'public')));
 app.use("/urbanfarming/public/", express.static('public'));
 //app.use("/urbanfarming/public/images", express.static('public/images'));
 
+app.use("/urbanfarming/scripts", express.static(path.join(__dirname, 'views/scripts')));
+app.use("/urbanfarming/scripts/", express.static('views/scripts'));
 
+app.use("/urbanfarming/styles", express.static(path.join(__dirname, 'views/styles')));
+app.use("/urbanfarming/styles/", express.static('views/styles'));
+
+
+app.get('/urbanfarming/scripts/:file', function(req, res) {
+    console.log(req.params);    
+    res.sendFile(__dirname + "/views/scripts/" + req.params.file);
+})
 app.get('/urbanfarming/public/:file', function(req, res) {
     console.log(req.params);    
     res.sendFile(__dirname + req.params);
@@ -42,6 +52,7 @@ app.get('/urbanfarming/public/:file', function(req, res) {
 app.get('/urbanfarming/Functions/ProcessImages/processed_image.jpg', function(req, res) {
     res.sendFile(__dirname + "/Functions/ProcessImages/processed_image.jpg");
 })
+
 app.get('/urbanfarming/Functions/ProcessImages/image.jpg', function(req, res) {
     res.sendFile(__dirname + "/Functions/ProcessImages/image.jpg");
 })
@@ -220,9 +231,6 @@ app.get('/urbanfarming/processImage', (req, res) => {
 })
 
 
-app.get('/urbanfarming/slides/carosel.js', (req, res) => {
-    res.sendFile(__dirname + "/views/carosel.js");
-})
 app.get('/urbanfarming/slides/carosel.css', (req, res) => {
     res.sendFile(__dirname + "/views/carosel.css");
 })
