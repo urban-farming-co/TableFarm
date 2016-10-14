@@ -139,6 +139,10 @@ function processNewImage(database){
     })
 }
 
+app.post('/urbanfarming/twoimages', (req, res) => {
+    res.render("twoImages", {title: "two images"});
+})
+
 app.post('/urbanfarming/data', function(req, res){
     database.processDataUpload(req, res, formidable, imageStuff)  
 })
@@ -321,3 +325,12 @@ app.get('/urbanfarming/verifyemail', (req, res) => {
 app.get('/urbanfarming/verified', (req, res) => {
     res.render("thanksVerify", {title: "Thank you"});
 })
+
+app.get('/urbanfarming/twoimages', (req, res) => {
+    res.render("twoImages", {title: "two images"});
+})
+
+
+app.use('', (req, res, next) =>{
+    res.render('404', {title: "404", status:404, url:req.url});
+});
