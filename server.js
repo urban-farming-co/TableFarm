@@ -13,6 +13,7 @@ var database  = require('./Functions/Database/checkAndCreate.js');
 var tableStuff  = require('./Functions/Database/viewInformation.js');
 var imageStuff = require('./Functions/ProcessImages/process_images.js');
 var util = require('util');
+var spawn   = require('child_process').spawn;
 
 
 
@@ -139,12 +140,62 @@ function processNewImage(database){
     })
 }
 
+function processStereoForm(req, res, callback){
+    var i = 0;
+    var form = new formidable.IncomingForm();
+
+    form.parse(req, function(err, fields, files) {
+
+        callback( files.left, files.right);
+    })
+    form.on('end', function(fields, files) {
+        /* Temporary location of our uploaded file */
+        var temp_path = this.openedFiles[i].path;
+        /* The file name of the uploaded file */
+        var file_name = this.openedFiles[i].name;
+        /* Location where we want to copy the uploaded file */
+        var new_location = 'image'+i+'.jpg';
+        i = i +1;
+        fs.createReadStream(temp_path).pipe(fs.createWriteStream( new_location) );
+        /* Temporary location of our uploaded file */
+        var temp_path = this.openedFiles[i].path;
+        /* The file name of the uploaded file */
+        var file_name = this.openedFiles[i].name;
+        /* Location where we want to copy the uploaded file */
+        var new_location = 'image'+i+'.jpg';
+        i = i +1;
+        fs.createReadStream(temp_path).pipe(fs.createWriteStream( new_location) );
+        spawnProcess = spawn("python", ["Functions/ProcessImages/ideas/createStereo.py", "image0.jpg", "image1.jpg"]);
+        spawnProcess.stdout.on("data", function(data){
+            console.log("GOT DATA");
+            d = data.toString();
+            console.log(d);
+        })
+
+        spawnProcess.stderr.on('data', function(data) {
+            console.log("GOT AN ERROR");
+            console.log(data.toString('utf8'));
+        })
+
+        spawnProcess.on('close', function(code) {
+            console.log("child process exited with a code: "+ code);
+        })
+    });
+}
+
+app.get('/urbanfarming/model', (req, res) => {
+    res.sendFile(__dirname + "/Functions/ProcessImages/ideas/model.jpg"); 
+})
 app.post('/urbanfarming/twoimages', (req, res) => {
-    res.render("twoImages", {title: "two images"});
+    processStereoForm(req, res, (c)=> {
+        res.render("dataReceieved", {title: "two images", contents: "Left image and right image"});
+    })
 })
 
 app.post('/urbanfarming/data', function(req, res){
-    database.processDataUpload(req, res, formidable, imageStuff)  
+    database.processDataUpload(req, res, formidable, imageStuff, (c) => {
+        res.render("dataReceieved", {title: "two images", contents: c});
+    })
 })
 
 app.post('/urbanfarming/chart', function(req, res) {
@@ -232,11 +283,6 @@ app.get('/urbanfarming/processImage', (req, res) => {
             });
         })
     })
-})
-
-
-app.get('/urbanfarming/slides/carosel.css', (req, res) => {
-    res.sendFile(__dirname + "/views/carosel.css");
 })
 
 app.get('/urbanfarming/slides', (req, res) => {
@@ -331,6 +377,9 @@ app.get('/urbanfarming/twoimages', (req, res) => {
 })
 
 
+app.use('', (err, req, res, next) =>{
+    res.render('404', {title: "500", status:err.status || 500, url:err});
+});
 app.use('', (req, res, next) =>{
     res.render('404', {title: "404", status:404, url:req.url});
 });

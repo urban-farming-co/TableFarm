@@ -12,8 +12,8 @@ describe ("getHome()", () =>{
                 console.error(err);
             }
             console.log(content);
-            expect(content).to.contain("src='/urbanfarming/img");
-            expect(content).to.contain("src='/urbanfarming/pimg");
+            expect(JSON.stringify(content)).to.contain("date");
+            expect(JSON.stringify(content)).to.contain("colour");
         })  
     })
 })

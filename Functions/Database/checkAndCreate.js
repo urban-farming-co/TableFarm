@@ -132,7 +132,7 @@ function processTextFields(fields, target, callback){
 
 
 
-function processDataUpload(request, response, formidable, imageStuff){
+function processDataUpload(request, response, formidable, imageStuff, callback){
     var form = new formidable.IncomingForm();
     form.parse(request, function(err, fields, files) {
         console.log(fields);
@@ -140,16 +140,13 @@ function processDataUpload(request, response, formidable, imageStuff){
             console.log(files);
             if (files.image.size<1) {
                 processTextFields(fields, null, (c) => {
-                    response.write(c);
-                    response.end();
+                    callback(c);
                 });
             }
             else {
                 imageStuff.formatImageForDB(files.image.path, function (err, target){
                     processTextFields(fields, target, (c) =>{
-                        response.writeHead(200, {'content-type':'text/plain'});         
-                        response.write('received upload:\n\n');
-                        response.end(c);
+                        callback(c);
                         getMostRecentImageID((err, id) =>{
                             if (err) {
                                 console.error(err)
@@ -165,8 +162,7 @@ function processDataUpload(request, response, formidable, imageStuff){
         else {
 
             processTextFields(fields,  null, (c)=> {
-                response.write(c);
-                response.end();
+                callback(c);
             })
 
         }

@@ -13,9 +13,9 @@ describe ("view page", () =>{
     var url = "http://localhost:4000/urbanfarming/view";
 
     describe("the website works.", () => {
-        it ("locally returns status 200", () =>{
+        it ("locally returns status 200", (done) =>{
             request(url, (error, response, body)=>{
-                response.statusCode.to.equal(200);
+                expect(response.statusCode).to.equal(200);
                 done();
             })
         })

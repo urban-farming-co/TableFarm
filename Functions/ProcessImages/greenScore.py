@@ -10,43 +10,132 @@ except ImportError:
     from PIL import Image
 
 saveLocation = "bar.JPEG"
-cardLengthmm = 75
+cardLengthmm = 50 # mm
 
 
-def isRed(pixel):
-    # if the green part is greater than the blue and red part.
-    if pixel[0] >= (pixel[1] - 0.01) and pixel[1] >= (pixel[2] - 0.01):
-        return True
-    return False
+def isColour(lightColour, darkColour, pixel):
+    if (pixel[0] < (pixel[1] + 0.15)):
+        if (pixel[0] > (pixel[1] - 0.15)):
+            if (pixel[1] < (pixel[0] + 0.15)):
+                if (pixel[1] > (pixel[0] - 0.15)):
+                    if (pixel[2] < (pixel[1] + 0.15)):
+                        if (pixel[2] > (pixel[1] - 0.15)):
+                            return False
 
-
-def isBlue(pixel):
-    # if the green part is greater than the blue and red part.
-    if pixel[2] >= (pixel[1] - 0.14) and pixel[2] >= (pixel[0] - 0.14):
-        return True
-    return False
-
-
-def isGreen(pixel):
-    # if the green part is greater than the blue and red part.
-    if pixel[1] >= (pixel[0] + 0.007) and pixel[1] >= (pixel[2] + 0.007):
-        return True
+    if pixel[0] >= darkColour[0] and pixel[0] <= lightColour[0]:
+        if pixel[2] >= darkColour[2] and pixel[2] <= lightColour[2]:
+            if pixel[1] >= darkColour[1] and pixel[1] <= lightColour[1]:
+                return True
     return False
 
 
 def findThePlant(r):
+
     p = []
     i = r.copy()
+
+    # greenlight = (1, 1, 1)
+    # greendark = (0, 0, 0)
+
+    greenlight = (0.6, 0.7, 0.3)
+    greendark  = (0.1, 0.3, 0)
     for y in range(r.shape[0]):
         for x in range(r.shape[1]):
             # Find the plant within the image.
-            if not(isBlue(r[y][x])):
-                if not(isRed(r[y][x])):
-                    if (isGreen(r[y][x])):
-                        # add (y, x) to the list
-                        i[y][x][0] = i[y][x][1] = 1
-                        p.append((y, x))
+            if (isColour(greenlight, greendark, r[y][x])):
+                # add (y, x) to the list
+                i[y][x][0] = i[y][x][1] = 1
+                p.append((y, x))
+
+
     return i, p
+
+
+def normalizeImage(r):
+    i = r.copy()
+    for x in range(r.shape[0]):
+        for y in range(r.shape[1]):
+            R = r[x][y][0]
+            G = r[x][y][1]
+            B = r[x][y][2]
+            l = (R * 47.448268554 +
+                 G * 119.950518949 +
+                 B * 11.601212497)
+            # (xm -x)(xm+x)
+            desiredBrightness =400
+            f = desiredBrightness - l  # 100000 is like the top luminosity
+
+            # Desired red brightnes:
+            Dr = f / 4.7
+            Dg = f / 12
+            Db = f / 1.2
+            i[x][y][0] = 1 - Dr*(-Dr)*R
+            i[x][y][1] = 1 - Dg*(-Dg)*G
+            i[x][y][2] = 1 - Db*(-Db)*B
+            """
+            i[x][y][0] = R + abs((Dr - R) * (1-R) / (Dr + R))  # + (R * f / 2550) * (R * f / 2550)
+            i[x][y][1] = G + abs((Dg - G) * (1-G) / (Dg + G))  # + (B * f / 2550) * (B * f / 2550)
+            i[x][y][2] = B + abs((Db - B) * (1-B) / (Db + B))  # + (G * f / 2550) * (G * f / 2550)
+
+            # add (y, x) to the list
+            i[y][x][0] = (R * lum - 120 * G - 12 * B) / (47.0 *    500000)
+            i[y][x][1] = (2*G * lum - 12 * B - 47 * R)  / (120.0 * 500000)
+            i[y][x][2] = (B * lum - 47 * R - 120 * G) /( 12.0 *    500000)
+            lddum /= (255)
+            i[y][x][0] = ((R * lum) / 47.0 ) / 255 + 2 *R / 255
+            i[y][x][1] = ((G * lum) / 120.0) / 255 + 2 *G / 255
+            i[y][x][2] = ((B * lum) / 12.0)  / 255 + 2 *B / 255
+            R = pixel[0]
+            G = pixel[1]
+            B = pixel[2]
+
+            i[y][x][0] =  R * R * lum + ((-120 * G - 12 * B)/4.7)
+            i[y][x][1] =  G * G * lum + ((-12 * B - 47 * R)/12.0)
+            i[y][x][2] =  B * B * lum  + ((-47 * R - 120 * G)/1.2)
+            """
+
+    i = ensureCorrectRange(i)
+
+    i *= (1, 0.7, 1)
+    return i
+
+
+def getMinColour(column,  image):
+    minC = image[0][0][column]
+
+    for x in range(image.shape[0]):
+        for y in range(image.shape[1]):
+            if (minC > image[x][y][column]):
+                minC = image[x][y][column]
+
+    return minC
+
+
+def getMaxColour(column, image):
+    maxC = image[0][0][column]
+    for x in range(image.shape[0]):
+        for y in range(image.shape[1]):
+            if (maxC < image[x][y][column]):
+                maxC = image[x][y][column]
+
+    return maxC
+
+
+def ensureCorrectRange(i):
+    maxR = getMaxColour(0, i)
+    minR = getMinColour(0, i)
+    maxG = getMaxColour(1, i)
+    minG = getMinColour(1, i)
+    maxB = getMaxColour(2, i)
+    minB = getMinColour(2, i)
+
+    for x in range(i.shape[0]):
+        for y in range(i.shape[1]):
+            i[x][y][0] = (i[x][y][0] - minR) / (maxR - minR)
+            i[x][y][1] = (i[x][y][1] - minG) / (maxG - minG)
+            i[x][y][2] = (i[x][y][2] - minB) / (maxB - minB)
+
+    return i
 
 
 def readFile(f):
@@ -60,15 +149,17 @@ def savePlantImage(m):
     return
 
 
-def displayProcesses(s, r, p):
+def displayProcesses(s, r, p, p1, p2):
     t = True
     size = (8, 4)
-    fig1, (ax5, ax6) = plt.subplots(ncols=2, figsize=size, sharex=t, sharey=t)
+    fig1, (ax, ax1,ax2, ax3) = plt.subplots(ncols=4, figsize=size, sharex=t, sharey=t)
 
-    ax5.imshow(r)
-    ax6.imshow(p)
-    ax5.set_title("original", fontsize=20)
-    ax6.set_title(s, fontsize=20)
+    ax.imshow(r)
+    ax1.imshow(p)
+    ax2.imshow(p1)
+    ax3.imshow(p2)
+    ax.set_title("original", fontsize=20)
+    ax1.set_title(s, fontsize=20)
 
     plt.show()
     return
@@ -87,6 +178,7 @@ def getMax(column, points):
     for p in points:
         if p[column] > m:
             m = p[column]
+
     return m
 
 
@@ -99,33 +191,35 @@ def getMin(column, points):
     for p in points:
         if p[column] < m:
             m = p[column]
+
     return m
 
 
-def isOrange(orange, pixel):
-    if pixel[0] >= (orange[0] - 0.14) and pixel[0] <= (orange[0] + 0.14):
-        if pixel[2] >= (orange[2] - 0.14) and pixel[2] <= (orange[2] + 0.14):
-            if pixel[1] >= (orange[1] - 0.1) and pixel[1] <= (orange[1] + 0.14):
-                return True
-    return False
-
-
-def findCard(p):
+def findCard(r):
     """
     There is an orange card in the image.
     Return the length of the card in pixels.
     The actual length of the card is 7.5cm
     """
     l = []
-    orange = (234 / 255.0, 142 / 255.0, 65 / 255.0)
-    print(orange)
+    p = r.copy()
+    p *= (0.7, 0.7, 0.7)
+    orangelight = (0.8, 0.5, 0.2)
+    orangedark = (0.52, 0.3, 0)
+
+    # orangelight = (1,1,1)
+    # orangedark = (0, 0, 0)
     for x in range(p.shape[0]):
         for y in range(p.shape[1]):
-            if (isOrange(orange, p[x][y])):
-                p[x][y][0] = p[x][y][2] = 1
+            if (isColour(orangelight, orangedark, p[x][y])):
+                # print(r[x][y])
+                p[x][y][0] = 1
+                p[x][y][2] = 1
                 l.append((y, x))
+
     x1 = getMin(0, l)
     x2 = getMax(0, l)
+
     return p, x2 - x1
 
 
@@ -140,7 +234,7 @@ def getWidth(p, ratio):
 def getHeight(p, ratio):
     maxY = getMax(1, p)
     minY = getMin(1, p)
-    print(ratio)
+
     return (maxY - minY) * ratio
 
 
@@ -152,6 +246,7 @@ def getAverageColour(column, points, image):
         x = p[0]
         y = p[1]
         total += image[x][y][column]
+
     return total/len(points)
 
 
@@ -159,6 +254,7 @@ def getAveragePlantColour(p, r):
     averageR = getAverageColour(0, p, r) * 255
     averageG = getAverageColour(1, p, r) * 255
     averageB = getAverageColour(2, p, r) * 255
+
     return (averageR, averageG, averageB)
 
 
@@ -190,14 +286,25 @@ if __name__ == '__main__':
     try:
         a = sys.argv[1]
     except:
-        a = "image.jpg"
+        a = "darkImage.jpg"
 
     picture = readFile(a)
-    processedImage, plantPoints = findThePlant(picture)
-    processedImage, length = findCard(processedImage)
-    mmtopixRatio = cardLengthmm/(length+0.0)
-
+    normalized = normalizeImage(picture)
+    plantImage, plantPoints = findThePlant(normalized)
     pheno = {}
+
+    try:
+        cardImage, length = findCard(normalized)
+        mmtopixRatio = cardLengthmm/(length+0.0)
+        pheno["ratioError"] = 0
+    except:
+        cardImage = normalized.copy()
+
+        cardImage *= (0.7, 0.7, 0.7)
+        mmtopixRatio = 1
+        pheno["ratioError"] = 1
+
+    pheno["file"]  = '"' + a + '"'
     pheno["Score"] = getScore(plantPoints)
     pheno["Width"] = getWidth(plantPoints, mmtopixRatio)
     pheno["Height"] = getHeight(plantPoints, mmtopixRatio)
@@ -205,9 +312,9 @@ if __name__ == '__main__':
     p = getAveragePlantColour(plantPoints, picture)
     pheno["AveragePlantColour"] = rtoh(p)
     pheno["saveTo"] = '"' + saveLocation + '"'
-    savePlantImage(processedImage)
+    savePlantImage(plantImage)
 
-    displayPheno(pheno)
-    displayProcesses(pheno["Score"], picture, processedImage)
+    # displayPheno(pheno)
+    # displayProcesses(pheno["Score"], picture, normalized, cardImage, plantImage)
 
     sys.stdout.flush()
