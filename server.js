@@ -39,6 +39,18 @@ app.use("/urbanfarming/scripts/", express.static('views/scripts'));
 
 app.use("/urbanfarming/styles", express.static(path.join(__dirname, 'views/styles')));
 app.use("/urbanfarming/styles/", express.static('views/styles'));
+app.use("/urbanfarming/model/skins/transparent_light", express.static('views/minimal/skins/transparent_light'));
+app.use("/urbanfarming/model/skins/transparent_dark", express.static('views/minimal/skins/transparent_dark'));
+app.use("/urbanfarming/model/skins/minimal_light", express.static('views/minimal/skins/minimal_light'));
+app.use("/urbanfarming/model/skins/minimal_dark", express.static('views/minimal/skins/minimal_dark'));
+app.use("/urbanfarming/model/skins/icons", express.static('views/minimal/skins/icons'));
+app.use("/urbanfarming/model/skins/light", express.static('views/minimal/skins/light'));
+app.use("/urbanfarming/model/js/", express.static('views/minimal/js'));
+app.use("/urbanfarming/model/stylesheet/", express.static('views/minimal/stylesheet'));
+app.use("/urbanfarming/model/models/multires/", express.static('views/models/multires'));
+app.use("/urbanfarming/model/models/singleres/", express.static('views/models/singleres'));
+app.use("/urbanfarming/model/skins/dark", express.static('views/minimal/skins/dark'));
+app.use("/urbanfarming/model/skins/backgrounds", express.static('views/minimal/skins/backgrounds'));
 
 
 app.get('/urbanfarming/scripts/:file', function(req, res) {
@@ -139,52 +151,46 @@ function processNewImage(database){
         })
     })
 }
+function createStereoModel(){
+    spawnProcess = spawn("python", ["Functions/ProcessImages/ideas/createStereo.py", "public/image0.jpg", "public/image1.jpg"]);
+    spawnProcess.stdout.on("data", function(data){
+        console.log("GOT DATA");
+        d = data.toString();
+        console.log(d);
+    })
+
+    spawnProcess.stderr.on('data', function(data) {
+        console.log("GOT AN ERROR");
+        console.log(data.toString('utf8'));
+    })
+
+    spawnProcess.on('close', function(code) {
+        console.log("child process exited with a code: "+ code);
+    })
+}
 
 function processStereoForm(req, res, callback){
     var i = 0;
     var form = new formidable.IncomingForm();
 
     form.parse(req, function(err, fields, files) {
+        console.log(files[0]);
+        console.log(files[1]);
+        var temp_path = files.left.path;
+        var new_location = "public/left.jpg";
+        fs.createReadStream(temp_path).pipe(fs.createWriteStream( new_location) );
 
+        var temp_path = files.right.path;
+        var new_location = "public/right.jpg";
+        fs.createReadStream(temp_path).pipe(fs.createWriteStream( new_location) );
+
+        createStereoModel();
         callback( files.left, files.right);
     })
-    form.on('end', function(fields, files) {
-        /* Temporary location of our uploaded file */
-        var temp_path = this.openedFiles[i].path;
-        /* The file name of the uploaded file */
-        var file_name = this.openedFiles[i].name;
-        /* Location where we want to copy the uploaded file */
-        var new_location = 'image'+i+'.jpg';
-        i = i +1;
-        fs.createReadStream(temp_path).pipe(fs.createWriteStream( new_location) );
-        /* Temporary location of our uploaded file */
-        var temp_path = this.openedFiles[i].path;
-        /* The file name of the uploaded file */
-        var file_name = this.openedFiles[i].name;
-        /* Location where we want to copy the uploaded file */
-        var new_location = 'image'+i+'.jpg';
-        i = i +1;
-        fs.createReadStream(temp_path).pipe(fs.createWriteStream( new_location) );
-        spawnProcess = spawn("python", ["Functions/ProcessImages/ideas/createStereo.py", "image0.jpg", "image1.jpg"]);
-        spawnProcess.stdout.on("data", function(data){
-            console.log("GOT DATA");
-            d = data.toString();
-            console.log(d);
-        })
-
-        spawnProcess.stderr.on('data', function(data) {
-            console.log("GOT AN ERROR");
-            console.log(data.toString('utf8'));
-        })
-
-        spawnProcess.on('close', function(code) {
-            console.log("child process exited with a code: "+ code);
-        })
-    });
 }
 
 app.get('/urbanfarming/model', (req, res) => {
-    res.sendFile(__dirname + "/Functions/ProcessImages/ideas/model.jpg"); 
+    res.render("model");  // model");   
 })
 app.post('/urbanfarming/twoimages', (req, res) => {
     processStereoForm(req, res, (c)=> {

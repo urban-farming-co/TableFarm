@@ -1,0 +1,60 @@
+<html>
+
+    <%-include header %>
+
+<img src = "../public/image1.jpg" />
+<img src = "../public/image0.jpg" />
+<img src = "../public/disparity.jpg" />
+<div id="3dhop" class="tdhop" onmousedown="if (event.preventDefault) event.preventDefault()">
+     <canvas id="draw-canvas" style="background-color: black"/>
+</div>
+
+<!--STYLESHEET-->
+<!--SPIDERGL-->
+<script type="text/javascript" src="../scripts/spidergl.js"></script>
+<!--JQUERY-->
+<script type="text/javascript" src="../scripts/jquery.js"></script>
+<!--PRESENTER-->
+<script type="text/javascript" src="../scripts/presenter.js"></script>
+<!--3D MODELS LOADING AND RENDERING-->
+<script type="text/javascript" src="../scripts/nexus.js"></script>
+<script type="text/javascript" src="../scripts/ply.js"></script>
+<!--TRACKBALLS-->
+<script type="text/javascript" src="../scripts/trackball_sphere.js"></script>
+<script type="text/javascript" src="../scripts/trackball_turntable.js"></script>
+<script type="text/javascript" src="../scripts/trackball_turntable_pan.js"></script>
+<script type="text/javascript" src="../scripts/trackball_pantilt.js"></script>
+<!--UTILITY-->
+<script type="text/javascript" src="../scripts/init.js"></script>
+
+<script>
+
+var presenter = null;
+
+function setup3dhop() {
+    presenter = new Presenter("draw-canvas");
+
+    presenter.setScene({
+        meshes: {
+            "plant": {
+                // url: "../public/out.ply"
+                url: "../public/generated1.ply"
+                // url: "models/singleres/laurana.ply"
+            }
+        },
+        modelInstances: {
+            "Model1": {
+                mesh: "plant"
+            }
+        }
+    });
+}
+$(document).ready(function(){
+      init3dhop();
+
+      setup3dhop();
+});
+
+</script>
+
+
