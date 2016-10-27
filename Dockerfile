@@ -1,4 +1,4 @@
-FROM tablefarmbase
+FROM urbanfarminco/tablefarmbase
 MAINTAINER Karen McCulloch <k.a.z.mcc95@gmail.com>
 EXPOSE 4000   
 EXPOSE 5432   

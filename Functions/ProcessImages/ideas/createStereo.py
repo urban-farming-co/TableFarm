@@ -41,7 +41,7 @@ def findKNearestNeighbours(K, verts, indexOfV1):
     return r[:K]
 
 
-def findFaces(verts, dispartityMap):
+def findFaces(verts, disparityMap):
     M, N = verts.shape
     print(verts.shape)
     print("M is %f and N is %f " % (M, N))
@@ -50,7 +50,9 @@ def findFaces(verts, dispartityMap):
     print("M is %f and N is %f " % size)
     faces = np.zeros(size, dtype="int32")
     print(faces.shape)
-    for m in range(faces.shape[0]):      # x
+    print("dispartity map has shape %d by %d " % disparityMap.shape)
+    for m in range(disparityMap.shape[0]):      # x
+        print(disparityMap[m])
         tri = [sides + 1, m] + findKNearestNeighbours(sides, verts, m)
         faces[m] = tri
         print(tri)
@@ -118,10 +120,6 @@ def doTheThing(l, r):
     write_ply(out_fn, out_points, out_colors, faces, sides)
     print('%s saved' % 'out.ply')
 
-    cv2.imshow('left', imgL)
-    cv2.imshow('disparity', (disp-min_disp)/num_disp)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
 
 
 def saveModel(image, fileName="disparity.jpg"):
@@ -133,7 +131,7 @@ def saveModel(image, fileName="disparity.jpg"):
         print("woops")
 
 root = "Functions/ProcessImages/ideas/"
-saveFolder = "/home/karen/Repos/UrbanFarming/public/"
+saveFolder = "public/"
 
 
 if __name__ == "__main__":
@@ -152,6 +150,7 @@ if __name__ == "__main__":
             l = root + "left.jpg"
         else:
 
+            saveFolder = "../../public/"
             r = "right.jpg"
             l = "left.jpg"
 

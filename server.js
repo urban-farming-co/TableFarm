@@ -152,7 +152,7 @@ function processNewImage(database){
     })
 }
 function createStereoModel(){
-    spawnProcess = spawn("python", ["Functions/ProcessImages/ideas/createStereo.py", "public/image0.jpg", "public/image1.jpg"]);
+    spawnProcess = spawn("python", ["Functions/ProcessImages/ideas/createStereo.py", "public/left.jpg", "public/right.jpg"]);
     spawnProcess.stdout.on("data", function(data){
         console.log("GOT DATA");
         d = data.toString();
@@ -174,6 +174,7 @@ function processStereoForm(req, res, callback){
     var form = new formidable.IncomingForm();
 
     form.parse(req, function(err, fields, files) {
+        console.log(files);
         console.log(files[0]);
         console.log(files[1]);
         var temp_path = files.left.path;
@@ -190,7 +191,7 @@ function processStereoForm(req, res, callback){
 }
 
 app.get('/urbanfarming/model', (req, res) => {
-    res.render("model");  // model");   
+    res.render("model", {title:"model", left:"../public/left.jpg", right:"../public/right.jpg", disparity:"../public/disparity.jpg", model:"../public/out.ply"});  // model");   
 })
 app.post('/urbanfarming/twoimages', (req, res) => {
     processStereoForm(req, res, (c)=> {
