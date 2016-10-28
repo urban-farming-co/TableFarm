@@ -301,11 +301,19 @@ app.get('/urbanfarming/slides', (req, res) => {
 
 app.get('/urbanfarming/viewcontent', (request, response) => {
     var x = request.query.x;
+    var u = request.query.u;
+
+    if (u && u.substr(-1) == '/'){
+        u = u.substr(0, u.length -1);
+        u = parseInt(u);
+    }
+    if (!u) 
+    {
+        u =10;
+    }
     if (x && x.substr(-1) == '/'){
         x = x.substr(0, x.length -1);
-        parseInt(x);
-        console.log("The variable x is:");
-        console.log(x);
+        x = parseInt(x);
     }
     if (!x) 
     {
@@ -316,6 +324,10 @@ app.get('/urbanfarming/viewcontent', (request, response) => {
             response.write(err);
         }
         else {
+        console.log("The variable u is:");
+        console.log(u);
+        console.log("The variable x is:");
+        console.log(x);
             response.writeHead(200, {
                 'Content-Type'  : 'text/html', 
                 'Content-Length': Buffer.byteLength(content)});
