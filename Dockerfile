@@ -11,5 +11,4 @@ COPY . /usr/src/app
 
 # start up the node app.  
 RUN npm install
-RUN npm test
 ENTRYPOINT npm start
