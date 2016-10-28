@@ -31,31 +31,31 @@ def findKNearestNeighbours(K, verts, indexOfV1):
         if d > 0:
             ds.append((d, k))
 
-
     ds.sort(key=lambda tup: tup[0])
 
     def flattenit(a):
         return a[1]
     r = map(flattenit, ds)
 
-    return r[:K]
+    return r[:K], r[K:K+K]
 
 
-def findFaces(verts, disparityMap):
+def findFaces(verts):
     M, N = verts.shape
     print(verts.shape)
     print("M is %f and N is %f " % (M, N))
-    sides = 2  #  2 vertices plus the current one.
-    size = (M-1, sides + 2)
+    sides = 2  # 2 vertices plus the current one.
+    size = (M * 2, sides + 2)
     print("M is %f and N is %f " % size)
     faces = np.zeros(size, dtype="int32")
     print(faces.shape)
-    print("dispartity map has shape %d by %d " % disparityMap.shape)
-    for m in range(disparityMap.shape[0]):      # x
-        print(disparityMap[m])
-        tri = [sides + 1, m] + findKNearestNeighbours(sides, verts, m)
-        faces[m] = tri
-        print(tri)
+    for m in range(M):      # x
+        face1, face2 = findKNearestNeighbours(sides, verts, m)
+        faces[m] = [sides + 1, m] + face1
+        faces[m+M] = [sides + 1, m] + face2
+        print(faces[m])
+        print(faces[m+M])
+
         print("Finished %d out of %d" % (m, verts.shape[0]))
         sys.stdout.flush()
     print("done")
@@ -82,8 +82,10 @@ def doTheThing(l, r):
     print(os.path.isfile(l))
     print(os.path.isfile(r))
     print('loading images...')
-    imgL = cv2.pyrDown(cv2.imread(l))
-    imgR = cv2.pyrDown(cv2.imread(r))
+    # imgL = cv2.pyrDown(cv2.imread(l))
+    # imgR = cv2.pyrDown(cv2.imread(r))
+    imgL = cv2.imread(l)  # cv2.pyrDown(cv2.imread(l))
+    imgR = cv2.imread(r)  # cv2.pyrDown(cv2.imread(r))
 
     window_size = 3
     min_disp = 16
@@ -116,10 +118,9 @@ def doTheThing(l, r):
     out_points = points[mask]
     out_colors = colors[mask]
     out_fn = saveFolder + 'out.ply'
-    sides, faces = findFaces(out_points, disp)
+    sides, faces = findFaces(out_points)
     write_ply(out_fn, out_points, out_colors, faces, sides)
     print('%s saved' % 'out.ply')
-
 
 
 def saveModel(image, fileName="disparity.jpg"):
@@ -140,7 +141,7 @@ if __name__ == "__main__":
         l = sys.argv[1]
         print(r)
         print(l)
-        cv2.imread(l )  # cause exception if l is not a file.
+        cv2.imread(l)  # cause exception if l is not a file.
 
         sys.stdout.flush()
     except:

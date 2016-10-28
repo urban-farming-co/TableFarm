@@ -24,7 +24,7 @@ function getImageIDs(database, callback){
 
 }
 
-function generatePlantChartData(database, callback, after, before){
+function generatePlantChartData(database, after, before, callback){
     sql = workOutSQL(database, database.processedData, "SELECT AVG(height) as height, AVG(width) as width, MIN(time) as time, AVG(greenscore) as score, MAX(livedateyo.id) FROM urbanfarming.livedateyo, urbanfarming.processedData WHERE livedateyo.id = processedData.id AND time > CURRENT_DATE - 60 GROUP BY time::DATE", after, before);
 
     var wid = [];
@@ -241,27 +241,39 @@ function rgbToHex(r, g, b) {
 
 
 function getHome(o, database, callback)  {
-    var sql="SELECT time, plantname, lightluxlevel, "+database.processed+ ".colour, soilmoisture, relhumidity, temperature, greenscore, width, height, compactness FROM "+database.liveData+" , " +database.processedData+" WHERE "+database.table+".id=(SELECT MAX(id) FROM "+database.liveData+") AND " +database.processed+".id = (SELECT MAX(id) FROM " + database.processedData +")";
+    var sql="SELECT time, "+database.plant+"plantname, lightluxlevel, "+database.processed+ ".colour, soilmoisture, relhumidity, temperature, greenscore, width, height, compactness "+
+        " FROM "+database.liveData+" , " +database.processedData+", "+ database.userTable + 
+        " WHERE "+database.table+".id=("+
+                                       "SELECT MAX(id) FROM "+database.liveData+
+                                       ") "+
+        " AND " +database.processed+".id = ("+
+                                            "SELECT MAX(id) FROM " + database.processedData +
+                                            ")";
+        " AND " +database.plantProject +".tablefarmid = " + database.table + ".tablefarmid";
     database.askDatabase (sql, function(err, result){
 
         if (err) {
             console.error(err); 
             callback(err)
         }
-        var row = result.rows[0];
-        date = formatDate(row.time);
-        time = formatTime(row.time, o);
-        var rgb = getrgb(row.colour); 
-        var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
+        try{ 
+            var row = result.rows[0];
+            date = formatDate(row.time);
+            time = formatTime(row.time, o);
+            var rgb = getrgb(row.colour); 
+            var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
 
-        row.green= rgb.g;
-        row.blue= rgb.b;
-        row.red = rgb.r;
-        row.time = time;
-        row.date = date;
-        
-        callback(null, row);
-
+            row.green= rgb.g;
+            row.blue= rgb.b;
+            row.red = rgb.r;
+            row.time = time;
+            row.date = date;
+            
+            callback(null, row);
+        }
+        catch(err){
+            callback("Tables exist, but something went wrong delivering live data.");
+        }
 
     })
 }

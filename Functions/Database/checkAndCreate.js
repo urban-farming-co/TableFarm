@@ -4,10 +4,14 @@ var fs      = require('fs');
 var conStr  = vcapServices.elephantsql[0].credentials.uri; 
 var pg      = require('pg');
 var Client  = require('pg').Client;
-var table   = 'livedateyo';
-var processed = "processeddata";
+var table   = 'flivedata';
+var processed = "fprocesseddata";
+var users   = 'fuser';
+var plant   = 'fplantproject';
 var processedData = schema + "." + processed;
 var liveData = schema + "." + table;
+var userTable = schema + "." + users;
+var plantProject = schema + "." + plant;
 var util = require('util');
 
 module.exports = {
@@ -19,7 +23,6 @@ module.exports = {
     schema, 
     askDatabase, 
     createTable, 
-    getTableSQL, 
     createTables, 
     createSchema, 
     checkSchema, 
@@ -170,42 +173,56 @@ function processDataUpload(request, response, formidable, imageStuff, callback){
 }
 
 
-function  createTables(sql, sql1){
+function  createTables(sql, sql1, callback){
     askDatabase(sql , function(err){
         if (err) {
             console.error(err)
+                callback(err);
         }
         askDatabase(sql1, function(err){
             if (err) {
-                console.error(err)
+                console.error(err);
+                callback(err);
             }
+            callback(null);
         })
     });
 }
 
 
-function  getTableSQL(t){ 
-    if (t==liveData) {
-        return `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER, colour VARCHAR(20))`;
-    }
-    else if (t == processedData){
-        return `CREATE TABLE ${processedData} (id SERIAL PRIMARY KEY, image BYTEA, greenScore INTEGER, colour VARCHAR(10))`;
-
-    }
-    else {
-        console.error("attempting to create table, but don't have a sql");
-        return null
-    }
+getTableSQL = {
+    "plantProject"  :  "CREATE TABLE " + plantProject + " (id SERIAL PRIMARY KEY, tablefarmid INTEGER UNIQUE, userid INTEGER, plantname varchar(50), plant_species varchar(50), FOREIGN KEY(userid) REFERENCES "+userTable + "(id) )",
+    "userTable"     : "CREATE TABLE " + userTable + " (id SERIAL PRIMARY KEY, username VARCHAR(50), passwordsalt VARCHAR(100), passwordhash VARCHAR(100))",
+    "processedData" : `CREATE TABLE ${processedData} (id SERIAL PRIMARY KEY, image BYTEA, greenScore INTEGER, colour VARCHAR(10), liveid INTEGER,  FOREIGN KEY(liveid) REFERENCES ${liveData} (id))`,
+    "liveData"      : `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soil_moisture INTEGER, rel_humidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, tablefarmid INTEGER, light_lux_level INTEGER, FOREIGN KEY (tablefarmID) REFERENCES ${plantProject} (tablefarmid))`
 }
 
-function  createTable(t){
-    sql = getTableSQL(t);
-    createTables(sql, "INSERT INTO "+t+"(id) VALUES (0)");
+getInsertRowSQL = {
+    // columns: id, username, password salt, password hash
+    userTable     : "INSERT INTO " + userTable +" (id, username, passwordhash, passwordsalt)   VALUES (1, 'urbanfarm', 'urban2016', '')",    
+    // columns: id, tfid, userid, plantName, plant species, 
+    plantProject  : "INSERT INTO " + plantProject + "(id, tablefarmid, userid, plantname, plant_species) VALUES (1, 1, 1, 'Minty MacMintface', 'mint')",
+    // columns: id, tfid, image, soil, rel, temp, time, lightlevel, 
+    liveData      : "INSERT INTO " + liveData + " (id, tablefarmid, soil_moisture, rel_humidity, temperature)  VALUES (1, 1, 100 ,100 ,100)", 
+    // columns: id, liveid, image, greenscore, colour,  
+    processedData : "INSERT INTO " + processedData + "(id, liveid) "+                        " VALUES (1, 1)",
+}
+
+function  createTable(t, callback){
+    var sql = getTableSQL[t];
+    console.log(sql);
+    var sql2 = getInsertRowSQL[t] ;
+    console.log(sql2);
+
+    createTables(sql, sql2, (e) =>{
+        callback(e);
+    } );
 }
 
 function  createSchema(callback){
-    askDatabase("CREATE SCHEMA" + schema);
-    callback();
+    askDatabase("CREATE SCHEMA" + schema, ()=> {
+        callback();
+    })
 }
 
 function  checkSchema(row, callback){
@@ -216,15 +233,15 @@ function  checkSchema(row, callback){
     callback();
 }
 
-function  checkTable(tables, t, callback){
+function  checkTable(tables, t, T, callback){
     if (tables.indexOf(t) < 0) {
         console.log(t + " doesn't exist, creating");
-        createTable(t)
+        createTable(T, callback);
     }
     else {
         console.log(t + " does exist");
+        callback();
     }
-    callback();
 }
 
 function  checkTablesExist(){    
@@ -238,14 +255,27 @@ function  checkTablesExist(){
             tables[n] = schema +"."+ row.rows[n].table_name;
         }
         checkSchema(row, () => {
-            checkTable(tables, liveData, () => {
-                checkTable(tables, processedData, () => {
-                    console.log("done");
+            checkTable(tables, userTable, "userTable", (e) => {
+                if (e){
+                    console.error(e); 
+                }
+                checkTable(tables, plantProject, "plantProject", (e)=>{
+                    if (e){
+                        console.error(e); 
+                    }
+                    checkTable(tables, liveData, "liveData", (e) => {
+                        if (e){
+                            console.error(e); 
+                        }
+                        checkTable(tables, processedData, "processedData", (e) => {
+                            if (e){
+                                console.error(e); 
+                            }
+                            console.log("done");
+                        })
+                    })
                 })
             })
         })
     });
 }
-
-
-
