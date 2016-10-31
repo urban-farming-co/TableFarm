@@ -25,7 +25,7 @@ function getImageIDs(database, callback){
 }
 
 function generatePlantChartData(database, after, before, callback){
-    sql = workOutSQL(database, database.processedData, "SELECT AVG(height) as height, AVG(width) as width, MIN(time) as time, AVG(greenscore) as score, MAX(livedateyo.id) FROM urbanfarming.livedateyo, urbanfarming.processedData WHERE livedateyo.id = processedData.id AND time > CURRENT_DATE - 60 GROUP BY time::DATE", after, before);
+    sql = workOutSQL(database, database.processedData, "SELECT AVG(height) as height, AVG(width) as width, MIN(time) as time, AVG(green_score) as score, MAX("+database.table+".id) FROM "+database.liveData+", "+database.processedData+" WHERE "+database.table+".id = "+database.processed+".id AND time > CURRENT_DATE - 60 GROUP BY time::DATE", after, before);
 
     var wid = [];
     var hei = [];
@@ -68,7 +68,7 @@ function generatePlantChartData(database, after, before, callback){
 
 function workOutSQL(database, table,  noABsql, after, before){
     if (table == database.processedData){
-        var sql = "SELECT height, width, time, greenscore as score, livedateyo.id FROM urbanfarming.livedateyo, urbanfarming.processedData WHERE livedateyo.id = processedData.id" ;
+        var sql = "SELECT height, width, time, green_score as score, "+database.table+".id FROM "+database.liveData+", "+database.processedData+" WHERE "+database.table+".id = "+database.processed+".id" ;
 
         var whereInStatement= true;
     }else {
@@ -128,8 +128,8 @@ function afterAndBefore(after, before){
     return [e, d, t];
 }
 
-function generateChartData(database, callback, after, before){
-    sql = workOutSQL(database, database.liveData, "SELECT AVG(temperature) as temperature, AVG(relhumidity) as relhumidity, MIN(time) as time, AVG(lightluxlevel) as lightluxlevel, AVG(soilmoisture) as soilmoisture, MAX(id) FROM urbanfarming.livedateyo WHERE time > CURRENT_DATE -60 GROUP BY time::DATE", after, before);
+function generateChartData(database, after, before, callback){
+    sql = workOutSQL(database, database.liveData, "SELECT AVG(temperature) as temperature, AVG(rel_humidity) as rel_humidity, MIN(time) as time, AVG(light_lux_level) as light_lux_level, AVG(soil_moisture) as soil_moisture, MAX(id) FROM " +database.liveData+" WHERE time > CURRENT_DATE -60 GROUP BY time::DATE", after, before);
     console.log(sql);
     var temp = [];
     var humi = [];
@@ -147,9 +147,9 @@ function generateChartData(database, callback, after, before){
         for (var n =0; n<result.rowCount; n++ ){
             labelData.push(formatLabel(result.rows[n], n));
             t = parseInt(result.rows[n].temperature);
-            h = parseInt(result.rows[n].relhumidity);
-            l = parseInt(result.rows[n].lightluxlevel);
-            m = parseInt(result.rows[n].soilmoisture);
+            h = parseInt(result.rows[n].rel_humidity);
+            l = parseInt(result.rows[n].light_lux_level);
+            m = parseInt(result.rows[n].soil_moisture);
             temp.push(t || 0);    
             humi.push(h || 0);    
             luxl.push(l || 0);
@@ -196,9 +196,9 @@ function addRow(content, row) {
         "<td id='date' >" +formatDate(row.time)+ "</td>"+
         "<td>" + formatTime(row.time) +"</td>"+
         "<td>" +row.plantname+"</td>"+
-        "<td>" +row.lightluxlevel+" lux</td>"+
-        "<td>" +row.soilmoisture+"%</td>"+
-        "<td>" +row.relhumidity+"%</td>"+
+        "<td>" +row.light_lux_level+" lux</td>"+
+        "<td>" +row.soil_moisture+"%</td>"+
+        "<td>" +row.rel_humidity+"%</td>"+
         "<td>" +row.temperature+"C</td>"+
         "<td bgcolor= "+row.colour+"</td>"+
         "</tr>";
@@ -241,8 +241,8 @@ function rgbToHex(r, g, b) {
 
 
 function getHome(o, database, callback)  {
-    var sql="SELECT time, "+database.plant+"plantname, lightluxlevel, "+database.processed+ ".colour, soilmoisture, relhumidity, temperature, greenscore, width, height, compactness "+
-        " FROM "+database.liveData+" , " +database.processedData+", "+ database.userTable + 
+    var sql="SELECT time, "+database.plant+".plantname, light_lux_level, "+database.processed+ ".colour, soil_moisture, rel_humidity, temperature, green_score, width, height, compactness "+
+        " FROM "+database.liveData+" , " +database.processedData+", "+ database.userTable + ", " + database.plantProject +
         " WHERE "+database.table+".id=("+
                                        "SELECT MAX(id) FROM "+database.liveData+
                                        ") "+
@@ -254,25 +254,40 @@ function getHome(o, database, callback)  {
 
         if (err) {
             console.error(err); 
-            callback(err)
+            callback(err);
+            return;
         }
         try{ 
+            console.log(result);
+            console.log(1);
             var row = result.rows[0];
+            console.log(1);
             date = formatDate(row.time);
+            console.log(1);
             time = formatTime(row.time, o);
+            console.log(1);
             var rgb = getrgb(row.colour); 
+            console.log(1);
             var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
-
+            console.log(1);
             row.green= rgb.g;
+            console.log(1);
+            console.log(1);
             row.blue= rgb.b;
+            console.log(1);
             row.red = rgb.r;
+            console.log(1);
             row.time = time;
+            console.log(1);
             row.date = date;
+            console.log(1);
             
             callback(null, row);
+            return;
         }
         catch(err){
             callback("Tables exist, but something went wrong delivering live data.");
+            return;
         }
 
     })
