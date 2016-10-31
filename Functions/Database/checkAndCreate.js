@@ -112,19 +112,19 @@ function askDatabase( sql, callback ) {
 }
 
 function processTextFields(fields, target, callback){
-    var moisture =  fields.soilMoisture;
+    var moisture =  fields.soil_moisture;
     var colour   = fields.colour;
-    var humidity = fields.relHumidity;
+    var humidity = fields.rel_humidity;
     var temp     = fields.temperature;
-    var name     = (( fields.plantName== "")?  'a' : fields.plantName);
-    var light    = fields.lightLuxLevel;
+    var name     = (( fields.plantname== "")?  'a' : fields.plantname);
+    var light    = fields.light_lux_level;
     var tablefarmID = fields.deviceID;
 
     if (target){   
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}', ${tablefarmID})`;
+        var sql=`INSERT INTO ${liveData} (soil_moisture, rel_humidity, temperature, image, plantname, light_lux_level, colour, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}', ${tablefarmID})`;
     }
     else {
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel, colour, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}', ${tablefarmID})`;
+        var sql=`INSERT INTO ${liveData} (soil_moisture, rel_humidity, temperature, plantname, light_lux_level, colour, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}', ${tablefarmID})`;
     }
     askDatabase(sql, function(err, result){;
         if(err){
@@ -206,7 +206,7 @@ getTableSQL = {
 getInsertRowSQL = {
     // columns: id, username, password salt, password hash
     userTable     : "INSERT INTO " + userTable +" (id, username, passwordhash, passwordsalt)   VALUES (1, 'urbanfarm', 'urban2016', '')",    
-    // columns: id, tfid, userid, plantName, plant species, 
+    // columns: id, tfid, userid, plantname, plant species, 
     plantProject  : "INSERT INTO " + plantProject + "(id, tablefarmid, userid, plantname, plant_species) VALUES (1, 1, 1, 'Minty MacMintface', 'mint')",
     // columns: id, tfid, image, soil, rel, temp, time, lightlevel, 
     liveData      : "INSERT INTO " + liveData + " (id, tablefarmid, soil_moisture, rel_humidity, temperature)  VALUES (1, 1, 100 ,100 ,100)", 

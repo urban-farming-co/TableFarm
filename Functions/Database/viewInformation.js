@@ -210,7 +210,7 @@ function getLastXRows(x,database, callback)  {
         "<tr>" +
         "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
         "</tr>";
-    var sql="SELECT "+database.table + ".id, " + database.table+ ".image, time, plantname, lightluxlevel, soilMoisture, relHumidity, temperature, "+
+    var sql="SELECT "+database.table + ".id, " + database.table+ ".image, time, plantname, light_lux_level, soilMoisture, relHumidity, temperature, "+
         database.processed+ ".colour "+
         " FROM "+ database.liveData + ", " + database.processedData +
         " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
