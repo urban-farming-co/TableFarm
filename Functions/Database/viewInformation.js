@@ -200,7 +200,7 @@ function addRow(content, row) {
         "<td>" +row.soilmoisture+"%</td>"+
         "<td>" +row.relhumidity+"%</td>"+
         "<td>" +row.temperature+"C</td>"+
-        "<td bgcolor= "+row.colour+"</td>"+
+        "<td bgcolor= "+row.colour+"></td>"+
         "</tr>";
     return content;
 }
@@ -210,13 +210,17 @@ function getLastXRows(x,database, callback)  {
         "<tr>" +
         "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
         "</tr>";
-    var sql="SELECT * FROM "+ database.liveData +" LIMIT " + x;
+    var sql="SELECT "+database.table + ".id, " + database.table+ ".image, time, plantname, lightluxlevel, soilMoisture, relHumidity, temperature, "+
+        database.processed+ ".colour "+
+        " FROM "+ database.liveData + ", " + database.processedData +
+        " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
     database.askDatabase(sql, function(err, result) {
         if (err) {
             console.error(err);
             callback(err);
         }
         else {
+            console.log(result);
             var N = result.rows.length;
             for (var n =0; n <N; n++){
                 content = addRow(content, result.rows[n]) ;
