@@ -118,11 +118,13 @@ function processTextFields(fields, target, callback){
     var temp     = fields.temperature;
     var name     = (( fields.plantName== "")?  'a' : fields.plantName);
     var light    = fields.lightLuxLevel;
+    var deviceID = fields.deviceID;
+
     if (target){   
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}')`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour, deviceid) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}', ${deviceID})`;
     }
     else {
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel, colour) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}')`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel, colour, deviceid) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}', ${deviceID})`;
     }
     askDatabase(sql, function(err, result){;
         if(err){
