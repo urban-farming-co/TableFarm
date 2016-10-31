@@ -109,18 +109,16 @@ function askDatabase( sql, callback ) {
 
 function processTextFields(fields, target, callback){
     var moisture =  fields.soil_moisture;
-    var colour   = fields.colour;
     var humidity = fields.rel_humidity;
     var temp     = fields.temperature;
-    var name     = (( fields.plantname== "")?  'a' : fields.plantname);
     var light    = fields.light_lux_level;
     var tablefarmID = fields.deviceID;
 
     if (target){   
-        var sql=`INSERT INTO ${liveData} (soil_moisture, rel_humidity, temperature, image, plantname, light_lux_level, colour, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}', ${tablefarmID})`;
+        var sql=`INSERT INTO ${liveData} (soil_moisture, rel_humidity, temperature, image, light_lux_level, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', ${light},  ${tablefarmID})`;
     }
     else {
-        var sql=`INSERT INTO ${liveData} (soil_moisture, rel_humidity, temperature, plantname, light_lux_level, colour, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}', ${tablefarmID})`;
+        var sql=`INSERT INTO ${liveData} (soil_moisture, rel_humidity, temperature, light_lux_level, tablefarmid) VALUES ( ${moisture}, ${humidity}, ${temp}, ${light}, ${tablefarmID})`;
     }
     askDatabase(sql, function(err, result){;
         if(err){
