@@ -80,23 +80,18 @@ div#partners img{
     cursor:pointer;
     display:inline-block;
     vertical-align:middle;
-    padding: 2%;
+    margin:auto;
+    padding:initial;
     max-width: 157px;
-    height: auto;
+    white-space: nowrap;
 }
 div#partners>div#uoe img{
-    display:inline-block;
-    vertical-align:middle;
-    padding: 2%;
     width: 40%;
     height:auto;
     max-width: unset;
 }
 
 div#partners>div#uos img{
-    display:inline-block;
-    vertical-align:middle;
-    padding: 2%;
     height: 150px;
     width: auto;
 }
