@@ -95,6 +95,8 @@ div#stats li>h3:first-child{
 
 div#partners div{
     display:inline-block;
+    padding: 0px;
+    margin:0px;
 }
 
 div#partners > div#divception{
@@ -107,8 +109,6 @@ div#partners div.img{
     display:flex;
     vertical-align:middle;
     max-width: 157px;
-    max-height: 200px;
-    height:200px;
     width:15%;
 }
 div#partners img{
