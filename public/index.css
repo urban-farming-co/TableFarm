@@ -110,6 +110,7 @@ div#partners div.img{
     vertical-align:middle;
     max-width: 157px;
     width:15%;
+    margin: 0 auto;
 }
 div#partners img{
     display:inline-block;
