@@ -12,12 +12,15 @@ var tableStuff  = require('./Functions/Database/viewInformation.js');
 var imageStuff = require('./Functions/ProcessImages/process_images.js');
 var util = require('util');
 var spawn   = require('child_process').spawn;
+var userArea = require("./Functions/User/index.js").app;
 
 
 
 
 var app     = express();
 var port    = (process.env.VCAP_APP_PORT || 4000);
+
+app.use('/urbanfarming/user', userArea);
 
 
 app.use(cors({

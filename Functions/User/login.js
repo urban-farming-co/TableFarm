@@ -1,11 +1,14 @@
 var express   = require('express');
 var passport  = require('passport');
+var Strategy = require('passport-local').Strategy;
 
-app = express();
+
+var app = express();
 /* All functionality to do with login in should go here. */
 
+module.exports = {app};
 
-passport.use(new LocalStrategy(
+passport.use(new Strategy(
             function(username, password, done) {
                 User.findOne({ username: username }, function (err, user) {
                     if (err) { return done(err); }
@@ -17,32 +20,29 @@ passport.use(new LocalStrategy(
             ));
 
 
-function login(){
-    passport.authenticate('local', { failureRedirect: '/login' }),
-    function(req, res) {
-        res.redirect('/');
-    });
-}
 
-
-
-
-app.post('/urbanfarming/register', (req, res) => {
+app.get('/', (req, res) => {
+    // if logged in, go to dashboard
+    //
+    // else go to login page
+    res.redirect(301,  "/urbanfarming/user/login/");
+})
+app.post('/register', (req, res) => {
     res.render("dataReceieved", {title: "Register", contents: "New registration"});
 })
 
-app.post('/urbanfarming/login', (req, res) => {
+app.post('/login', (req, res) => {
     res.render("dataReceieved", {title: "Login", contents: "Login credentials"});
 })
 
-app.get('/urbanfarming/register', (req, res) => {
+app.get('/register', (req, res) => {
     res.render("register", {title: "Register"});
 })
 
-app.get('/urbanfarming/login', (req, res) => {
+app.get('/login', (req, res) => {
     res.render("login", {title: "Login"});
 })
-app.get('/urbanfarming/dashboard', require('connect-ensure-login').ensureLoggedIn(),
+app.get('/dashboard', require('connect-ensure-login').ensureLoggedIn(),
         function(req, res){
 
             // get the game url
