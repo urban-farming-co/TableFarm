@@ -8,7 +8,6 @@ public/images/*
 #Processed images
 Functions/ProcessImages/*.jpg
 Functions/ProcessImages/*.JPEG
-Functions/ProcessImages/ideas/*
 
 
 #Logs
