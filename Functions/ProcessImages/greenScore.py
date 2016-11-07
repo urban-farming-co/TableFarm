@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from skimage.io import imread
 from skimage import img_as_float
 import numpy as np
+import blob
+
 try:
     import Image
 except ImportError:
@@ -203,19 +205,24 @@ def findCard(r):
     """
     l = []
     p = r.copy()
-    p *= (0.7, 0.7, 0.7)
-    orangelight = (0.8, 0.5, 0.2)
-    orangedark = (0.52, 0.3, 0)
-
+    # p *= (0.7, 0.7, 0.7)
+    orangelight = (1, 0.5, 0.5)
+    orangedark = (0.62, 0.2, 0.1)
     # orangelight = (1,1,1)
     # orangedark = (0, 0, 0)
     for x in range(p.shape[0]):
         for y in range(p.shape[1]):
             if (isColour(orangelight, orangedark, p[x][y])):
-                # print(r[x][y])
+                print(r[x][y])
+                print("x is %d and y is %d " % (x, y))
                 p[x][y][0] = 1
                 p[x][y][2] = 1
-                l.append((y, x))
+                l.append((x, y))
+
+    orange_blob = blob(l)
+    orange_blob.split()
+    orange_blob.pick()
+
 
     x1 = getMin(0, l)
     x2 = getMax(0, l)
@@ -314,7 +321,9 @@ if __name__ == '__main__':
     pheno["saveTo"] = '"' + saveLocation + '"'
     savePlantImage(plantImage)
 
-    # displayPheno(pheno)
-    # displayProcesses(pheno["Score"], picture, normalized, cardImage, plantImage)
+    print("the card length is: %d so the ratio is %d "% (length, mmtopixRatio))
+
+    displayPheno(pheno)
+    displayProcesses(pheno["Score"], picture, normalized, cardImage, plantImage)
 
     sys.stdout.flush()
