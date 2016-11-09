@@ -7,13 +7,13 @@
         <link rel="stylesheet" type="text/css" href="../public/index.css" />
         <link rel="shortcut icon" type="image/x-icon" href='../public/files/flower.ico' />
         <meta charset="utf-8" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.js"></script>
+        <script type="text/javascript" src="../scripts/Chart.js/dist/Chart.bundle.js"></script> 
         <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     </head>
     <body style="margin:0">
 
 
-      <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post" enctype="multipart/form-data">
             Find data after: 
             <input type="date" name="after">
             Find data before: 
@@ -24,9 +24,10 @@
         <p> Current values: from <%= after %> to <%=before%> </p>
         If no dates are given, average values for each day will be calculated instead.
         <center>
-        <div style="position:absolute; width:80%; height:100%">
-            <canvas id="myChart"></canvas>
-        </div>
+            <a name="justChart"> </a>
+            <div style="position:absolute; width:100%; height:100%">
+                <canvas id="myChart"></canvas>
+            </div>
         </center>
         <script>
 function twoDigits(f){
@@ -39,14 +40,15 @@ var d = "";
 var m;
 for (var mhd in (minHourDays)){
     console.log(mhd);
-    d = (`${minHourDays[mhd][1]}-${twoDigits(minHourDays[mhd][2])}-${twoDigits(minHourDays[mhd][3])}T${twoDigits(minHourDays[mhd][4])}:${twoDigits(minHourDays[mhd][5])}:${twoDigits(minHourDays[mhd][6])}` ) 
+    d = (`${minHourDays[mhd][1]}-${twoDigits(minHourDays[mhd][2])}-${twoDigits(minHourDays[mhd][3])}` ) ;
 
     console.log(d);
-    m = new Date(d)
+    m = new Date(d);
+
     console.log(m);
     lab.push ([
-            minHourDays[mhd][0], 
-            (m).toLocaleString()
+            "Day: "+ minHourDays[mhd][0], 
+            (m).toLocaleDateString()
     ] )
 }
 
@@ -103,9 +105,11 @@ var myNewChart = new Chart(ctx, {
     type: 'line',
     data: data,
     options:{ 
+        showXLabels: 10,
         scales: {
             yAxes:[{
                 ticks:{
+                    autoSkip:true,
                     beginAtZero:true
                 }
             }]
