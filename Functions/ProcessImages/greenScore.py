@@ -219,13 +219,20 @@ def findCard(r):
                 p[x][y][2] = 1
                 l.append((x, y))
 
-    orange_blob = blob(l)
-    orange_blob.split()
-    orange_blob.pick()
+    try:
+        orange_blob = blob.CardBlob(l)
+        print("init")
 
+        orange_blob.split()
+        orange_blob.pick()
+
+        print(orange_blob)
+    except:
+        print("gahh!")
 
     x1 = getMin(0, l)
     x2 = getMax(0, l)
+    print (x2 -x1)
 
     return p, x2 - x1
 
@@ -293,7 +300,7 @@ if __name__ == '__main__':
     try:
         a = sys.argv[1]
     except:
-        a = "darkImage.jpg"
+        a = "../../public/foo.jpg"
 
     picture = readFile(a)
     normalized = normalizeImage(picture)
@@ -309,6 +316,7 @@ if __name__ == '__main__':
 
         cardImage *= (0.7, 0.7, 0.7)
         mmtopixRatio = 1
+        length =1
         pheno["ratioError"] = 1
 
     pheno["file"]  = '"' + a + '"'
