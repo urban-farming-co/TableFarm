@@ -5,7 +5,9 @@ canvas{
 }
 #chartjs-tooltip {
     opacity: 1;
-    position: absolute;
+    position: relative;
+    top: 0px;
+    left:30%;
     background: rgba(0, 0, 0, .7);
     color: white;
     border-radius: 3px;

@@ -18,12 +18,7 @@ var customTooltips = function(tooltip) {
     }
 
     // Set caret Position
-    tooltipEl.classList.remove('above', 'below', 'no-transform');
-    if (tooltip.yAlign) {
-        tooltipEl.classList.add(tooltip.yAlign);
-    } else {
-        tooltipEl.classList.add('no-transform');
-    }
+    tooltipEl.classList.remove('above', 'below' );
 
     function getBody(bodyItem) {
         return bodyItem.lines;
@@ -60,8 +55,7 @@ var customTooltips = function(tooltip) {
 
     // Display, position, and set styles for font
     tooltipEl.style.opacity = 1;
-    tooltipEl.style.left = position.left + tooltip.caretX + 'px';
-    tooltipEl.style.top = position.top + tooltip.caretY + 'px';
+    tooltipEl.style.margin ="0 auto";
     tooltipEl.style.fontFamily = tooltip._fontFamily;
     tooltipEl.style.fontSize = tooltip.fontSize;
     tooltipEl.style.fontStyle = tooltip._fontStyle;
@@ -75,7 +69,7 @@ var myNewChart = new Chart(ctx, {
             custom:customTooltips,
             mode: "label",
             position: "nearest",
-            enabled:false
+            enabled: false,
         }
     },
     scales: {
