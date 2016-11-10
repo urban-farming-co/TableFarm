@@ -190,8 +190,27 @@ function processStereoForm(req, res, callback){
     })
 }
 
+function processGameForm(req, res, callback){
+    var i = 0;
+    var form = new formidable.IncomingForm();
+
+    form.parse(req, function(err, fields, files) {
+        callback(util.inspect({fields:fields}));
+    })
+}
+
 app.get('/urbanfarming/model', (req, res) => {
     res.render("model", {title:"model", left:"../public/left.jpg", right:"../public/right.jpg", disparity:"../public/disparity.jpg", model:"../public/out.ply"});  // model");   
+})
+app.get('/urbanfarming/api/postLatestGameData', (req, res) => {
+    processGameForm(req, res, (c)=> {
+        res.render("gameForm", {title: "EnterSomeData"});
+    })
+})
+app.post('/urbanfarming/api/postLatestGameData', (req, res) => {
+    processGameForm(req, res, (c)=> {
+        res.render("dataReceieved", {title: "Upload Complete", contents: c});
+    })
 })
 app.post('/urbanfarming/twoimages', (req, res) => {
     processStereoForm(req, res, (c)=> {
@@ -201,7 +220,7 @@ app.post('/urbanfarming/twoimages', (req, res) => {
 
 app.post('/urbanfarming/data', function(req, res){
     database.processDataUpload(req, res, formidable, imageStuff, (c) => {
-        res.render("dataReceieved", {title: "two images", contents: c});
+        res.render("dataReceieved", {title: "Upload Complete", contents: c});
     })
 })
 
