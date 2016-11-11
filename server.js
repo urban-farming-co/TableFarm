@@ -7,7 +7,6 @@ var vcapServices = require('./vcapServices');
 var fs      = require('fs');
 var express = require('express');
 var exphbs  = require('express-handlebars');
-var bodyParser = require('body-parser');
 var passport  = require('passport');
 var database  = require('./Functions/Database/checkAndCreate.js');
 var tableStuff  = require('./Functions/Database/viewInformation.js');
