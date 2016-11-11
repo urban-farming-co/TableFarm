@@ -99,6 +99,7 @@ div#partners a{
 }
 
 div#partners div{
+    cursor:pointer;
     display:inline-block;
     padding: 0px;
     margin:0px;
