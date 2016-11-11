@@ -82,9 +82,11 @@
             <h2>Partners</h2>
             <p>Click on a logo for more information</p>
             <img onclick="showuoe()"src="public/files/uoe-logo.jpg"/>
+            <img onclick="showuos()" src="public/files/uos-logo.jpg"/>
+            <img onclick="showdia()" src="public/files/designInAction-logo.jpg"/>
+            <img onclick="showuoa()" src="public/files/abertay-logo.jpg"/>
             <img onclick="showecci()" src="public/files/ecci-logo.jpg"/>
             <img onclick="showcensis()" src="public/files/censis-logo.jpg"/>
-            <img onclick="showuos()" src="public/files/uos-logo.jpg"/>
             <div id="uoe" style="display:block">
                 <p> The Molecular Plant Sciences department at the University of Edinburgh did some experiments for us to prove that different lighting conditions could alter the way a plant might grow.</p>
                 <img src="public/files/growRig1.jpg"/>
@@ -104,6 +106,14 @@
                 <p> CENSIS helped us out a lot in the beginning. Everytime we have a meeting, we bring with us the prototype that they made for us.</p>
                 <a  target="_blank" href="http://censis.org.uk/cddc">Go To Organisation Website</a>
             </div>
+            <div id="uoa" style="display:none">
+                <p> Abertay is a great partner. We are based in the building and love it here.</p>
+                <a target="_blank" href="http://edinburghcentre.org/Ideas-Lab.html">Go To Organisation Website</a> 
+            </div>
+            <div id="dia" style="display:none">
+                <p> Design in action is a great partner. We are based in the building and love it here.</p>
+                <a target="_blank" href="http://edinburghcentre.org/Ideas-Lab.html">Go To Organisation Website</a> 
+            </div>
             <div id="ecci" style="display:none">
                 <p> ECCI is a great partner. We are based in the building and love it here.</p>
                 <a target="_blank" href="http://edinburghcentre.org/Ideas-Lab.html">Go To Organisation Website</a> 
@@ -116,6 +126,18 @@ function displayNone(){
     document.getElementById('censis').style.display ="none";
     document.getElementById('ecci').style.display ="none";
     document.getElementById('uoe').style.display ="none";
+    document.getElementById('dia').style.display ="none";
+    document.getElementById('uoa').style.display ="none";
+}
+function showuoa(){
+    displayNone();
+    document.getElementById('uoa').style.display ="block";
+
+}
+function showdia(){
+    displayNone();
+    document.getElementById('dia').style.display ="block";
+
 }
 function showuos(){
     displayNone();
