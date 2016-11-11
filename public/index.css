@@ -93,14 +93,32 @@ div#stats li>h3:first-child{
     display:inline;
 }
 
-div#partners img{
-    cursor:pointer;
+div#partners div{
     display:inline-block;
+}
+
+div#partners > div#divception{
+    display:flex;
     vertical-align:middle;
-    margin:auto;
-    padding:initial;
+}
+
+div#partners div.img{
+    cursor:pointer;
+    display:flex;
+    vertical-align:middle;
+    max-width: 157px;
+    max-height: 200px;
+    height:200px;
+    width:15%;
+}
+div#partners img{
+    display:inline-block;
+    cursor:pointer;
+    margin: auto;
+    vertical-align:middle;
     max-width: 157px;
     white-space: nowrap;
+    width:100%;
 }
 div#partners>div#uoe img{
     width: 40%;
@@ -111,6 +129,25 @@ div#partners>div#uoe img{
 div#partners>div#uos img{
     height: 150px;
     width: auto;
+}
+div#partners>div.unselected {
+    background-color:#ffffff;
+    display:none;
+    vertical-align:middle;
+}
+
+div#divception > div.unselected{
+    background-color:#ffffff;
+    vertical-align:middle;
+}
+div#divception > div.selected{
+    background-color:#ffe7ff;
+    vertical-align:middle;
+}
+div#partners>div.selected {
+    background-color:#ffe7ff;
+    display:block;
+    vertical-align:middle;
 }
 
 table{

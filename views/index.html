@@ -73,48 +73,77 @@
             <img src="public/files/strawberry.jpg" alt="strawberry" /> 
         </div>
 
-        <div="challenge">
+        <div id="challenge">
             <h3> Key challenge:</h3>
             <p> How can we develop our children's awareness of the benefits of fresh food using their digital knowledge? </p>
         </div>
         <hr/>
         <div id="partners">
             <h2>Partners</h2>
+
             <p>Click on a logo for more information</p>
-            <img onclick="showuoe()"src="public/files/uoe-logo.jpg"/>
-            <img onclick="showuos()" src="public/files/uos-logo.jpg"/>
-            <img onclick="showdia()" src="public/files/designInAction-logo.jpg"/>
-            <img onclick="showuoa()" src="public/files/abertay-logo.jpg"/>
-            <img onclick="showecci()" src="public/files/ecci-logo.jpg"/>
-            <img onclick="showcensis()" src="public/files/censis-logo.jpg"/>
-            <div id="uoe" style="display:block">
-                <p> The Molecular Plant Sciences department at the University of Edinburgh did some experiments for us to prove that different lighting conditions could alter the way a plant might grow.</p>
+            <div id="divception">
+                <div onclick="showuoe()" class="img unselected">
+                    <img onclick="showuoe()"    class="unselected" id="uoe-logo" src="public/files/uoe-logo.jpg"/>
+                </div class="img">
+                <div onclick="showuos()" class="img unselected">
+                    <img onclick="showuos()"    class="unselected"  id="uos-logo" src="public/files/uos-logo.jpg"/>
+                </div class="img">
+                <div onclick="showdia()" class="img unselected">
+                    <img onclick="showdia()"    class="unselected" id="dia-logo" src="public/files/designInAction-logo.jpg"/>
+                </div class="img">
+                <div onclick="showuoa()" class="img unselected">
+                    <img onclick="showuoa()"    class="unselected" id="uoa-logo" src="public/files/abertay-logo.jpg"/>
+                </div>
+                <div onclick="showecci()"  class="img unselected">
+                    <img onclick="showecci()"   class="unselected" id="ecci-logo" src="public/files/ecci-logo.jpg"/>
+                </div class="img">
+                <div onclick="showcensis()" class="img unselected">
+                    <img onclick="showcensis()" class="unselected" id="censis-logo" src="public/files/censis-logo.jpg"/>
+                </div>
+            </div>
+            <div id="uoe" class="unselected" >
+                <p>
+                Research collaboration with Institute of Molecular Plant Sciences (Dr. Alistair McCormick, SynthSys). This innovative collaboration evaluated the affect of lighting quality on optimal plant growth.
+                Working with PhD student Andrei Dobrescu to develop TableFarm's machine learning technology based on image processing applications.
+                </p>
                 <img src="public/files/growRig1.jpg"/>
                 <img src="public/files/growRig2.jpg"/>
                 <br/>
                 <a  target="_blank"  href="http://www.ed.ac.uk/biology/molecular-plant-sciences">Go To Organisation Website</a>
             </div>
-            <div id="uos" style="display:none"> 
-                <p>In order to test the affect that lighting has on a plant, we asked The University of Strathclyde Intelligent Lighting Centre to  make us grow rigs. They were very helpful. The grow rigs have become a product in their own right. One of our friends in the Intelligent Light Centre spoke to their local school and they bought a grow rig for their advanced higher biology course.</p> 
+            <div id="uos"  class="unselected"> 
+                <p>
+                Partnership with Prof. James Irvine (Electronic engineering) and Dr. Robert Martin (Lighting Innovation Centre) exploring the design, development and affect of light on plant growth. The University of Strathclyde's Intelligent Lighting Centre helped design and fabricate TableFarm prototype Grow Rigs. The Rigs are currently being used for plant phenotype research and as an experimental educational tool for an Advanced Higher Biology course for a school near Glasgow.
+                </p>
                 <img src="public/files/lightArray.jpg"/>
                 <img src="public/files/makingLightingRigP.jpg"/>
                 <img src="public/files/website.jpg"/>
                 <br/>
                 <a target="_blank" href="http://www.strath.ac.uk/intelligentlightingcentre/">Go To Organisation Website</a>
             </div>
-            <div id="censis" style="display:none">
-                <p> CENSIS helped us out a lot in the beginning. Everytime we have a meeting, we bring with us the prototype that they made for us.</p>
+            <div class="unselected" id="censis">
+                <p>
+                Centre of excellence for Sensor and Imaging Systems (SIS)  -CENSIS is providing valuable leading industry innovations and access to world-class research. TableFarm benefited from their in-house IoT Centre prototyping accelerating concept to prototype NPD. The IoT Centre technical team was able to support TableFarm's rapid prototyping building a full-spectrum sensor hardware set for our working prototype.
+                </p>
+                <img src="public/files/censis.jpg"/>
                 <a  target="_blank" href="http://censis.org.uk/cddc">Go To Organisation Website</a>
             </div>
-            <div id="uoa" style="display:none">
-                <p> Abertay is a great partner. We are based in the building and love it here.</p>
-                <a target="_blank" href="http://edinburghcentre.org/Ideas-Lab.html">Go To Organisation Website</a> 
+            <div id="uoa" class="unselected" >
+                <p>
+                World-class interface and gamification collaboration with the renounced department of Computational Modelling & Visualization, School of Arts, Media and Computer Games. Working collaboration with student team developing design narrative, code and user experiences related to TableFarm's digital world.
+                </p>
+                <a target="_blank" href="">Go To Organisation Website</a> 
             </div>
-            <div id="dia" style="display:none">
-                <p> Design in action is a great partner. We are based in the building and love it here.</p>
-                <a target="_blank" href="http://edinburghcentre.org/Ideas-Lab.html">Go To Organisation Website</a> 
+            <div id="dia" class="unselected" >
+                <p>
+                Urban Farming Company benefited from Design in Action's seed funding as part of the Art and Humanities Research Council-funded Knowledge Exchange Hub for the Creative Economy.  2014 Design Chiasma support as a residential collaborative workshop through to current strategic mentoring.
+                </p>
+                <img src="public/files/dia.jpg"/>
+                <a target="_blank" href="">Go To Organisation Website</a> 
             </div>
-            <div id="ecci" style="display:none">
+            <div id="ecci" class="unselected">
+
                 <p> ECCI is a great partner. We are based in the building and love it here.</p>
                 <a target="_blank" href="http://edinburghcentre.org/Ideas-Lab.html">Go To Organisation Website</a> 
             </div>
@@ -122,39 +151,51 @@
         <hr/>
         <script>
 function displayNone(){
-    document.getElementById('uos').style.display ="none";
-    document.getElementById('censis').style.display ="none";
-    document.getElementById('ecci').style.display ="none";
-    document.getElementById('uoe').style.display ="none";
-    document.getElementById('dia').style.display ="none";
-    document.getElementById('uoa').style.display ="none";
+    document.getElementById('censis').className="unselected";
+    document.getElementById('ecci').className="unselected";
+    document.getElementById('uoe').className="unselected";
+    document.getElementById('uos').className="unselected";
+    document.getElementById('dia').className="unselected";
+    document.getElementById('uoa').className="unselected";
+
+    document.getElementById('censis-logo').parentNode.className="img unselected";
+    document.getElementById('ecci-logo').parentNode.className="img unselected";
+    document.getElementById('uoe-logo').parentNode.className="img unselected";
+    document.getElementById('uos-logo').parentNode.className="img unselected";
+    document.getElementById('dia-logo').parentNode.className="img unselected";
+    document.getElementById('uoa-logo').parentNode.className="img unselected";
 }
 function showuoa(){
     displayNone();
-    document.getElementById('uoa').style.display ="block";
-
+    document.getElementById('uoa').className="selected";
+    document.getElementById('uoa-logo').parentNode.className="img selected";
 }
 function showdia(){
     displayNone();
-    document.getElementById('dia').style.display ="block";
+    document.getElementById('dia-logo').parentNode.className="img selected";
+    document.getElementById('dia').className="selected";
 
 }
 function showuos(){
     displayNone();
-    document.getElementById('uos').style.display ="block";
+    document.getElementById('uos-logo').parentNode.className="img selected";
+    document.getElementById('uos').className="selected";
 
 }
 function showecci(){
     displayNone();
-    document.getElementById('ecci').style.display ="block";
+    document.getElementById('ecci-logo').parentNode.className="img selected";
+    document.getElementById('ecci').className="selected";
 }
 function showcensis(){
     displayNone();
-    document.getElementById('censis').style.display ="block";
+    document.getElementById('censis-logo').parentNode.className="img selected";
+    document.getElementById('censis').className="selected";
 }
 function showuoe(){
     displayNone();
-    document.getElementById('uoe').style.display ="block";
+    document.getElementById('uoe-logo').parentNode.className="img selected";
+    document.getElementById('uoe').className="selected";
 }
         </script>
         <div id="mail">

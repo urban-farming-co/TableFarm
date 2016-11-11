@@ -4,17 +4,21 @@
   "description": "holding page for urban farming",
   "main": "server.js",
   "dependencies": {
-    "chai": "^3.5.0",
+    "body-parser": "^1.15.2",
+    "connect-redis": "^3.1.0",
     "consolidate": "^0.14.1",
     "ejs": "^2.5.2",
+    "errorhandler": "^1.4.3",
     "express": "^4.14.0",
     "express-cors": "0.0.3",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.14.1",
     "formidable": "^1.0.17",
+    "jquery": "^3.1.0",
     "mocha": "^3.0.2",
     "passport": "^0.3.2",
-    "pg": "^6.1.0"
+    "pg": "^6.1.0",
+    "re": "^0.1.4"
   },
   "devDependencies": {},
   "scripts": {
