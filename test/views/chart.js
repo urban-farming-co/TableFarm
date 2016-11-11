@@ -40,6 +40,7 @@ describe ("chart page", () =>{
         it ("locally returns status 200", (done) =>{
             general.requestURL(charturl, done);
         })
+        /*
 
         it ("You can enter a before date", (done)  => {
             formData = {before: today}
@@ -72,6 +73,7 @@ describe ("chart page", () =>{
                 done()
             })
         })
+        */
     })
 })
 
