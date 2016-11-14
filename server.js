@@ -208,7 +208,9 @@ app.get('/urbanfarming/api/postLatestGameData', (req, res) => {
 })
 app.post('/urbanfarming/api/postLatestGameData', (req, res) => {
     processGameForm(req, res, (c)=> {
-        res.render("dataReceieved", {title: "Upload Complete", contents: c});
+
+        res.setHeader("Content-Type", "application/json");
+        res.send(c);
     })
 })
 app.post('/urbanfarming/twoimages', (req, res) => {
