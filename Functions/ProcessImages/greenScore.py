@@ -298,11 +298,11 @@ def displayPheno(p):
 
 if __name__ == '__main__':
     try:
-        a = sys.argv[1]
+        imageFile = sys.argv[1]
     except:
-        a = "../../public/foo.jpg"
+        imageFile = "../../public/foo.jpg"
 
-    picture = readFile(a)
+    picture = readFile(imageFile)
     normalized = normalizeImage(picture)
     plantImage, plantPoints = findThePlant(normalized)
     pheno = {}
@@ -319,7 +319,7 @@ if __name__ == '__main__':
         length =1
         pheno["ratioError"] = 1
 
-    pheno["file"]  = '"' + a + '"'
+    pheno["file"]  = '"' + imageFile + '"'
     pheno["Score"] = getScore(plantPoints)
     pheno["Width"] = getWidth(plantPoints, mmtopixRatio)
     pheno["Height"] = getHeight(plantPoints, mmtopixRatio)
@@ -329,7 +329,7 @@ if __name__ == '__main__':
     pheno["saveTo"] = '"' + saveLocation + '"'
     savePlantImage(plantImage)
 
-    print("the card length is: %d so the ratio is %d "% (length, mmtopixRatio))
+    print("the card length is: %d so the ratio is %f "% (length, mmtopixRatio))
 
     displayPheno(pheno)
     displayProcesses(pheno["Score"], picture, normalized, cardImage, plantImage)
