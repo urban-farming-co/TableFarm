@@ -5,7 +5,7 @@ EXPOSE 5432
 # copy the application folder inside the container
 RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
-
+WORKDIR /usr/src/app
 
 
 
