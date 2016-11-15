@@ -39,12 +39,14 @@ div {
     position: relative;
     padding-bottom: 55%;
     height:0;
+    width:100%;
 }
 #chartdiv iframe{
+    margin: 0 auto;
     position:absolute;
     top:0;
     left:0;
-    width:100%;
+    width:120%;
     height:100%;
 
 }
