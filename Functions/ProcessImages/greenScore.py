@@ -212,8 +212,6 @@ def findCard(r):
     for x in range(p.shape[0]):
         for y in range(p.shape[1]):
             if (isColour(orangelight, orangedark, p[x][y])):
-                print(r[x][y])
-                print("x is %d and y is %d " % (x, y))
                 p[x][y][0] = 1
                 p[x][y][2] = 1
                 l.append((x, y))
@@ -316,7 +314,6 @@ if __name__ == '__main__':
     pheno["saveTo"] = '"' + saveLocation + '"'
     savePlantImage(plantImage)
 
-    print("the card length is: %d so the ratio is %d "% (length, mmtopixRatio))
 
     displayPheno(pheno)
     displayProcesses(pheno["Score"], picture, normalized, cardImage, plantImage)

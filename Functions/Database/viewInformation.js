@@ -8,6 +8,23 @@ module.exports = {
 }
 
 
+function getDeviceImageIDs(database, deviceID, callback){
+    sql = "SELECT id FROM " + database.liveData + " WHERE IMAGE IS NOT NULL AND deviceid = " +deviceID +" ORDER BY id DESC";
+    database.askDatabase(sql, (err, result) => {
+        if (err) {
+            console.error(err);
+            callback(err);
+        }
+        console.log(result);
+        ids = []
+            for (row in result.rows){
+                console.log(row);
+                ids.push(result.rows[row].id);
+            }
+        callback(null, ids);
+    })
+}
+
 function getImageIDs(database, callback){
     sql = "SELECT id FROM " + database.liveData + " WHERE IMAGE IS NOT NULL";
     database.askDatabase(sql, (err, result) => {
@@ -219,7 +236,7 @@ function getLast1Row(u,database, callback)  {
     // " AND " + database.user +".id = " + u +
     "ORDER BY id DESC LIMIT 1";
     */
-    var sql1 =`SELECT id, time, lightluxlevel, soilMoisture, relHumidity, temperature FROM ${database.liveData}` ;
+    var sql1 =`SELECT id,deviceid, time, lightluxlevel, soilMoisture, relHumidity, temperature FROM ${database.liveData} WHERE deviceid=${u} ORDER BY id DESC LIMIT 1` ;
     database.askDatabase(sql1, function(err, result) {
         if (err) {
             console.error(err);
@@ -230,96 +247,108 @@ function getLast1Row(u,database, callback)  {
             if (result.rows.length ===0){
                 callback("no rows to return", null);
             } else {
-                var sql2 =`SELECT width, height, colour FROM ${database.processedData}  WHERE id=${result.rows[0].id}` ;
-                database.askDatabase(sql2, function(err, result2) {
-                    if (err) {
-                        console.error(err);
+                getDeviceImageIDs(database, u, (err, ids) =>{
+                    if(err){
                         callback(err);
                     }
-                    else {
-
-                        console.log(result2);
+                    else{
+                        console.log(ids);
+                        mostRecentImageID = ids.shift(); // the list is sorted, this will be the top entry.
+                        var sql2 =`SELECT compactness, width, height, colour FROM ${database.processedData}  WHERE id=${mostRecentImageID}` ;
                         var content = {
+                            id:             result.rows[0].id,
                             time:           result.rows[0].time, 
                             relhumidity:    result.rows[0].relhumidity,
                             lightluxlevel:  result.rows[0].lightluxlevel,
-                            id:             result.rows[0].id,
                             soilmoisture:   result.rows[0].soilmoisture,
-                            temperature:    result.rows[0].temperature,
+                            temperature:    result.rows[0].temperature}
 
-                            width:          result2.rows[0].width,
-                            height:         result2.rows[0].height,
-                            colour:         result2.rows[0].colour
-                        }
-                            callback(null, content );
-                        }
-                    })
-                }
+                        database.askDatabase(sql2, function(err, result2) {
+                            if (err) {
+                                console.error(err);
+                                callback(err);
+                            }
+                            else {
+                                if (result2.rows.length >0){
+
+                                    console.log(result2);
+
+                                    content["width"] = result2.rows[0].width;
+                                    content["height"] = result2.rows[0].height;
+                                    content["colour"] = result2.rows[0].colour;
+
+                                }
+                                callback(null, content );
+                            }
+                        })
+                    }
+                })
             }
-        })
-    };
-    function getLastXRows(x,database, callback)  {
-        var content = "<table id='view'>" +
-            "<tr>" +
-            "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
-            "</tr>";
-        var sql="SELECT "+database.table + ".id, time, plantname, lightluxlevel, soilMoisture, relHumidity, temperature, "+
-            database.processed+ ".colour "+
-            " FROM "+ database.liveData + ", " + database.processedData +
-            " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
-        database.askDatabase(sql, function(err, result) {
-            if (err) {
-                console.error(err);
-                callback(err);
+        }
+    })
+};
+function getLastXRows(x,database, callback)  {
+    var content = "<table id='view'>" +
+        "<tr>" +
+        "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
+        "</tr>";
+    var sql="SELECT "+database.table + ".id, time, plantname, lightluxlevel, soilMoisture, relHumidity, temperature, "+
+        database.processed+ ".colour "+
+        " FROM "+ database.liveData + ", " + database.processedData +
+        " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
+    database.askDatabase(sql, function(err, result) {
+        if (err) {
+            console.error(err);
+            callback(err);
+        }
+        else {
+            console.log(result);
+            var N = result.rows.length;
+            for (var n =0; n <N; n++){
+                content = addRow(content, result.rows[n]) ;
             }
-            else {
-                console.log(result);
-                var N = result.rows.length;
-                for (var n =0; n <N; n++){
-                    content = addRow(content, result.rows[n]) ;
-                }
-                content += "</table>" ;
-                callback(null, content);
-            }
-        })
-    }
+            content += "</table>" ;
+            callback(null, content);
+        }
+    })
+}
 
 
-    function getrgb(hex) {
-        var result = hex.match(/^#?([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})$/i);
-        col = result ? { r: parseInt(result[1], 16),  g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0, g:0, b:0};  
-        return col ;
-    }
+function getrgb(hex) {
+    var result = hex.match(/^#?([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})$/i);
+    col = result ? { r: parseInt(result[1], 16),  g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0, g:0, b:0};  
+    return col ;
+}
 
 
-    function rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
+function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
 
 
-    function getHome(o, database, callback)  {
-        var sql="SELECT time, plantname, lightluxlevel, "+database.processed+ ".colour, soilmoisture, relhumidity, temperature, greenscore, width, height, compactness FROM "+database.liveData+" , " +database.processedData+" WHERE "+database.table+".id=(SELECT MAX(id) FROM "+database.liveData+") AND " +database.processed+".id = (SELECT MAX(id) FROM " + database.processedData +")";
-        database.askDatabase (sql, function(err, result){
+function getHome(o, database, callback)  {
+    var sql="SELECT time, plantname, lightluxlevel, "+database.processed+ ".colour, soilmoisture, relhumidity, temperature, greenscore, width, height, compactness FROM "+database.liveData+" , " +database.processedData+" WHERE "+database.table+".id=(SELECT MAX(id) FROM "+database.liveData+") AND " +database.processed+".id = (SELECT MAX(id) FROM " + database.processedData +")";
+    database.askDatabase (sql, function(err, result){
 
-            if (err) {
-                console.error(err); 
-                callback(err)
-            }
-            var row = result.rows[0];
-            date = formatDate(row.time);
-            time = formatTime(row.time, o);
-            var rgb = getrgb(row.colour); 
-            var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
+        if (err) {
+            console.error(err); 
+            callback(err)
+        }
+        var row = result.rows[0];
+        date = formatDate(row.time);
+        time = formatTime(row.time, o);
+        var rgb = getrgb(row.colour); 
+        var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
 
-            row.green= rgb.g;
-            row.blue= rgb.b;
-            row.red = rgb.r;
-            row.time = time;
-            row.date = date;
+        row.green= rgb.g;
+        row.blue= rgb.b;
+        row.red = rgb.r;
+        row.time = time;
+        row.date = date;
 
-            callback(null, row);
+        callback(null, row);
 
 
-        })
-    }
+    })
+}
 
