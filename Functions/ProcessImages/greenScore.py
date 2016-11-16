@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from skimage.io import imread
 from skimage import img_as_float
 import numpy as np
-import blob
 
 try:
     import Image
@@ -218,10 +217,6 @@ def findCard(r):
                 p[x][y][0] = 1
                 p[x][y][2] = 1
                 l.append((x, y))
-
-    orange_blob = blob(l)
-    orange_blob.split()
-    orange_blob.pick()
 
 
     x1 = getMin(0, l)
