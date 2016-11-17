@@ -352,29 +352,6 @@ app.get('/urbanfarming/viewcontent', (request, response) => {
         if (err) {
             response.render("error", {title:"something went wrong", error:err});
 
-app.get('/urbanfarming/api/getUserPlantDetails', (req, res) =>{
-    
-    var u = req.query.u;
-
-    if (u && u.substr(-1) == '/'){
-        u = u.substr(0, u.length -1);
-        u = parseInt(u);
-    }
-    if (!u) 
-    {
-        u =10;
-    }
-    tableStuff.getLast1Row(1, database, (err, content) => {
-        if (err) {
-            res.write(err);
-        }
-        else {
-        console.log("The variable u is:");
-        console.log(u);
-        console.log("The variable x is:");
-        console.log(1);
-        res.setHeader("Content-Type", "application/json");
-        res.send(JSON.stringify(content));
         }
     })
 })
@@ -430,3 +407,4 @@ app.use('', (err, req, res, next) =>{
 });
 app.use('', (req, res, next) =>{
     res.render('404', {title: "404", status:404, url:req.url});
+});

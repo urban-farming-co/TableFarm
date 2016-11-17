@@ -1,6 +1,7 @@
 var express   = require('express');
 var passport  = require('passport');
 var Strategy = require('passport-local').Strategy;
+var tablestuff  = require("../Database/viewInformation").tablestuff;
 
 
 var app = express();
@@ -42,23 +43,21 @@ app.get('/register', (req, res) => {
 app.get('/login', (req, res) => {
     res.render("login", {title: "Login"});
 })
-app.get('/dashboard', require('connect-ensure-login').ensureLoggedIn(),
-        function(req, res){
-
-            // get the game url
-            var index = '<iframe src="http://zap.pm/game/57d96ed87dfb28e51e95f50b/play" width="480" height="365" allowfullscreen></iframe><br> Keep your plant safe from the salt!';
-            // get the table info.
-            tableStuff.getHome( 1, database, (err, content)=>{
-                if (err){
+app.get('/dashboard', (req, res)=>{ // require('connect-ensure-login').ensureLoggedIn(),   function(req, res){
+    // get the game url
+    var index = '<iframe src="http://zap.pm/game/57d96ed87dfb28e51e95f50b/play" width="480" height="365" allowfullscreen></iframe><br> Keep your plant safe from the salt!';
+    // get the table info.
+    tableStuff.getHome( 1, database, (err, content)=>{
+        if (err){
+            res.render("error", {title:"something went wrong", error:err});
+        }else{
+            tableStuff.generateChartData(database,null, null, (err, dict) => {
+                if (err) {
                     res.render("error", {title:"something went wrong", error:err});
                 }else{
-                    tableStuff.generateChartData(database,null, null, (err, dict) => {
-                        if (err) {
-                            res.render("error", {title:"something went wrong", error:err});
-                        }else{
-                            res.render("userHome", {title: "Welcome", user:"karen", game:index, row:content, dict});
-                        }
-                    })
+                    res.render("userHome", {title: "Welcome", user:"karen", game:index, row:content, dict});
                 }
             })
-        })
+        }
+    })
+})
