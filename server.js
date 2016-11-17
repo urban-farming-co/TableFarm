@@ -228,9 +228,15 @@ app.post('/urbanfarming/data', function(req, res){
 app.post('/urbanfarming/chart', function(req, res) {
     console.log("post");
     processChartForm(req, res, (a, b) =>{
-        tableStuff.generateChartData(database, (err, c) => {
-            console.log(c);
-            res.render("chart", c)},a,b);      
+        tableStuff.generateChartData(database,a, b, (err, c) => {
+            if (err){
+                res.render("error", {title:"cant produce chart", error:err});
+            }
+            else  {
+                console.log(c);
+                res.render("chart", c);      
+            }
+        })
     })
 })
 
@@ -341,17 +347,10 @@ app.get('/urbanfarming/viewcontent', (request, response) => {
     }
     tableStuff.getLastXRows(x, database, (err, content) => {
         if (err) {
-            response.write(err);
+            response.render("error", {title:"something went wrong", error:err});
         }
         else {
-        console.log("The variable u is:");
-        console.log(u);
-        console.log("The variable x is:");
-        console.log(x);
-            response.writeHead(200, {
-                'Content-Type'  : 'text/html', 
-                'Content-Length': Buffer.byteLength(content)});
-            response.write(content);
+            response.render("viewContent", {row: content});
         }
     })
 })
@@ -384,11 +383,7 @@ app.get('/urbanfarming/api/getUserPlantDetails', (req, res) =>{
 })
 
 app.get('/urbanfarming/view', (request, response) => {
-    response.sendFile(__dirname + "/views/view.html", () =>{
-        console.log("sent");
-        response.end();
-
-    });
+    response.render("view.html");
 })
 app.get('/urbanfarming/liveData',(req, res)=>{
     var o =  req.query.o;
@@ -402,8 +397,7 @@ app.get('/urbanfarming/liveData',(req, res)=>{
     }
     tableStuff.getHome( o, database, (err, content)=>{
         if (err){
-            res.write(err);
-            res.end();
+            res.render("error", {title:"something went wrong", error:err});
         }else{
             res.render("liveData", {row:content});
         }

@@ -1,0 +1,29 @@
+<table id='view'>   
+    <tr>   
+        <th>Image</th>
+        <th>Date</th> 
+        <th>Time</th>
+        <th>PlantName</th>   
+        <th>Light lux level &amp; Lux </th> 
+        <th>SoilMoisture &amp; % </th>   
+        <th>Relative Humidity &amp; %</th>  
+        <th>Temperature &amp; C </th> 
+        <th>Colour </th>   
+    </tr> 
+
+    <% for(var i=0; i<row.length; i++) {%>
+
+        <tr>   
+            <td><img src='http://tablefarm.co.uk/urbanfarming/img?x= <%- row[0].id -%> ' /></td>   
+            <td id='date' >   <%- row[0].time -%>      </td>  
+            <td>   <%- row[0].time -%>                 </td>  
+            <td>   <%- row[0].plantname -%>            </td>  
+            <td>   <%- row[0].lightluxlevel -%>        </td>  
+            <td>   <%- row[0].soilmoisture -%>         </td>  
+            <td>   <%- row[0].relhumidity -%>          </td>  
+            <td>   <%- row[0].temperature -%>          </td>  
+            <td bgcolor=   <%- row.colour -%> >     </td>  
+        </tr> 
+    <% } %>
+
+</table>

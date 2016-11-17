@@ -25,7 +25,7 @@ function getImageIDs(database, callback){
 
 }
 
-function generatePlantChartData(database, callback, after, before){
+function generatePlantChartData(database, after, before, callback){
     sql = workOutSQL(database, database.processedData, "SELECT AVG(height) as height, AVG(width) as width, MIN(time) as time, AVG(greenscore) as score, MAX(livedateyo.id) FROM urbanfarming.livedateyo, urbanfarming.processedData WHERE livedateyo.id = processedData.id AND time > CURRENT_DATE - 60 GROUP BY time::DATE", after, before);
 
     var wid = [];
@@ -251,60 +251,61 @@ function getLast1Row(u,database, callback)  {
                             height:         result2.rows[0].height,
                             colour:         result2.rows[0].colour
                         }
-                            callback(null, content );
-                        }
-                    })
-                }
+                        callback(null, content );
+                    }
+                })
             }
-        })
-    };
-    function getLastXRows(x,database, callback)  {
-        var content = "<table id='view'>" +
-            "<tr>" +
-            "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
-            "</tr>";
-        var sql="SELECT "+database.table + ".id, time, plantname, lightluxlevel, soilMoisture, relHumidity, temperature, "+
-            database.processed+ ".colour "+
-            " FROM "+ database.liveData + ", " + database.processedData +
-            " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
-        database.askDatabase(sql, function(err, result) {
-            if (err) {
-                console.error(err);
-                callback(err);
+        }
+    })
+};
+function getLastXRows(x,database, callback)  {
+    var content = "<table id='view'>" +
+        "<tr>" +
+        "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
+        "</tr>";
+    var sql="SELECT "+database.table + ".id, time, plantname, lightluxlevel, soilMoisture, relHumidity, temperature, "+
+        database.processed+ ".colour "+
+        " FROM "+ database.liveData + ", " + database.processedData +
+        " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
+    database.askDatabase(sql, function(err, result) {
+        if (err) {
+            console.error(err);
+            callback(err);
+        }
+        else {
+            console.log(result);
+            var N = result.rows.length;
+            for (var n =0; n <N; n++){
+                content = addRow(content, result.rows[n]) ;
             }
-            else {
-                console.log(result);
-                var N = result.rows.length;
-                for (var n =0; n <N; n++){
-                    content = addRow(content, result.rows[n]) ;
-                }
-                content += "</table>" ;
-                callback(null, content);
-            }
-        })
-    }
+            content += "</table>" ;
+            callback(null, content);
+        }
+    })
+}
 
 
-    function getrgb(hex) {
-        var result = hex.match(/^#?([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})$/i);
-        col = result ? { r: parseInt(result[1], 16),  g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0, g:0, b:0};  
-        return col ;
-    }
+function getrgb(hex) {
+    var result = hex.match(/^#?([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})$/i);
+    col = result ? { r: parseInt(result[1], 16),  g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0, g:0, b:0};  
+    return col ;
+}
 
 
-    function rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
+function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
 
 
-    function getHome(o, database, callback)  {
-        var sql="SELECT time, plantname, lightluxlevel, "+database.processed+ ".colour, soilmoisture, relhumidity, temperature, greenscore, width, height, compactness FROM "+database.liveData+" , " +database.processedData+" WHERE "+database.table+".id=(SELECT MAX(id) FROM "+database.liveData+") AND " +database.processed+".id = (SELECT MAX(id) FROM " + database.processedData +")";
-        database.askDatabase (sql, function(err, result){
+function getHome(o, database, callback)  {
+    var sql="SELECT time, plantname, lightluxlevel, "+database.processed+ ".colour, soilmoisture, relhumidity, temperature, greenscore, width, height, compactness FROM "+database.liveData+" , " +database.processedData+" WHERE "+database.table+".id=(SELECT MAX(id) FROM "+database.liveData+") AND " +database.processed+".id = (SELECT MAX(id) FROM " + database.processedData +")";
+    database.askDatabase (sql, function(err, result){
 
-            if (err) {
-                console.error(err); 
-                callback(err)
-            }
+        if (err) {
+            console.error(err); 
+            callback(err)
+        }
+        try{ 
             var row = result.rows[0];
             date = formatDate(row.time);
             time = formatTime(row.time, o);
@@ -318,8 +319,12 @@ function getLast1Row(u,database, callback)  {
             row.date = date;
 
             callback(null, row);
+        }
+        catch(err){
+            callback("Tables exist, but something went wrong delivering live data.");
+        }
 
 
-        })
-    }
+    })
+}
 
