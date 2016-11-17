@@ -430,4 +430,3 @@ app.use('', (err, req, res, next) =>{
 });
 app.use('', (req, res, next) =>{
     res.render('404', {title: "404", status:404, url:req.url});
-});
