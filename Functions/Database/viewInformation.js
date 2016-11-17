@@ -311,13 +311,11 @@ function getHome(o, database, callback)  {
             time = formatTime(row.time, o);
             var rgb = getrgb(row.colour); 
             var rgbf = rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
-
             row.green= rgb.g;
             row.blue= rgb.b;
             row.red = rgb.r;
             row.time = time;
             row.date = date;
-
             callback(null, row);
         }
         catch(err){
