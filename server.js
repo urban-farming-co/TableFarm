@@ -432,6 +432,17 @@ app.get('/urbanfarming/twoimages', (req, res) => {
     res.render("twoImages", {title: "two images"});
 })
 
+app.get('/urbanfarming/login', (req, res) => {
+    res.render("login", {title: "login"});
+})
+app.get('/urbanfarming/register', (req, res) => {
+    res.render("register", {title: "register"});
+})
+
+app.get('/urbanfarming/userHome', (req, res) => {
+    res.render("userHome", {title: "userHome"});
+})
+
 
 app.use('', (err, req, res, next) =>{
     res.render('404', {title: "500", status:err.status || 500, url:err});

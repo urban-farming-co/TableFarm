@@ -1,3 +1,11 @@
+$("#submitReg").click(function(){
+    console.log("tah");
+    alert("thanks paul");
+    window.location = "../userHome";
+})
+
+
+
 function Authenticate()
 {
     //save our local GUID and Title Id so we use the same one (or at least until our cookies are cleared)
@@ -19,7 +27,7 @@ function AuthenticationCallback(response, error)
 {
     if(error)
     {
-        OutputError(error);
+        console.error(error);
     }   
     else
     {
@@ -27,8 +35,7 @@ function AuthenticationCallback(response, error)
         console.log("Login Successful. Welcome Player: " + result.PlayFabId);
         console.log("Your session ticket is: " + result.SessionTicket);
 
-        $(".loginUI").hide();
-        $(".exampleUI").show();
+        window.location ="../userHome";
     }
 }
 
