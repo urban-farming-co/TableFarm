@@ -16,10 +16,14 @@ var util = require('util');
 
 module.exports = {
     processDataUpload,
-    processed, 
     table, 
+    processed, 
+    users,
+    plant,
     liveData,
+    userTable,
     processedData, 
+    plantProject,
     schema, 
     askDatabase, 
     createTable, 
@@ -192,7 +196,7 @@ function  createTables(sql, sql1, callback){
 getTableSQL = {
     "plantProject"  :  "CREATE TABLE " + plantProject + " (id SERIAL PRIMARY KEY, tablefarmid INTEGER UNIQUE, userid INTEGER, plantname varchar(50), plant_species varchar(50), FOREIGN KEY(userid) REFERENCES "+userTable + "(id) )",
     "userTable"     : "CREATE TABLE " + userTable + " (id SERIAL PRIMARY KEY, username VARCHAR(50), passwordsalt VARCHAR(100), passwordhash VARCHAR(100))",
-    "processedData" : `CREATE TABLE ${processedData} (id SERIAL PRIMARY KEY, image BYTEA, greenScore INTEGER, colour VARCHAR(10), liveid INTEGER,  FOREIGN KEY(liveid) REFERENCES ${liveData} (id))`,
+    "processedData" : `CREATE TABLE ${processedData} (id SERIAL PRIMARY KEY, image BYTEA, green_score INTEGER, colour VARCHAR(10), width INTEGER, height INTEGER, compactness INTEGER, leaf_elongation INTEGER, liveid INTEGER,  FOREIGN KEY(liveid) REFERENCES ${liveData} (id))`,
     "liveData"      : `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soil_moisture INTEGER, rel_humidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, tablefarmid INTEGER, light_lux_level INTEGER, FOREIGN KEY (tablefarmID) REFERENCES ${plantProject} (tablefarmid))`
 }
 
@@ -203,7 +207,6 @@ getInsertRowSQL = {
     plantProject  : "INSERT INTO " + plantProject + "(id, tablefarmid, userid, plantname, plant_species) VALUES (1, 1, 1, 'Minty MacMintface', 'mint')",
     // columns: id, tfid, image, soil, rel, temp, time, lightlevel, 
     liveData      : "INSERT INTO " + liveData + " (id, tablefarmid, soil_moisture, rel_humidity, temperature)  VALUES (1, 1, 100 ,100 ,100)", 
-    // columns: id, liveid, image, greenscore, colour,  
     processedData : "INSERT INTO " + processedData + "(id, liveid) "+                        " VALUES (1, 1)",
 }
 
