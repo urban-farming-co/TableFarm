@@ -7,7 +7,6 @@ var vcapServices = require('./vcapServices');
 var fs      = require('fs');
 var express = require('express');
 var exphbs  = require('express-handlebars');
-var passport  = require('passport');
 var database  = require('./Functions/Database/checkAndCreate.js');
 var tableStuff  = require('./Functions/Database/viewInformation.js');
 var imageStuff = require('./Functions/ProcessImages/process_images.js');
@@ -404,14 +403,6 @@ app.get('/urbanfarming/liveData',(req, res)=>{
     });
 })
 
-app.get('/urbanfarming/game', (req, res) => {
-    var index ='<iframe src="http://zap.pm/game/55ae4e2b7dfb285122934106/play" width="480" height="365" allowfullscreen></iframe><br> <a href="http://zap.pm/game/55ae4e2b7dfb285122934106" target=_blank>Tank Battle by roger on ZAP<br> Remix to add your own pictures and settings!</a> - See more at: http://zap.pm/game/55ae4e2b7dfb285122934106#sthash.Ptk8wWfG.dpuf';
-    //res.writeHead(200, {
-    //    "Content-Type": "text/plain"
-    //});
-    res.render("layout", {title: "possible game",
-        content:index});
-})
 
 
 app.get('/urbanfarming/plantchart', (req, res) => {
@@ -436,7 +427,39 @@ app.get('/urbanfarming/verified', (req, res) => {
 app.get('/urbanfarming/twoimages', (req, res) => {
     res.render("twoImages", {title: "two images"});
 })
+app.post('/urbanfarming/register', (req, res) => {
+    res.render("dataReceieved", {title: "Register", contents: "New registration"});
+})
 
+app.post('/urbanfarming/login', (req, res) => {
+    res.render("dataReceieved", {title: "Login", contents: "Login credentials"});
+})
+
+app.get('/urbanfarming/register', (req, res) => {
+    res.render("register", {title: "Register"});
+})
+
+app.get('/urbanfarming/login', (req, res) => {
+    res.render("login", {title: "Login"});
+})
+app.get('/urbanfarming/dashboard', (req, res) => {
+    // get the game url
+    var index = '<iframe src="http://zap.pm/game/57d96ed87dfb28e51e95f50b/play" width="480" height="365" allowfullscreen></iframe><br> Keep your plant safe from the salt!';
+    // get the table info.
+    tableStuff.getHome( 1, database, (err, content)=>{
+        if (err){
+            res.render("error", {title:"something went wrong", error:err});
+        }else{
+            tableStuff.generateChartData(database,null, null, (err, dict) => {
+                if (err) {
+                    res.render("error", {title:"something went wrong", error:err});
+                }else{
+                    res.render("userHome", {title: "Welcome", user:"karen", game:index, row:content, dict});
+                }
+            })
+        }
+    })
+})
 
 app.use('', (err, req, res, next) =>{
     res.render('404', {title: "500", status:err.status || 500, url:err});
