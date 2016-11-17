@@ -26,7 +26,8 @@ function getImageIDs(database, callback){
 }
 
 function generatePlantChartData(database, after, before, callback){
-    sql = workOutSQL(database, database.processedData, "SELECT AVG(height) as height, AVG(width) as width, MIN(time) as time, AVG(greenscore) as score, MAX(livedateyo.id) FROM urbanfarming.livedateyo, urbanfarming.processedData WHERE livedateyo.id = processedData.id AND time > CURRENT_DATE - 60 GROUP BY time::DATE", after, before);
+    sql1 = "SELECT AVG(height) as height, AVG(width) as width, MIN(time) as time, AVG(green_score) as score, MAX("+database.table+".id) FROM "+database.liveData+", "+database.processedData+" WHERE "+database.table+".id = "+database.processed+".id AND time > CURRENT_DATE - 60 GROUP BY time::DATE"
+    sql = workOutSQL(database, database.processedData, sql1 , after, before);
 
     var wid = [];
     var hei = [];
@@ -263,10 +264,13 @@ function getLastXRows(x,database, callback)  {
         "<tr>" +
         "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
         "</tr>";
-    var sql="SELECT "+database.table + ".id, time, plantname, lightluxlevel, soilMoisture, relHumidity, temperature, "+
+    var sql="SELECT "+database.table + ".id, " + database.table+ ".image, time, "+database.plant+".plantname, light_lux_level, soilMoisture, relHumidity, temperature, "+
         database.processed+ ".colour "+
         " FROM "+ database.liveData + ", " + database.processedData +
-        " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
+        " Where "+ database.table + ".id  = " + database.processed +".id " + 
+        " AND " + database.table + ".tablefarmid  = " +database.plant+".tablefarmid" +
+        " ORDER BY id DESC LIMIT " + x;
+
     database.askDatabase(sql, function(err, result) {
         if (err) {
             console.error(err);

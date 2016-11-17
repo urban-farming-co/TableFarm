@@ -126,7 +126,6 @@ function processTextFields(fields, target, callback){
             callback(err);
         }
         else {
-            console.log(callback);
             callback(util.inspect({fields:fields}));
         }
     })
