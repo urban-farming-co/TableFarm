@@ -201,18 +201,6 @@ function processGameForm(req, res, callback){
 app.get('/urbanfarming/model', (req, res) => {
     res.render("model", {title:"model", left:"../public/left.jpg", right:"../public/right.jpg", disparity:"../public/disparity.jpg", model:"../public/out.ply"});  // model");   
 })
-app.get('/urbanfarming/api/postLatestGameData', (req, res) => {
-    processGameForm(req, res, (c)=> {
-        res.render("gameForm", {title: "EnterSomeData"});
-    })
-})
-app.post('/urbanfarming/api/postLatestGameData', (req, res) => {
-    processGameForm(req, res, (c)=> {
-
-        res.setHeader("Content-Type", "application/json");
-        res.send(c);
-    })
-})
 app.post('/urbanfarming/twoimages', (req, res) => {
     processStereoForm(req, res, (c)=> {
         res.render("dataReceieved", {title: "two images", contents: "Left image and right image"});
@@ -368,9 +356,10 @@ app.get('/urbanfarming/api/getUserPlantDetails', (req, res) =>{
     {
         u =10;
     }
-    tableStuff.getLast1Row(1, database, (err, content) => {
+    tableStuff.getLast1Row(u, database, (err, content) => {
         if (err) {
             res.write(err);
+            res.end();
         }
         else {
         console.log("The variable u is:");
