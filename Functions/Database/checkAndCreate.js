@@ -188,7 +188,7 @@ function  createTables(sql, sql1){
 
 function  getTableSQL(t){ 
     if (t==liveData) {
-        return `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER, colour VARCHAR(20))`;
+        return `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER, colour VARCHAR(20), deviceid INTEGER)`;
     }
     else if (t == processedData){
         return `CREATE TABLE ${processedData} (id SERIAL PRIMARY KEY, image BYTEA, greenScore INTEGER, colour VARCHAR(10))`;
