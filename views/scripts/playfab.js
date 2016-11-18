@@ -5,7 +5,7 @@ var url =  "https://DF78.playfabapi.com/Client/";
 var regAPI = url + "RegisterPlayFabUser";
 var updAPI = url + "UpdateUserData";
 var logAPI = url + "LoginWithPlayFab";
-var getAPI = url + "GetAccountInfo";
+var getAPI = url + "GetPlayerCombinedInfo";
 
 
 
@@ -24,7 +24,7 @@ $("#submitReg").click(function(){
     var displayname = $("#displayname").val();
     var type = $("#type").val();
     var password = $("#password").val();
-    var deviceID = $("#deviceID").val();
+    var deviceID = $("#deviceid").val();
     var plantspecies = $("#plantspecies").val();
     var plantname = $("#plantname").val();
 
@@ -172,6 +172,23 @@ function Authenticate(username, password, callback)
 
 function getUserInfo(callback){
     var data ={
+        "InfoRequestParameters": {
+            "GetUserAccountInfo": true,
+            "GetUserInventory": false,
+            "GetUserVirtualCurrency": false,
+            "GetUserData": true,
+            "UserDataKeys": [
+                "deviceID",
+                "plantSpecies",
+                "userType",
+                "plantName"
+            ],
+            "GetUserReadOnlyData": true,
+            "GetCharacterInventories": false,
+            "GetCharacterList": false,
+            "GetTitleData": true,
+            "GetPlayerStatistics": false
+        }
     }
 
     var headers = {"Content-Type": "application/json"};
@@ -183,7 +200,11 @@ function getUserInfo(callback){
         data: JSON.stringify( data),
         complete: function(data, status){
             var res = JSON.parse(data.responseText);
-            var info = res.data.AccountInfo;
+
+            var info = res.data.InfoResultPayload;
+            console.log(info);
+            console.log(data);
+            console.log(res);
             callback(null, info);
         },
 
@@ -201,7 +222,7 @@ function getUserInfo(callback){
    var data ={
    }
 
-    var headers = {"Content-Type": "application/json"};
+   var headers = {"Content-Type": "application/json"};
    $.ajax({
    type: "POST",
    url: getAPI, 

@@ -18,34 +18,94 @@
 
         <hr/>
         <h2>Game</h2>
-        <%- game -%>
+        <iframe src="http://zap.pm/game/57d96ed87dfb28e51e95f50b/play" width="480" height="365" allowfullscreen></iframe>
+        <p> Keep your plant safe from the salt!<p>
 
         <hr/>
 
         <h2>Your Plant</h2>
         <h3>Table</h3>
-        <% include liveData %> 
+        <div id="tableDiv">
+            {{content}}
+        </div>
+        </div>
         <h3>Chart</h3>
-        <% include chart %> 
+        <div id="chartDiv">
+            {{content}}
+        </div>
         <hr/>
         <script>
 
-getUserInfo(function(err, info) {
-    if (err){
-        alert(err);
-    } else{
-        try{
-            var displayName = info.TitleInfo.DisplayName;
-        } catch(e) {
-            console.error(e);
-            var displayName = " ";
-            alert("something has gone wrong.\n" +e); 
-        }
 
-        $("#displayName").html(displayName);
-        console.log(info);
+function getTable(deviceID, name){
+
+    var data ={
     }
+
+    var headers = {"Content-Type": "application/json"};
+    $.ajax({
+        type: "GET",
+        url: "../livedata?d="+deviceID,
+        data: JSON.stringify( data),
+        complete: function(data, status){
+
+            $("#tableDiv").html(data.responseText);
+            console.log(name);
+            $("#tableDiv #name").html(name);
+            
+        },
+        error: function(err, dko){
+            console.error(err);
+            alert("something went wrong\n" + err);
+        },
+    });
+}
+
+function getChart(deviceID){
+
+    var data ={
+    }
+
+    var headers = {"Content-Type": "application/json"};
+    $.ajax({
+        type: "GET",
+        url: "../chart?d="+deviceID,
+        data: JSON.stringify( data),
+        complete: function(data, status){
+
+            $("#chartDiv").html(data.responseText);
+        },
+        error: function(err, dko){
+            console.error(err);
+            alert("something went wrong\n" + err);
+        },
+    });
+}
+
+$(document).ready(function(){
+    getUserInfo(function(err, info) {
+        if (err){
+            alert(err);
+        } else{
+            try{
+                var displayName = info.AccountInfo.TitleInfo.DisplayName;
+            } catch(e) {
+                console.error(e);
+                var displayName = " ";
+                alert("something has gone wrong.\n" +e); 
+            }
+
+            $("#displayName").html(displayName);
+            console.log(info);
+
+            getTable(info.UserData.deviceID.Value , info.UserData.plantName.Value );
+            getChart(info.UserData.deviceID.Value);
+        }
+    })
 })
+
+
+
         </script>
     </body>
 </html>
