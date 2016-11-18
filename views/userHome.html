@@ -30,17 +30,22 @@
         <hr/>
         <script>
 
-    getUserInfo(function(err, info) {
+getUserInfo(function(err, info) {
+    if (err){
+        alert(err);
+    } else{
         try{
-        var displayName = info.TitleInfo.DisplayName;
+            var displayName = info.TitleInfo.DisplayName;
         } catch(e) {
             console.error(e);
-        var displayName = "karen";
+            var displayName = " ";
+            alert("something has gone wrong.\n" +e); 
         }
 
         $("#displayName").html(displayName);
         console.log(info);
-    })
+    }
+})
         </script>
     </body>
 </html>
