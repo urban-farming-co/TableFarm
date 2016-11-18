@@ -81,11 +81,11 @@
         <div class="row">
 
             <div class="col-xs-8">
-                <label for="name">Your Name</label>
+                <label for="displayname">Your Name</label>
                 <p>This will be your display name.</p>
             </div>
             <div class="col-xs-4">
-                <input type="text" id="name" accept="text" placeholder="Karen"/>
+                <input type="text" id="displayname" accept="text" placeholder="Karen"/>
             </div>
 
         </div>
@@ -93,11 +93,11 @@
         <div class="row">
 
             <div class="col-xs-8">
-                <label  required for="name">Your username</label>
+                <label  required for="username">Your username</label>
                 <p>This will be the name you log in with.</p>
             </div>
             <div class="col-xs-4">
-                <input type="text"  required id="name" accept="text" placeholder="Karen"/>
+                <input type="text" required id="username" accept="text" pattern=".{6,20}" title="The username must be between 6 and 20 characters." placeholder="Karen"/>
             </div>
 
         </div>
