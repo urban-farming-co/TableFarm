@@ -146,7 +146,7 @@ function afterAndBefore(after, before){
     return [e, d, t];
 }
 
-function generateChartData(database, callback, after, before){
+function generateChartData(database, after, before, callback){
     sql = workOutSQL(database, database.liveData, "SELECT AVG(temperature) as temperature, AVG(relhumidity) as relhumidity, MIN(time) as time, AVG(lightluxlevel) as lightluxlevel, AVG(soilmoisture) as soilmoisture, MAX(id) FROM urbanfarming.livedateyo WHERE time > CURRENT_DATE -60 GROUP BY time::DATE", after, before);
     console.log(sql);
     var temp = [];
@@ -162,32 +162,50 @@ function generateChartData(database, callback, after, before){
         }
         console.log("the result is: ");
         console.log(result);
-        for (var n =0; n<result.rowCount; n++ ){
-            labelData.push(formatLabel(result.rows[n], n));
-            t = parseInt(result.rows[n].temperature);
-            h = parseInt(result.rows[n].relhumidity);
-            l = parseInt(result.rows[n].lightluxlevel);
-            m = parseInt(result.rows[n].soilmoisture);
-            temp.push(t || 0);    
-            humi.push(h || 0);    
-            luxl.push(l || 0);
-            soil.push(m || 0);
-        };
-        var e;
+        try{
+            for (var n =0; n<result.rowCount; n++ ){
+                labelData.push(formatLabel(result.rows[n], n));
+                t = parseInt(result.rows[n].temperature);
+                h = parseInt(result.rows[n].relhumidity);
+                l = parseInt(result.rows[n].lightluxlevel);
+                m = parseInt(result.rows[n].soilmoisture);
+                temp.push(t || 0);    
+                humi.push(h || 0);    
+                luxl.push(l || 0);
+                soil.push(m || 0);
+            };
+            var e;
 
-        e = afterAndBefore(after, before);
+            e = afterAndBefore(after, before);
 
-        dict = { title      : e[2],
-            temp       : temp,
-            labels     : JSON.stringify(labelData),
-            humi       : humi,
-            soil       : soil,
-            luxl       : luxl,
-            after      : e[0],
-            before     : e[1]
+            dict = { title      : e[2],
+                temp       : temp,
+                labels     : JSON.stringify(labelData),
+                humi       : humi,
+                soil       : soil,
+                luxl       : luxl,
+                after      : e[0],
+                before     : e[1]
+            }
+            console.log(dict);
+            callback(err, dict);
         }
-        console.log(dict);
-        callback(err, dict)
+        catch (e){
+
+            dict = { title      : "no",
+                temp       :  "no",
+                labels     : "no",
+                humi       : "no",
+                soil       : "no",
+                luxl       : "no",
+                after      : "no",
+                before     : "no",
+            }
+            console.log(dict);
+            callback(e, dict);
+
+        }
+
     })
 
 }

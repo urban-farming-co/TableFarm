@@ -216,9 +216,9 @@ app.post('/urbanfarming/data', function(req, res){
 app.post('/urbanfarming/chart', function(req, res) {
     console.log("post");
     processChartForm(req, res, (a, b) =>{
-        tableStuff.generateChartData(database, (err, c) => {
+        tableStuff.generateChartData(database, a,b, (err, c) => {
             console.log(c);
-            res.render("chart", c)},a,b);      
+            res.render("chart", c)});      
     })
 })
 
@@ -226,9 +226,9 @@ app.post('/urbanfarming/chart', function(req, res) {
 app.post('/urbanfarming/plantchart', function(req, res) {
     console.log("post");
     processChartForm(req, res, (a, b) =>{
-        tableStuff.generatePlantChartData(database, (err, c) => {
+        tableStuff.generatePlantChartData(database,a,b, (err, c) => {
             console.log(c);
-            res.render("plantChart", c)},a,b);      
+            res.render("plantChart", c)});      
     })
 })
 
@@ -411,13 +411,13 @@ app.get('/urbanfarming/game', (req, res) => {
 
 app.get('/urbanfarming/plantchart', (req, res) => {
     console.log("get");
-    tableStuff.generatePlantChartData(database, (err, dict) => {
+    tableStuff.generatePlantChartData(database, null, null,(err, dict) => {
         res.render("plantChart", dict);
     })
 })
 app.get('/urbanfarming/chart', (req, res) => {
     console.log("get");
-    tableStuff.generateChartData(database, (err, dict) => {
+    tableStuff.generateChartData(database,null, null, (err, dict) => {
         res.render("chart", dict);
     })
 })
@@ -440,7 +440,22 @@ app.get('/urbanfarming/register', (req, res) => {
 })
 
 app.get('/urbanfarming/userHome', (req, res) => {
-    res.render("userHome", {title: "userHome"});
+    // get the table info.
+    tableStuff.getHome( 1, database, (err, content)=>{
+        if (err){
+            res.render("error", {title:"something went wrong", error:err});
+        }else{
+            tableStuff.generateChartData(database,null, null, (err, dict) => {
+                if (err) {
+                    console.error(err);
+                    res.render("error", {title:"something went wrong", error:err});
+                }else{
+                    console.log(dict);
+                    res.render("userHome", {title: "Welcome", row:content, chart:dict});
+                }
+            })
+        }
+    })
 })
 
 
