@@ -26,8 +26,6 @@ describe ("live data page", () =>{
             var fields = {
                 soilMoisture : '2',
                 relHumidity  : '45',
-                plantName    : 'Minty MacMintface',
-                colour       : '0',
                 lightLuxLevel: '458',
                 temperature  : '20'
             }
@@ -40,8 +38,6 @@ describe ("live data page", () =>{
     it ("integrates well with data insertion with image", (done) => {
         var formData = { soilMoisture: '3',
             relHumidity: '4',
-            plantName: 'Boaty MacMintface',
-            colour: '0',
             lightLuxLevel: '500',
             temperature: '21' 
         }

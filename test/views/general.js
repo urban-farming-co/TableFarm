@@ -51,7 +51,6 @@ function postToServer(fields, path) {
                                                                                                           }
                                                                                                           expect(body).to.contain(fields["soilMoisture"]);
                                                                                                           expect(body).to.contain(fields["relHumidity"]);
-                                                                                                          expect(body).to.contain(fields["plantName"]);
                                                                                                           expect(body).to.contain(fields["lightLuxLevel"]);
                                                                                                           expect(body).to.contain(fields["temperature"]);
                                                                                                           done();

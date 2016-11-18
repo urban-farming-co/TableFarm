@@ -19,8 +19,6 @@ describe ("I can insert data", () =>{
         it ("integrates well with live data  without image", (done) => {
             var formData = { soilMoisture: '2',
                 relHumidity: '45',
-                plantName: 'Minty MacMintface',
-                colour: '0',
                 lightLuxLevel: '458',
                 temperature: '20' }
 
@@ -31,8 +29,6 @@ describe ("I can insert data", () =>{
         it ("integrates well with live data image", (done) => {
             var formData = { soilMoisture: '3',
                 relHumidity: '4',
-                plantName: 'Boaty MacMintface',
-                colour: '0',
                 lightLuxLevel: '500',
                 temperature: '21' 
             }

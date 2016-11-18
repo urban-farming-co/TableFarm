@@ -109,15 +109,14 @@ function processTextFields(fields, target, callback){
     var colour   = fields.colour;
     var humidity = fields.relHumidity;
     var temp     = fields.temperature;
-    var name     = (( fields.plantName== "")?  'a' : fields.plantName);
     var light    = fields.lightLuxLevel;
     var deviceID = fields.deviceID;
 
     if (target){   
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, plantName, lightLuxLevel, colour, deviceid) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}', ${deviceID})`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, image, lightLuxLevel, colour, deviceid) VALUES ( ${moisture}, ${humidity}, ${temp}, '${target}', '${name}', ${light}, '${colour}', ${deviceID})`;
     }
     else {
-        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, plantName, lightLuxLevel, colour, deviceid) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}', ${deviceID})`;
+        var sql=`INSERT INTO ${liveData} (soilMoisture, relHumidity, temperature, lightLuxLevel, colour, deviceid) VALUES ( ${moisture}, ${humidity}, ${temp},  '${name}', ${light}, '${colour}', ${deviceID})`;
     }
     askDatabase(sql, function(err, result){;
         if(err){
@@ -188,7 +187,7 @@ function  createTables(sql, sql1){
 
 function  getTableSQL(t){ 
     if (t==liveData) {
-        return `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL, plantName VARCHAR(50), lightLuxLevel INTEGER, colour VARCHAR(20), deviceid INTEGER)`;
+        return `CREATE TABLE ${liveData} (id SERIAL  PRIMARY KEY, image BYTEA , soilMoisture INTEGER, relHumidity INTEGER, temperature INTEGER, time TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() at time zone 'utc') NOT NULL), lightLuxLevel INTEGER, colour VARCHAR(20), deviceid INTEGER)`;
     }
     else if (t == processedData){
         return `CREATE TABLE ${processedData} (id SERIAL PRIMARY KEY, image BYTEA, greenScore INTEGER, colour VARCHAR(10))`;
