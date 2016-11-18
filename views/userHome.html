@@ -1,13 +1,18 @@
 <html>
     <head>
         <title><%- title -%></title>
+        <!--jquery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <!-- Chart.js   -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.js"></script> 
+        <!-- PlayFab C API  -->
         <script src="https://download.playfab.com/PlayFabClientApi.js"></script>
+        <!-- my playfab script -->
         <script type="text/javascript" src="../scripts/playfab.js"> </script>
         <% include header %>
     </head>
    <body>
-       <h1>Welcome <%- user -%>!</h1>
+       <h1>Welcome </h1> <h1 id=displayName></h1>
         
 
        <hr/>
@@ -18,10 +23,9 @@
 
        <h2>Your Plant</h2>
        <h3>Table</h3>
-       <% include liveData %>
+     <% include liveData %> 
        <h3>Chart</h3>
-       <p> Chart. </p>
-     
+       <% include chart %> 
        <hr/>
    </body>
 </html>
