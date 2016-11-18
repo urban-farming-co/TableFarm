@@ -8,24 +8,39 @@
         <!-- PlayFab C API  -->
         <script src="https://download.playfab.com/PlayFabClientApi.js"></script>
         <!-- my playfab script -->
-        <script type="text/javascript" src="../scripts/playfab.js"> </script>
+        <script type="text/javascript" src="../scripts/playfab.js"> 
+        </script>
         <% include header %>
     </head>
-   <body>
-       <h1>Welcome </h1> <h1 id=displayName></h1>
-        
+    <body>
+        <h1>Welcome </h1> <h1 id=displayName></h1>
 
-       <hr/>
-       <h2>Game</h2>
-       <%- game -%>
 
-       <hr/>
+        <hr/>
+        <h2>Game</h2>
+        <%- game -%>
 
-       <h2>Your Plant</h2>
-       <h3>Table</h3>
-     <% include liveData %> 
-       <h3>Chart</h3>
-       <% include chart %> 
-       <hr/>
-   </body>
+        <hr/>
+
+        <h2>Your Plant</h2>
+        <h3>Table</h3>
+        <% include liveData %> 
+        <h3>Chart</h3>
+        <% include chart %> 
+        <hr/>
+        <script>
+
+    getUserInfo(function(err, info) {
+        try{
+        var displayName = info.TitleInfo.DisplayName;
+        } catch(e) {
+            console.error(e);
+        var displayName = "karen";
+        }
+
+        $("#displayName").html(displayName);
+        console.log(info);
+    })
+        </script>
+    </body>
 </html>

@@ -5,6 +5,9 @@ var url =  "https://DF78.playfabapi.com/Client/";
 var regAPI = url + "RegisterPlayFabUser";
 var updAPI = url + "UpdateUserData";
 var logAPI = url + "LoginWithPlayFab";
+var getAPI = url + "GetAccountInfo";
+
+
 
 $("#submitReg").click(function(){
     isValid = $("#email")[0].checkValidity() && 
@@ -44,6 +47,8 @@ $("#submitReg").click(function(){
                 }
                 else{
                     window.location = "../userHome";
+
+                    localStorage.tablefarm = user_session_ticket_value;
                 }
 
             });
@@ -61,6 +66,13 @@ $("#submitLog").click(function(){
             alert("something went wrong.\n" + JSON.stringify(err));
         }else{
             window.location = "../userHome";
+            var user_session_ticket_value = 0; 
+            try{
+                user_session_ticket_value = data.data.SessionTicket;
+            }catch(err){
+                user_session_ticket_value = JSON.parse(data.responseText).data.SessionTicket;
+            }
+            localStorage.tablefarm = user_session_ticket_value;
         }
     });
 })
@@ -158,3 +170,52 @@ function Authenticate(username, password, callback)
 
 }
 
+function getUserInfo(callback){
+    var data ={
+    }
+
+    var headers = {"Content-Type": "application/json"};
+    headers["X-Authentication"]= localStorage.tablefarm;
+    console.log(headers);
+    $.ajax({
+        type: "POST",
+        url: getAPI, 
+        data: JSON.stringify( data),
+        complete: function(data, status){
+            var res = JSON.parse(data.responseText);
+            var info = res.data.AccountInfo;
+            callback(null, info);
+        },
+
+        error: function(err, dko){
+            console.error(err);
+            callback(JSON.parse(err.responseText));
+        },
+        headers: headers,
+        dataType:  "json"
+    });
+
+}
+/*
+   function template getUserInfo(){
+   var data ={
+   }
+
+    var headers = {"Content-Type": "application/json"};
+   $.ajax({
+   type: "POST",
+   url: getAPI, 
+   data: JSON.stringify( data),
+   complete: function(data, status){
+   callback(null, JSON.parse(data.responseText));
+   },
+   error: function(err, dko){
+   console.error(err);
+   callback(JSON.parse(err.responseText));
+   },
+   headers: headers,
+   dataType:  "json"
+   });
+
+   }
+   */
