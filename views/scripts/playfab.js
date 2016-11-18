@@ -4,6 +4,7 @@ var secretKey = "7EKB53HCE5XACZD644IFFIUU4RP1QRP3YMOFDP5Z593BCH8544";
 var url =  "https://DF78.playfabapi.com/Client/"; 
 var regAPI = url + "RegisterPlayFabUser";
 var updAPI = url + "UpdateUserData";
+var logAPI = url + "LoginWithPlayFab";
 
 $("#submitReg").click(function(){
     isValid = $("#email")[0].checkValidity() && 
@@ -53,7 +54,15 @@ $("#submitReg").click(function(){
 $("#submitLog").click(function(){
     console.log("tah");
     alert("thanks paul");
-    window.location = "../userHome";
+    var username = $("#username").val();
+    var password = $("#password").val();
+    Authenticate(username, password, function(err, data) {
+        if (err){
+            alert("something went wrong.\n" + JSON.stringify(err));
+        }else{
+            window.location = "../userHome";
+        }
+    });
 })
 
 
@@ -118,37 +127,34 @@ function setAdditionalParameters(deviceID, plantspecies, plantname, userType, us
     });
 }
 
-function Authenticate()
+function Authenticate(username, password, callback)
 {
     //save our local GUID and Title Id so we use the same one (or at least until our cookies are cleared)
     localStorage.titleId = $("#inputTitleId").val();
-    localStorage.userId = $("#inputUserId").val();
-
-    PlayFab.settings.titleId = $("#inputTitleId").val();
-    var LoginWithCustomIDRequest = {
-        "TitleId" : PlayFab.settings.titleId,
-        "CustomId" : $("#inputUserId").val(),
-        "CreateAccount" : true
-    };
-
-    console.log("Logging into PlayFab...");
-    PlayFabClientSDK.LoginWithCustomID(LoginWithCustomIDRequest, AuthenticationCallback);
-}
-
-function AuthenticationCallback(response, error)
-{
-    if(error)
+    var headers = {"Content-Type": "application/json"};
+    data = 
     {
-        console.error(error);
-    }   
-    else
-    {
-        var result = response.data;
-        console.log("Login Successful. Welcome Player: " + result.PlayFabId);
-        console.log("Your session ticket is: " + result.SessionTicket);
-
-        window.location ="../userHome";
+        "TitleId": titleID,
+        "Username": username,
+        "Password": password
     }
-}
+    console.log(data)
 
+        console.log("Logging into PlayFab...");
+    $.ajax({
+        type: "POST",
+        url: logAPI, 
+        data: JSON.stringify( data),
+        complete: function(data, status){
+            callback(null, JSON.parse(data.responseText));
+        },
+        error: function(err, dko){
+            console.error(err);
+            callback(JSON.parse(err.responseText));
+        },
+        headers: headers,
+        dataType:  "json"
+    });
+
+}
 
