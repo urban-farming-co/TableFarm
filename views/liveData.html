@@ -1,59 +1,78 @@
-<h3>Green Fingers Score:<%-row.greenscore-%></h3>
-<img width=100 src='/urbanfarming/img?f=1/'/>
-<img width=100 src='/urbanfarming/pimg/'/>
+<html>
 
-<table id='data-plant'>
-    <tr>
-        <th>Plant Name:</th>
-        <td id="name">Minty MacMintface</td>
-    </tr>
-    <tr>
-        <th>Plant Species:</th>
-        <td id="species">Mint</td>
-    </tr>
-    <tr>
-        <th>Date:</th>
-        <td id='date'><%-row.date-%></td>
-    </tr>
-    <tr>
-        <th>Time:</th>
-        <td id='time'><%-row.time-%></td>
-    </tr>
-    <tr>
-        <th>Green Fingers Score:</th>
-        <td><%-row.greenscore-%></td>
-    </tr>
-    <tr>
-        <th>Plant Width:</th>
-        <td><%-row.width-%> mm</td>
-    </tr>
-    <tr>
-        <th>Plant Height:</th>
-        <td><%-row.height-%> mm </td>
-    </tr>
-    <tr>
-        <th>Plant Colour Composition:</th>
-        <td><font color=' <%-row.colour-%> '> &#x2587 </font> red:<%-row.red-%>, green: <%- row.green -%>, blue:<%-row.blue-%></td>
-    </tr>
-</table>
+    <head>
+        <title>LiveData</title>
+    </head>
+    <body>
 
-<h3>Environment Variables</h3>
-<table id='data-environment'>
-    <tr>
-        <th>Lighting Lux Level:</th>
-        <td> <%-row.lightluxlevel-%> lux</td>
-    </tr>
-    <tr>
-        <th>Soil Moisture:</th>
-        <td> <%-row.soilmoisture-%> %</td>
-    </tr>
-    <tr>
-        <th>Relative Humidity:</th>
-        <td> <%-row.relhumidity-%> %</td>
-    </tr>
-    <tr>
-        <th>Ambient Temperature:</th>
-        <td> <%-row.temperature-%> C</td>
-    </tr>
-</table>
+        <h3>Green Fingers Score:<%-row.greenscore-%></h3>
+        <img width=100 src='/urbanfarming/img?f=1/'/>
+        <img width=100 src='/urbanfarming/pimg/'/>
 
+        <table id='data-plant'>
+            <tr>
+                <th>Plant Name:</th>
+                <td id="name">Minty MacMintface</td>
+            </tr>
+            <tr>
+                <th>Plant Species:</th>
+                <td id="species">Mint</td>
+            </tr>
+            <tr>
+                <th>Date:</th>
+                <td id='date'><%-row.date-%></td>
+            </tr>
+            <tr>
+                <th>Time:</th>
+                <td id='time'><%-row.time-%></td>
+            </tr>
+            <tr>
+                <th>Green Fingers Score:</th>
+                <td><%-row.greenscore-%></td>
+            </tr>
+            <tr>
+                <th>Plant Width:</th>
+                <td><%-row.width-%> mm</td>
+            </tr>
+            <tr>
+                <th>Plant Height:</th>
+                <td><%-row.height-%> mm </td>
+            </tr>
+            <tr>
+                <th>Plant Colour Composition:</th>
+                <td><font color=' <%-row.colour-%> '> &#x2587 </font> red:<%-row.red-%>, green: <%- row.green -%>, blue:<%-row.blue-%></td>
+            </tr>
+        </table>
+
+        <h3>Environment Variables</h3>
+        <table id='data-environment'>
+            <tr>
+                <th>Lighting Lux Level:</th>
+                <td> <%-row.lightluxlevel-%> lux</td>
+            </tr>
+            <tr>
+                <th>Soil Moisture:</th>
+                <td> <%-row.soilmoisture-%> %</td>
+            </tr>
+            <tr>
+                <th>Relative Humidity:</th>
+                <td> <%-row.relhumidity-%> %</td>
+            </tr>
+            <tr>
+                <th>Ambient Temperature:</th>
+                <td> <%-row.temperature-%> C</td>
+            </tr>
+        </table>
+
+        <!--jquery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script>
+var date1 = $("#date").html();
+var time1 = $("#time").html();
+var n = date1 +"T"+time1;
+var d = new Date(n);
+console.log(d);
+console.log(n);
+        </script>
+    </body>
+</html>
