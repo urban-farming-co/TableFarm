@@ -26,7 +26,65 @@
         <h2>Your Plant</h2>
         <h3>Table</h3>
         <div id="tableDiv">
-            {{content}}
+            <h3>Green Fingers Score:<%-row.greenscore-%></h3>
+            <img width=100 src='/urbanfarming/img?f=1/'/>
+            <img width=100 src='/urbanfarming/pimg/'/>
+
+            <table id='data-plant'>
+                <tr>
+                    <th>Plant Name:</th>
+                    <td id="name">Minty MacMintface</td>
+                </tr>
+                <tr>
+                    <th>Plant Species:</th>
+                    <td id="species">Mint</td>
+                </tr>
+                <tr>
+                    <th>Date:</th>
+                    <td id='date'></td>
+                </tr>
+                <tr>
+                    <th>Time:</th>
+                    <td id='time'></td>
+                </tr>
+                <tr>
+                    <th>Green Fingers Score:</th>
+                    <td id="green"></td>
+                </tr>
+                <tr>
+                    <th>Plant Width:</th>
+                    <td id="width"></td>
+                </tr>
+                <tr>
+                    <th>Plant Height:</th>
+                    <td id="height"></td>
+                </tr>
+                <tr>
+                    <th>Plant Colour Composition:</th>
+                    <td id="colour">&#x2587</td>
+                </tr>
+            </table>
+
+            <h3>Environment Variables</h3>
+            <table id='data-environment'>
+                <tr>
+                    <th>Lighting Lux Level:</th>
+                    <td id="light"> </td>
+                </tr>
+                <tr>
+                    <th>Soil Moisture:</th>
+                    <td id="soil"> </td>
+                </tr>
+                <tr>
+                    <th>Relative Humidity:</th>
+                    <td id="humidity"> </td>
+                </tr>
+                <tr>
+                    <th>Ambient Temperature:</th>
+                    <td id="temp"> </td>
+                </tr>
+            </table>
+
         </div>
         </div>
         <h3>Chart</h3>
@@ -37,7 +95,7 @@
         <script>
 
 
-function getTable(deviceID, name){
+function getTable(deviceID, name, species){
 
     var data ={
     }
@@ -45,15 +103,29 @@ function getTable(deviceID, name){
     var headers = {"Content-Type": "application/json"};
     $.ajax({
         type: "GET",
-        url: "../livedata?d="+deviceID,
+        url: "../api/getUserPlantDetails?u="+deviceID,
         data: JSON.stringify( data),
         complete: function(data, status){
 
-            $("#tableDiv").html(data.responseText);
-            console.log(name);
-            $("#tableDiv #name").html(name);
-            
-        },
+
+            var userData = JSON.parse(data.responseText);
+            console.log(userData);
+            var date1 = new Date(userData.time);
+            $("#name").text(name);
+            $("#species").text(species);
+            $("#width").text(userData.width);
+            $("#height").text(userData.height);
+            $("#temp").text(userData.temperature);
+            $("#time").text(date1.toLocaleTimeString());
+            $("#date").text(date1.toLocaleDateString());
+            $("#green").text(userData.greenscore);
+            $("#colour").css("color", userData.colour);
+
+
+            $("#light").text(userData.lightluxlevel);
+            $("#soil").text(userData.soilmoisture);
+            $("#humidity").text(userData.relhumidity);
+    },
         error: function(err, dko){
             console.error(err);
             alert("something went wrong\n" + err);
@@ -98,7 +170,7 @@ $(document).ready(function(){
             $("#displayName").html(displayName);
             console.log(info);
 
-            getTable(info.UserData.deviceID.Value , info.UserData.plantName.Value );
+            getTable(info.UserData.deviceID.Value , info.UserData.plantName.Value, info.UserData.plantSpecies.Value );
             getChart(info.UserData.deviceID.Value);
         }
     })
