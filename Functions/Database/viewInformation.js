@@ -271,7 +271,7 @@ function getLast1Row(u,database, callback)  {
                     else{
                         console.log(ids);
                         mostRecentImageID = ids.shift(); // the list is sorted, this will be the top entry.
-                        var sql2 =`SELECT compactness, width, height, colour FROM ${database.processedData}  WHERE id=${mostRecentImageID}` ;
+                        var sql2 =`SELECT compactness, greenscore, width, height, colour FROM ${database.processedData}  WHERE id=${mostRecentImageID}` ;
                         var content = {
                             id:             result.rows[0].id,
                             time:           result.rows[0].time, 
@@ -293,6 +293,7 @@ function getLast1Row(u,database, callback)  {
                                     content["width"] = result2.rows[0].width;
                                     content["height"] = result2.rows[0].height;
                                     content["colour"] = result2.rows[0].colour;
+                                    content["greenscore"] = result2.rows[0].greenscore;
 
                                 }
                                 callback(null, content );
