@@ -15,8 +15,8 @@ $("#submitReg").click(function(){
         $("#username")[0].checkValidity() && 
         $("#password")[0].checkValidity();
     if (!isValid){
-        alert("Something is wrong! \nPlease check that you've entered the correct data.")
-            return;
+        alert("Something is wrong! \nPlease check that you've entered the correct data.");
+        return;
     }
 
     var email = $("#email").val();
