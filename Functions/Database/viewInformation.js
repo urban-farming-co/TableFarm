@@ -155,14 +155,13 @@ function generateDeviceChartData(database, device, callback){
         "MIN(time) as time, " +
         "AVG(lightluxlevel) as lightluxlevel, "+
         "AVG(soilmoisture) as soilmoisture, "+
-        " AVG(height) as height, " +
-        " min(time) as time " +
-        " FROM " + database.liveData + " LEFT JOIN " + database.processedData + " ON " + database.processed+".id = " + database.table + ".id" +
-        " WHERE time > CURRENT_DATE -30 "+
+        " AVG(height) as height " +
+        " FROM " + database.liveData + " LEFT JOIN " + database.processedData + " ON (" + database.processed+".id = " + database.table + ".id )" +
+        " WHERE time > (CURRENT_DATE -30) "+
 
         " AND "+  database.table +".deviceid = " + device+
-        " ORDER BY id desc " + 
-        " GROUP BY time::DATE ";
+        " GROUP BY time::DATE "+
+        " ORDER BY time DESC" ; 
     database.askDatabase(sql1, (err, results)=>{
         if (err){
             console.log(err);
