@@ -9,74 +9,31 @@
         <script async type="text/javascript" src="../scripts/playfab.js"> </script>
         <script src="https://download.playfab.com/PlayFabClientApi.js"></script>
         <% include header %>
+        <link rel="stylesheet" type="text/css" href="../styles/playfab.css"> 
     </head>
     <body>
 
         <style>
-:required{
-    color:red;
-    padding-right:10px;
-    border-style:solid;
-}
-:valid{
-    color:green;
-}
-:invalid{
-    color:red;
-}
-    #form{
-        padding-right:15%;
-    }
-    button:valid,
-    button:invalid{
-        color:black;
-    }
-    label, p{
-        float:right;
-        display:block;
-        text-align:right;
-    }
-    p{
-        font-size:0.5em;
-        width:100%;
-        margin:-10px;
-    }
-    .col-xs-8{
-        width:60%;
-    }
-    input, select{
-        float:left;
-    }
-    body{
-        margin: 1%;
-    }
-    #cress{
-        position:relative;
-        height:100px;
-        bottom: 0px;
-        left: 10px;
-        width:80vw;
-    }
         </style>
         <h1>Register!</h1>
 
         <div id="form">
             <div class="row">
-                <div class="col-xs-8">
+                <div class="col-xs-6">
 
-                    <label for="email">Your email</label>
+                    <label for="email">Email</label>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <input required pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?" type="text" id="email" accept="text" placeholder="somebody@example.com" title="please enter a valid email address."/>
                 </div>
 
             </div>
             <div class="row">
-                <div class="col-xs-8">
+                <div class="col-xs-6">
 
                     <label for="type">Are you </label>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <select  required  id="type">
                         <option invalid selected disabled value="">Please choose</option>
                         <option value="Adult">Over 18</option>
@@ -88,11 +45,11 @@
             </div>
             <div class="row">
 
-                <div class="col-xs-8">
+                <div class="col-xs-6">
                     <label for="displayname">Your Name</label>
                     <p>This will be your display name.</p>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <input type="text" id="displayname" accept="text" placeholder="Karen"/>
                 </div>
 
@@ -100,59 +57,69 @@
 
             <div class="row">
 
-                <div class="col-xs-8">
-                    <label  required for="username">Your username</label>
+                <div class="col-xs-6">
+                    <label  required for="username">Username</label>
                     <p>This will be the name you log in with.</p>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <input type="text" required id="username" accept="text" pattern=".{6,20}" title="The username must be between 6 and 20 characters." placeholder="Karen"/>
                 </div>
 
             </div>
             <div class="row">
-                <div class="col-xs-8">
-                    <label for="password">Enter a new password</label>
-                    <p>passwords must be between 6 and 100 characters </p>
+                <div class="col-xs-6">
+                    <label for="password">New password</label>
+                    <p>passwords must be between 6 and 100 characters <i>unmask</i> </p>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <input title="passwords must be between 6 and 100 characters" required pattern=".{6,}"  type="password"  required id="password" accept="text" placeholder=""/>
-                    <i>unmask</i>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <label for="passwordconf">Repeat password</label>
+                    <p>Re-enter the password  <i>unmask</i> </p>
+                </div>
+                <div class="col-xs-6">
+                    <input title="passwords must be between 6 and 100 characters" required pattern=".{6,}"  type="password"  required id="passwordconf" accept="text" placeholder=""/>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-8">
-                    <label for="deviceid">Please enter your tablefarm device id</label>
+                <div class="col-xs-6">
+                    <label for="deviceid"> TableFARM device ID</label>
+                    <p>This will be on the side of your box</p>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <input type="integer" id="deviceid" accept="text" placeholder="1"/>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-8">
-                    <label for="plantspecies">Please enter your plant species</label>
+                <div class="col-xs-6">
+                    <label for="plantspecies">Plant species</label>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <input type="text" id="plantspecies" accept="text" placeholder="Mint"  />
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-xs-8">
-                    <label for="plantname">Please enter your plant name</label>
+                <div class="col-xs-6">
+                    <label for="plantname"> Plant name</label>
+                    <p>Be creative!</p>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <input type="text" id="plantname" accept="text" placeholder="Minty MacMintface" />
                 </div>
             </div>
 
             <br/>
             <div class="row">
-                <div class="col-xs-8">
+                <div class="col-xs-6">
                     <a href="../login">Already have an account? </a>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-6">
                     <button id="submitReg">Connect with nature</button>
                 </div>
             </div>
@@ -162,12 +129,31 @@
         <script>
 function a(){
     $("#password")[0].type = "text";
+    $("#passwordconf")[0].type = "text";
 }
 function b(){
     $("#password")[0].type = "password";
+    $("#passwordconf")[0].type = "password";
 }
 $("i").hover(a, b);
 $("#logo").width(100);
+
+
+function equalPasswords(){
+    p = $("#password").val();
+    c = $("#passwordconf").val();
+    console.log(p);
+    console.log(c);
+
+    if (p === c){
+        $("#passwordconf").css("color", "green");
+        return true;
+    }
+    $("#passwordconf").css("color", "red");
+    alert("please check the passwords - it seems they aren't the same.");
+    return false;
+}
+$("#passwordconf").change(equalPasswords);
         </script>
     </body>
 </html>

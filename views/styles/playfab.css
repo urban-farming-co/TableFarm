@@ -1,0 +1,44 @@
+
+:required{
+    color:red;
+    padding-right:10px;
+    border-style:solid;
+}
+:valid{
+    color:green;
+}
+:invalid{
+    color:red;
+}
+    #form{
+        padding-right:15%;
+    }
+    button:valid,
+    button:invalid{
+        color:black;
+    }
+    label, p{
+        float:right;
+        display:block;
+        text-align:right;
+    }
+    p{
+        font-size:0.5em;
+        width:100%;
+        margin:-10px;
+    }
+    .col-xs-6{
+        width:50%;
+    }
+    input, select{
+        float:left;
+    }
+    body{
+        margin: 1%;
+        overflow-y:hidden;
+    }
+    #cress{
+        position:relative;
+        bottom: 0px;
+        width:80vw;
+    }
