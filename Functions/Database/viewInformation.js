@@ -4,6 +4,7 @@ module.exports = {
     getHome,
     generateChartData,
     generatePlantChartData,
+    generateDeviceChartData,
     getImageIDs
 }
 
@@ -144,6 +145,71 @@ function afterAndBefore(after, before){
     }
     t = "chart";
     return [e, d, t];
+}
+
+function generateDeviceChartData(database, device, callback){
+    sql1 = "SELECT AVG(greenscore) as greenscore, "+
+        " AVG(width) as width, " + 
+        "AVG(temperature) as temperature, "  + 
+        "AVG(relhumidity) as relhumidity, " +
+        "MIN(time) as time, " +
+        "AVG(lightluxlevel) as lightluxlevel, "+
+        "AVG(soilmoisture) as soilmoisture, "+
+        " AVG(height) as height, " +
+        " min(time) as time " +
+        " FROM " + database.liveData + " LEFT JOIN " + database.processedData + " ON " + database.processed+".id = " + database.table + ".id" +
+        " WHERE time > CURRENT_DATE -30 "+
+
+        " AND "+  database.table +".deviceid = " + device+
+        " ORDER BY id desc " + 
+        " GROUP BY time::DATE ";
+    database.askDatabase(sql1, (err, results)=>{
+        if (err){
+            console.log(err);
+            callback(err);
+        }
+        else{
+            temp = [];
+            soil = [];
+            humi = [];
+            luxl = [];
+            width = [];
+            height = [];
+            green = [];
+            labelData = [];
+            console.log(results);
+            for (var n =0; n<results.rowCount; n++ ){
+                labelData.push(formatLabel(results.rows[n], n));
+                t = parseInt(results.rows[n].temperature);
+                h = parseInt(results.rows[n].relhumidity);
+                l = parseInt(results.rows[n].lightluxlevel);
+                s = parseInt(results.rows[n].soilmoisture);
+                g = parseInt(results.rows[n].greenscore);
+                w = parseInt(results.rows[n].width);
+                h1 = parseInt(results.rows[n].height);
+
+                temp.push(t || 0);
+                humi.push(h || 0);
+                luxl.push(l || 0);
+                soil.push(s || 0);
+                width.push(w || 0);
+                green.push(g || 0);
+                height.push(h1 || 0);
+            }
+            var contents = {
+                title : "You're chart",
+                height: height,
+                width : width,
+                score : green,
+                temp : temp,
+                humi : humi,
+                soil : soil,
+                labels: JSON.stringify(labelData),
+                luxl : luxl
+            }
+            callback(null, contents);
+        }
+    })
 }
 
 function generateChartData(database, after, before, callback){

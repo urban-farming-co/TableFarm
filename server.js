@@ -1,4 +1,5 @@
 console.error('Starting');
+var request = require('request');
 var path    = require ('path');
 var cons    = require('consolidate');
 var formidable = require('formidable');
@@ -332,10 +333,10 @@ app.get('/urbanfarming/viewcontent', (request, response) => {
             response.write(err);
         }
         else {
-        console.log("The variable u is:");
-        console.log(u);
-        console.log("The variable x is:");
-        console.log(x);
+            console.log("The variable u is:");
+            console.log(u);
+            console.log("The variable x is:");
+            console.log(x);
             response.writeHead(200, {
                 'Content-Type'  : 'text/html', 
                 'Content-Length': Buffer.byteLength(content)});
@@ -345,7 +346,7 @@ app.get('/urbanfarming/viewcontent', (request, response) => {
 })
 
 app.get('/urbanfarming/api/getUserPlantDetails', (req, res) =>{
-    
+
     var u = req.query.u;
 
     if (u && u.substr(-1) == '/'){
@@ -362,12 +363,12 @@ app.get('/urbanfarming/api/getUserPlantDetails', (req, res) =>{
             res.end();
         }
         else {
-        console.log("The variable u is:");
-        console.log(u);
-        console.log("The variable x is:");
-        console.log(1);
-        res.setHeader("Content-Type", "application/json");
-        res.send(JSON.stringify(content));
+            console.log("The variable u is:");
+            console.log(u);
+            console.log("The variable x is:");
+            console.log(1);
+            res.setHeader("Content-Type", "application/json");
+            res.send(JSON.stringify(content));
         }
     })
 })
@@ -417,9 +418,22 @@ app.get('/urbanfarming/plantchart', (req, res) => {
 })
 app.get('/urbanfarming/chart', (req, res) => {
     console.log("get");
-    tableStuff.generateChartData(database,null, null, (err, dict) => {
-        res.render("chart", dict);
-    })
+    var d = req.query.d;
+    if (d && d.substr(-1) == '/'){
+        d = d.substr(0, d.length -1);
+        parseInt(d);
+        console.log(d);
+    }
+    if (!d) {
+        tableStuff.generateChartData(database, null, null,(err, dict) => {
+            res.render("chart", dict);
+        })
+    }
+    else{
+        tableStuff.generateDeviceChartData(database, d,  (err, dict) => {
+            res.render("chartDevice", dict);
+        })
+    }
 })
 app.get('/urbanfarming/verifyemail', (req, res) => {
     res.render("pleaseVerify", {title: "Please check your email"});
@@ -430,6 +444,40 @@ app.get('/urbanfarming/verified', (req, res) => {
 
 app.get('/urbanfarming/twoimages', (req, res) => {
     res.render("twoImages", {title: "two images"});
+})
+
+
+app.get('/urbanfarming/getName', (req, reso)=>{
+    var serverurl =  "https:\/\/DF78.playfabapi.com\/server\/"; 
+    var getTitleAPI = serverurl + "gettitledata";
+    var secretKey = "7EKB53HCE5XACZD644IFFIUU4RP1QRP3YMOFDP5Z593BCH8544";
+    console.log(getTitleAPI);
+    var headers = {
+        "Content-Type": "application/json",
+        "X-SecretKey" : secretKey    
+    };
+    options = {
+        headers: headers,
+        url: getTitleAPI,
+        method: "POST"
+    }
+    request(options, (err, res, body)=>{
+       console.log(res.statusMessage);
+       console.log(res.statusCode);
+       body = JSON.parse(body);
+       console.log(body);
+        console.log(err);
+        if (!err & res.statusCode ==200){
+            content = {};
+            content["name"] = body.data.Data.plantName;
+            content["species"] = body.data.Data.plantSpecies;
+            reso.send(content);
+        }
+        else{
+            reso.send('{name:"Minty", species:"mint"}');
+        }
+        reso.end();
+    })
 })
 
 app.get('/urbanfarming/login', (req, res) => {

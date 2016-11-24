@@ -5,7 +5,19 @@ var url =  "https://DF78.playfabapi.com/Client/";
 var regAPI = url + "RegisterPlayFabUser";
 var updAPI = url + "UpdateUserData";
 var logAPI = url + "LoginWithPlayFab";
-var getAPI = url + "GetPlayerCombinedInfo";
+var getapi = url + "getplayercombinedinfo";
+var serverurl =  "https://DF78.playfabapi.com/server/"; 
+var getTitleAPI = serverurl + "gettitledata";
+
+/*
+ *
+ *POST https://{{TitleID}}.playfabapi.com/Client/SendAccountRecoveryEmail
+ Content-Type: application/json
+ {
+ "Email": "Me@here.com",
+ "TitleId": "1000"
+ }
+ */ 
 
 
 
@@ -214,6 +226,46 @@ function getUserInfo(callback){
         },
         headers: headers,
         dataType:  "json"
+    });
+
+}
+function  getTitleData(callback){
+    var data ={
+    }
+
+    var headers = {
+        "Content-Type": "application/json",
+        "X-SecretKey" : secretKey    
+    };
+    $.ajax({
+        type: "GET",
+        //url: getTitleAPI, 
+        headers: headers,
+        dataType:  "json",
+        url:"getName",
+        complete: function(data, status){
+            console.log(data);
+            callback(null, JSON.parse(data.responseText));
+        },
+        error: function(err, dko){
+            console.error(err);
+
+            $.ajax({
+                type: "GET",
+                headers: headers,
+                dataType:  "json",
+                    //url: getTitleAPI, 
+                    url:"../getName",
+                    complete: function(data, status){
+                        console.log(data);
+                        callback(null, JSON.parse(data.responseText));
+                    },
+                    error: function(err, dko){
+                        console.error(err);
+                        callback(err, {name:"Minty", species:"mint"});
+                    }
+            });
+        }
     });
 
 }

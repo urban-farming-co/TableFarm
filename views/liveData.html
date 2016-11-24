@@ -2,9 +2,20 @@
 
     <head>
         <title>LiveData</title>
+
+
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script async type="text/javascript" src="../scripts/playfab.js"> </script>
+        <script src="https://download.playfab.com/PlayFabClientApi.js"></script>
+
+
+        <!--playfab-->
+        <script src="../scripts/playfab.js"> </script>
+        <!--jquery -->
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     </head>
     <body>
-
         <h3>Green Fingers Score:<%-row.greenscore-%></h3>
         <img width=100 src='/urbanfarming/img?f=1/'/>
         <img width=100 src='/urbanfarming/pimg/'/>
@@ -64,8 +75,14 @@
             </tr>
         </table>
 
-        <!--jquery -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+     <script>
+getTitleData(function(err, data){
+    console.log(data);
+    $("#name").text(data.name);
+    $("#species").text(data.species);
+})
+
+     </script>
         <script>
 var date1 = $("#date").html();
 var time1 = $("#time").html();
@@ -74,5 +91,6 @@ var d = new Date(n);
 console.log(d);
 console.log(n);
         </script>
+
     </body>
 </html>

@@ -9,6 +9,8 @@
         <script src="https://download.playfab.com/PlayFabClientApi.js"></script>
         <!-- my playfab script -->
         <script type="text/javascript" src="../scripts/playfab.js"> 
+        <!-- my chart.js code -->
+        <script src="../scripts/chart.js">   </script>
         </script>
         <% include header %>
     </head>
@@ -26,7 +28,7 @@
         <h2>Your Plant</h2>
         <h3>Table</h3>
         <div id="tableDiv">
-            <h3>Green Fingers Score:<%-row.greenscore-%></h3>
+            <h3>Green Fingers Score:</h3>
             <img width=100 src='/urbanfarming/img?f=1/'/>
             <img width=100 src='/urbanfarming/pimg/'/>
 
@@ -145,6 +147,7 @@ function getChart(deviceID){
         data: JSON.stringify( data),
         complete: function(data, status){
 
+            console.log(data.responseText);
             $("#chartDiv").html(data.responseText);
         },
         error: function(err, dko){
