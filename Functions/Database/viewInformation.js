@@ -291,18 +291,19 @@ function formatTime(t, o ){
     time = `${hh}:${mm}`;
     return time;
 }
-function addRow(content, row) {
-    content +="<tr> "+
-        "<td><img src='http://tablefarm.co.uk/urbanfarming/img?x=" + row.id.toString() + "' /></td>"+ 
-        "<td id='date' >" +formatDate(row.time)+ "</td>"+
-        "<td>" + formatTime(row.time) +"</td>"+
-        "<td>" +row.lightluxlevel+" lux</td>"+
-        "<td>" +row.soilmoisture+"%</td>"+
-        "<td>" +row.relhumidity+"%</td>"+
-        "<td>" +row.temperature+"C</td>"+
-        "<td bgcolor= "+row.colour+"></td>"+
-        "</tr>";
-    return content;
+function addRow(row) {
+    c ={ 
+        id : row.id.toString(),
+        date: formatDate(row.time),
+        time: formatTime(row.time),
+        lightluxlevel: row.lightluxlevelux,
+        soilmoisture: row.soilmoisture,
+        relhumidity: row.relhumidity,
+        temperature: row.temperature,
+        colour: row.colour
+    }
+    console.log(c);
+    return c;
 }
 
 function getLast1Row(u,database, callback)  {
@@ -371,14 +372,11 @@ function getLast1Row(u,database, callback)  {
     })
 };
 function getLastXRows(x,database, callback)  {
-    var content = "<table id='view'>" +
-        "<tr>" +
-        "<th>Image</th>"+  "<th>date</th>"+ "<th>time</th>"+ "<th>PlantName</th>"+ "<th>light lux level</th>"+ "<th>soilMoisture</th>"+ "<th>relative Humidity</th>"+ "<th>temperature</th>"+ "<th>Colour</th>" +
-        "</tr>";
     var sql="SELECT "+database.table + ".id, time, lightluxlevel, soilMoisture, relHumidity, temperature, "+
         database.processed+ ".colour "+
         " FROM "+ database.liveData + ", " + database.processedData +
         " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;
+    var content= [];
     database.askDatabase(sql, function(err, result) {
         if (err) {
             console.error(err);
@@ -388,9 +386,9 @@ function getLastXRows(x,database, callback)  {
             console.log(result);
             var N = result.rows.length;
             for (var n =0; n <N; n++){
-                content = addRow(content, result.rows[n]) ;
+                t = addRow(result.rows[n]);
+                content.push(t);
             }
-            content += "</table>" ;
             callback(null, content);
         }
     })
