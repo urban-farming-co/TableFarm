@@ -337,10 +337,8 @@ app.get('/urbanfarming/viewcontent', (request, response) => {
             console.log(u);
             console.log("The variable x is:");
             console.log(x);
-            response.writeHead(200, {
-                'Content-Type'  : 'text/html', 
-                'Content-Length': Buffer.byteLength(content)});
-            response.write(content);
+            console.log(content.toString());
+            response.render("view", {roows:content});
         }
     })
 })
@@ -373,13 +371,6 @@ app.get('/urbanfarming/api/getUserPlantDetails', (req, res) =>{
     })
 })
 
-app.get('/urbanfarming/view', (request, response) => {
-    response.sendFile(__dirname + "/views/view.html", () =>{
-        console.log("sent");
-        response.end();
-
-    });
-})
 app.get('/urbanfarming/liveData',(req, res)=>{
     var o =  req.query.o;
     if (o && o.substr(-1) == '/'){
