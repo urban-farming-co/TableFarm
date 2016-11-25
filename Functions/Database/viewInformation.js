@@ -5,10 +5,28 @@ module.exports = {
     generateChartData,
     generatePlantChartData,
     generateDeviceChartData,
+    remove,
     getImageIDs
 }
 
+function remove(database, x, callback){
+    sql1 = "UPDATE " + database.liveData + 
+        " SET image = NULL WHERE id = " + x;
+    sql2 = "DELETE FROM " + database.processedData +
+        " WHERE id = " + x;
+    database.askDatabase(sql1, (err, result1) =>{
+        if (err){
+            callback(err);
+        }
+        database.askDatabase(sql2, (err, result2) =>{
+            if(err){
+                callback(err);
+            }
+            callback(null);
+        })
+    })
 
+}
 function getDeviceImageIDs(database, deviceID, callback){
     sql = "SELECT id FROM " + database.liveData + " WHERE IMAGE IS NOT NULL AND deviceid = " +deviceID +" ORDER BY id DESC";
     database.askDatabase(sql, (err, result) => {

@@ -6,6 +6,8 @@
         <meta http-equiv=Content-Type content=text/html;charset=utf-8>
         <link rel=stylesheet href=../public/index.css />
         <link rel=shortcut icon type=image/x-icon href='../public/files/flower.ico' />
+        <!-- JQUERY -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     </head>
     <body>
 
@@ -30,9 +32,22 @@ width:100px;
                 <td> <%- roows[i].relhumidity %>%     </td>
                 <td> <%- roows[i].temperature %> C    </td>
                 <td bgcolor= <%- roows[i].colour %>>   </td>
-                <td> <button>Delete</button>  </td>
+                <td> <button class="delete" id=<%- roows[i].id%> >Delete</button>  </td>
             </tr>
             <% } %>
+            <script>
+$(".delete").click(function (){
+    pass = prompt("please enter the secret delete images key");
+    var id = $(this).attr("id");
+var url = "../remove?x="+id.toString()+"&y="+pass;
+console.log(url);
+    var jqxhr = $.getJSON(url ,function(data){
+        console.log(data);
+        status = data.Status;
+        alert("done. \n" + status);
+    });
 
+})
+            </script>
     </body>
 </html>

@@ -453,10 +453,10 @@ app.get('/urbanfarming/getName', (req, reso)=>{
         method: "POST"
     }
     request(options, (err, res, body)=>{
-       console.log(res.statusMessage);
-       console.log(res.statusCode);
-       body = JSON.parse(body);
-       console.log(body);
+        console.log(res.statusMessage);
+        console.log(res.statusCode);
+        body = JSON.parse(body);
+        console.log(body);
         console.log(err);
         if (!err & res.statusCode ==200){
             content = {};
@@ -497,7 +497,49 @@ app.get('/urbanfarming/userHome', (req, res) => {
     })
 })
 
+app.get('/urbanfarming/remove', (req, res)=> {
+    var x = req.query.x;
+    var y = req.query.y;
+    if (x && x.substr(-1) == '/'){
+        x = x.substr(0, x.length -1);
+        parseInt(x);
+        console.log(x);
+    }
+    if (!x) {
+        res.send({Status : "You haven't specified an id"});
+        res.end();
+        return;
+    }
 
+    if (y && y.substr(-1) == '/'){
+        y = y.substr(0, y.length -1);
+        console.log(y);
+    }
+    if (!y) {
+        res.send({Status: "You haven't specified the pass code"});
+        res.end();
+        return;
+    }
+
+    if(y == "000"){
+        tableStuff.remove(database, x, (e) =>{
+            if (e){
+                res.send({Status: "Something went wrong."});
+            }
+            else{
+                res.send({Status: "deleted " + x});
+            }
+            res.end();
+            return;
+        })
+    }
+    else{
+        res.send({Status: "wrong pass code"});
+        res.end();
+        return;
+    }
+
+})
 app.use('', (err, req, res, next) =>{
     res.render('404', {title: "500", status:err.status || 500, url:err});
 });
