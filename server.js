@@ -425,8 +425,8 @@ app.get('/urbanfarming/chart', (req, res) => {
         console.log(d);
     }
     if (!d) {
-        tableStuff.generateChartData(database, null, null,(err, dict) => {
-            res.render("chart", dict);
+        tableStuff.generateDeviceChartData(database, 1, (err, dict) => {
+            res.render("chartDevice", dict);
         })
     }
     else{

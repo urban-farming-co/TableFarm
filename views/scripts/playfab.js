@@ -5,7 +5,7 @@ var url =  "https://DF78.playfabapi.com/Client/";
 var regAPI = url + "RegisterPlayFabUser";
 var updAPI = url + "UpdateUserData";
 var logAPI = url + "LoginWithPlayFab";
-var getapi = url + "getplayercombinedinfo";
+var getAPI = url + "getplayercombinedinfo";
 var serverurl =  "https://DF78.playfabapi.com/server/"; 
 var getTitleAPI = serverurl + "gettitledata";
 
