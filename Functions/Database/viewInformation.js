@@ -314,7 +314,8 @@ function addRow(row) {
         id : row.id.toString(),
         date: formatDate(row.time),
         time: formatTime(row.time),
-        lightluxlevel: row.lightluxlevelux,
+        lightluxlevel: row.lightluxlevel,
+        greenscore : row.greenscore,
         soilmoisture: row.soilmoisture,
         relhumidity: row.relhumidity,
         temperature: row.temperature,
@@ -390,7 +391,7 @@ function getLast1Row(u,database, callback)  {
     })
 };
 function getLastXRows(x,database, callback)  {
-    var sql="SELECT "+database.table + ".id, time, lightluxlevel, soilMoisture, relHumidity, temperature, "+
+    var sql="SELECT "+database.table + ".id, time, greenscore, lightluxlevel, soilMoisture, relHumidity, temperature, "+
         database.processed+ ".colour "+
         " FROM "+ database.liveData + ", " + database.processedData +
         " Where "+ database.table + ".id  = " + database.processed +".id ORDER BY id DESC LIMIT " + x;

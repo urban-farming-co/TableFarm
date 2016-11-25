@@ -11,23 +11,24 @@
     </head>
     <body>
 
-<style>
+        <style>
 img{
-width:100px;
+    width:100px;
 }
-</style>
+        </style>
 
         <table id='view'>
             <tr>
                 <th>Image</th>  <th>date</th> <th>time</th> <th>light lux level</th><th>Green score</th> <th>soilMoisture</th> <th>relative Humidity</th> <th>temperature</th> <th>Colour</th> <th> delete </th>
             </tr>
             <% for(var i=0; i < roows.length; i++) { %>
-            
+
             <tr> 
                 <td><img src='../img?x=<%- roows[i].id %>' /></td> 
                 <td id='date' > <%- roows[i].date %>  </td>
                 <td> <%- roows[i].time %>             </td>
                 <td> <%- roows[i].lightluxlevel %> lux</td>
+                <td> <%- roows[i].greenscore %></td>
                 <td> <%- roows[i].soilmoisture %>%    </td>
                 <td> <%- roows[i].relhumidity %>%     </td>
                 <td> <%- roows[i].temperature %> C    </td>
@@ -39,8 +40,8 @@ width:100px;
 $(".delete").click(function (){
     pass = prompt("please enter the secret delete images key");
     var id = $(this).attr("id");
-var url = "../remove?x="+id.toString()+"&y="+pass;
-console.log(url);
+    var url = "../remove?x="+id.toString()+"&y="+pass;
+    console.log(url);
     var jqxhr = $.getJSON(url ,function(data){
         console.log(data);
         status = data.Status;
