@@ -19,7 +19,8 @@
     "mocha": "^3.0.2",
     "passport": "^0.3.2",
     "pg": "^6.1.0",
-    "re": "^0.1.4"
+    "re": "^0.1.4",
+    "request": "^2.79.0"
   },
   "devDependencies": {},
   "scripts": {
